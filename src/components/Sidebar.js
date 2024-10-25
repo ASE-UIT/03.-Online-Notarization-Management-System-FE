@@ -9,7 +9,6 @@ import YesNoModal from './modals/YesNoModal';
 import { sidebarItems } from '../utils/fakeData';
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import SidebarItem from './static/SidebarItem';
-
 const MENUS = {
   LOGOUT: 'logout',
   PROFILE: 'profile',
@@ -24,6 +23,8 @@ const Sidebar = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.user);
+
 
   const handleLogout = async () => {
     try {
@@ -52,7 +53,7 @@ const Sidebar = () => {
     if (currentMenu) {
       setSelectedMenu(currentMenu.type);
     }
-  }, [location]);
+  }, [location, userInfo]);
 
   const drawerWidth = openSideBar ? '18rem' : '5rem';
   const drawerTransition = '0.2s ease';
@@ -121,7 +122,7 @@ const Sidebar = () => {
           <SidebarItem
             icon={<AccountCircleRoundedIcon />}
             type={MENUS.PROFILE}
-            title={userInfo?.name || 'Stranger'}
+            title={user?.name || 'Stranger'}
             selectedMenu={selectedMenu}
             openSideBar={openSideBar}
             onClick={() => handleSelectMenu({ type: MENUS.PROFILE, href: '/profile' })}
