@@ -6,8 +6,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { userLogout } from '../stores/actions/authAction';
 import YesNoModal from './modals/YesNoModal';
-import { sidebarItems } from '../utils/fakeData';
-import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
+import {
+  AddCircleOutline,
+  DocumentScanner,
+  Groups2Rounded,
+  Settings,
+  GridViewRounded,
+  SupervisorAccountRounded,
+  AccountCircleRounded,
+  HailRounded,
+  WorkHistoryRounded,
+} from '@mui/icons-material';
 import SidebarItem from './static/SidebarItem';
 const MENUS = {
   LOGOUT: 'logout',
@@ -22,9 +31,8 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo, role } = useSelector((state) => state.auth);
   const { user } = useSelector((state) => state.user);
-
 
   const handleLogout = async () => {
     try {
@@ -36,24 +44,80 @@ const Sidebar = () => {
   };
 
   const handleSelectMenu = (menu) => {
-    switch (menu.type) {
-      case MENUS.LOGOUT:
-        setOpenLogoutModal(true);
-        break;
-
-      default:
-        setSelectedMenu(menu.type);
-        navigate(menu.href);
-        break;
+    if (menu.type === MENUS.LOGOUT) {
+      setOpenLogoutModal(true);
+    } else {
+      setSelectedMenu(menu.type);
+      navigate(menu.href);
     }
   };
 
+  const renderSidebarItems = () => {
+    const items = [];
+
+    if (role === 'user') {
+      items.push(
+        {
+          type: 'create-notarization-profile',
+          icon: <AddCircleOutline />,
+          title: 'Tạo hồ sơ công chứng',
+          href: '/user/create-notarization-profile',
+        },
+        { type: 'history', icon: <DocumentScanner />, title: 'Lịch sử', href: '/user/history' },
+        {
+          type: 'create-notarization-session',
+          icon: <Groups2Rounded />,
+          title: 'Tạo phiên công chứng',
+          href: '/user/create-notarization-session',
+        },
+        { type: 'settings', icon: <Settings />, title: 'Cài đặt', href: '/user/settings' },
+      );
+    } else if (role === 'admin') {
+      items.push(
+        {
+          type: 'dashboard',
+          icon: <GridViewRounded />,
+          title: 'Dashboard',
+          href: '/admin/dashboard',
+        },
+        {
+          type: 'employee-management',
+          icon: <HailRounded />,
+          title: 'Quản lý nhân viên',
+          href: '/admin/employee-management',
+        },
+        {
+          type: 'user-management',
+          icon: <SupervisorAccountRounded />,
+          title: 'Quản lý người dùng',
+          href: '/admin/user-management',
+        },
+        {
+          type: 'notary-management',
+          icon: <WorkHistoryRounded />,
+          title: 'Quản lý công chứng',
+          href: '/admin/notary-management',
+        },
+        {
+          type: 'notary-session-management',
+          icon: <Groups2Rounded />,
+          title: 'Quản lý phiên công chứng',
+          href: '/admin/notary-session-management',
+        },
+      );
+    } else if (role === 'secretary') {
+    } else if (role === 'notary') {
+    }
+
+    return items;
+  };
+
   useEffect(() => {
-    const currentMenu = sidebarItems.find((item) => item.href === location.pathname);
+    const currentMenu = renderSidebarItems().find((item) => item.href === location.pathname);
     if (currentMenu) {
       setSelectedMenu(currentMenu.type);
     }
-  }, [location, userInfo]);
+  }, [location, renderSidebarItems]);
 
   const drawerWidth = openSideBar ? '18rem' : '5rem';
   const drawerTransition = '0.2s ease';
@@ -92,15 +156,15 @@ const Sidebar = () => {
 
         <Box flex={1}>
           <List>
-            {sidebarItems.map((screen, index) => (
+            {renderSidebarItems().map((item) => (
               <SidebarItem
-                key={index}
-                type={screen.type}
-                icon={screen.icon}
-                title={screen.title}
+                key={item.type}
+                type={item.type}
+                icon={item.icon}
+                title={item.title}
                 selectedMenu={selectedMenu}
                 openSideBar={openSideBar}
-                onClick={() => handleSelectMenu(screen)}
+                onClick={() => handleSelectMenu(item)}
               />
             ))}
           </List>
@@ -120,7 +184,7 @@ const Sidebar = () => {
           />
 
           <SidebarItem
-            icon={<AccountCircleRoundedIcon />}
+            icon={<AccountCircleRounded />}
             type={MENUS.PROFILE}
             title={user?.name || 'Stranger'}
             selectedMenu={selectedMenu}

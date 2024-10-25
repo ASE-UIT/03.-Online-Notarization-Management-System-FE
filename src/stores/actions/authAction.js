@@ -25,6 +25,7 @@ export const userLogout = createAsyncThunk('auth/logout', async (_, thunkAPI) =>
 
   try {
     await AuthService.logout(refreshToken);
+    thunkAPI.dispatch(setUser({ user: null }));
     return true;
   } catch (status) {
     return thunkAPI.rejectWithValue(status);
@@ -46,6 +47,8 @@ export const userGoogleLogin = createAsyncThunk('auth/google', async ({ userData
   }
 
   try {
+    thunkAPI.dispatch(setUser({ user: userData }));
+
     return {
       user: userData,
       userToken: userToken,

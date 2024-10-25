@@ -9,12 +9,12 @@ import Sidebar from './components/Sidebar';
 import { Box } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { ToastContainer } from 'react-toastify';
-import PrivateRoute from './routes/PrivateRoute';
 import UserService from './services/user.service';
 import TokenService from './services/token.service';
 import { userGoogleLogin } from './stores/actions/authAction';
-import AuthService from './services/auth.service';
 import Cookies from 'js-cookie';
+import PrivateRoute from './routes/PrivateRoute';
+import PublicRoute from './routes/PublicRoute';
 
 const Home = lazy(() => import('./pages/home/Home'));
 const Services = lazy(() => import('./pages/services/Services'));
@@ -27,6 +27,11 @@ const HistoryNotarizationProfile = lazy(() => import('./pages/services/HistoryNo
 const CreateNotarizationSession = lazy(() => import('./pages/services/CreateNotarizationSession'));
 const UserGuide = lazy(() => import('./pages/static/UserGuide'));
 const NotFound = lazy(() => import('./pages/notfound/NotFound'));
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const EmployeeManagement = lazy(() => import('./pages/admin/EmployeeManagement'));
+const UserManagement = lazy(() => import('./pages/admin/UserManagement'));
+const NotaryManagement = lazy(() => import('./pages/admin/NotaryManagement'));
+const NotarySessionManagement = lazy(() => import('./pages/admin/NotarySessionManagement'));
 
 function App() {
   const dispatch = useDispatch();
@@ -66,20 +71,99 @@ function App() {
           <Box flex={1}>
             {!isAuthenticated && <Header />}
             <Routes>
-              {/* Define routes directly here */}
-              <Route path="/" element={<Home />} />
-              <Route path="/services" element={<Services />} />
-              <Route path="/signin" element={<SignIn />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/profile" element={<PrivateRoute element={<UserProfile />} />} />
-              <Route path="/notarization" element={<PrivateRoute element={<CreateNotarizationProfile />} />} />
-              <Route path="/lookup" element={<LookupNotarizationProfile />} />
-              <Route path="/history" element={<PrivateRoute element={<HistoryNotarizationProfile />} />} />
+              {/* Public Routes */}
               <Route
-                path="/create-notarization-session"
-                element={<PrivateRoute element={<CreateNotarizationSession />} />}
+                path="/"
+                element={
+                  <PublicRoute>
+                    <Home />
+                  </PublicRoute>
+                }
               />
-              <Route path="/user-guide" element={<UserGuide />} />
+              <Route
+                path="/services"
+                element={
+                  <PublicRoute>
+                    <Services />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/lookup"
+                element={
+                  <PublicRoute>
+                    <LookupNotarizationProfile />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/user-guide"
+                element={
+                  <PublicRoute>
+                    <UserGuide />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/signin"
+                element={
+                  <PublicRoute>
+                    <SignIn />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/signup"
+                element={
+                  <PublicRoute>
+                    <SignUp />
+                  </PublicRoute>
+                }
+              />
+
+              {/* Auth Routes */}
+              <Route path="/signin" element={<PublicRoute element={<SignIn />} />} />
+              <Route path="/signup" element={<PublicRoute element={<SignUp />} />} />
+
+              {/* User Routes */}
+              <Route element={<PrivateRoute allowedRoles={['user']} />}>
+                <Route path="/user/create-notarization-profile" element={<CreateNotarizationProfile />} />
+                <Route path="/user/history" element={<HistoryNotarizationProfile />} />
+                <Route path="/user/create-notarization-session" element={<CreateNotarizationSession />} />
+              </Route>
+
+              {/* Admin Routes */}
+              <Route element={<PrivateRoute allowedRoles={['admin']} />}>
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                <Route path="/admin/employee-management" element={<EmployeeManagement />} />
+                <Route path="/admin/user-management" element={<UserManagement />} />
+                <Route path="/admin/notary-management" element={<NotaryManagement />} />
+                <Route path="/admin/notary-session-management" element={<NotarySessionManagement />} />
+              </Route>
+
+              {/* Secretary Routes */}
+              <Route element={<PrivateRoute allowedRoles={['secretary']} />}>
+                <Route path="/secretary/dashboard" element={<></>} />
+                <Route path="/secretary/employee-management" element={<></>} />
+                <Route path="/secretary/user-management" element={<></>} />
+                <Route path="/secretary/notary-management" element={<></>} />
+                <Route path="/secretary/notary-session-management" element={<></>} />
+              </Route>
+
+              {/* Notary Routes */}
+              <Route element={<PrivateRoute allowedRoles={['notary']} />}>
+                <Route path="/secretary/dashboard" element={<></>} />
+                <Route path="/secretary/employee-management" element={<></>} />
+                <Route path="/secretary/user-management" element={<></>} />
+                <Route path="/secretary/notary-management" element={<></>} />
+                <Route path="/secretary/notary-session-management" element={<></>} />
+              </Route>
+
+              {/* Profile Routes */}
+              <Route element={<PrivateRoute allowedRoles={['user', 'admin', 'secretary', 'notary']} />}>
+                <Route path="/profile" element={<UserProfile />} />
+              </Route>
+
               <Route path="*" element={<NotFound />} />
             </Routes>
             {!isAuthenticated && <Footer />}
