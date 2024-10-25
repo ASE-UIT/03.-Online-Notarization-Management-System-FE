@@ -10,6 +10,7 @@ const initialState = {
   userInfo,
   userToken,
   isAuthenticated: !!userToken,
+  role: userInfo?.role || '',
 };
 
 const authSlice = createSlice({
@@ -22,15 +23,18 @@ const authSlice = createSlice({
       state.userInfo = payload.user;
       state.userToken = payload.userToken;
       state.isAuthenticated = true;
+      state.role = payload.user.role;
     });
     builder.addCase(userLogin.rejected, (state, { payload }) => {
       state.isAuthenticated = false;
+      state.role = '';
     });
     builder.addCase(userLogout.pending, (state) => {});
     builder.addCase(userLogout.fulfilled, (state) => {
       state.userInfo = null;
       state.userToken = null;
       state.isAuthenticated = false;
+      state.role = '';
     });
     builder.addCase(userLogout.rejected, (state, { payload }) => {});
     builder.addCase(refreshAccessToken.pending, (state) => {});
@@ -46,6 +50,7 @@ const authSlice = createSlice({
         console.log('Refreshed token is invalid or expired');
         state.userToken = null;
         state.isAuthenticated = false;
+        state.role = '';
       }
     });
     builder.addCase(refreshAccessToken.rejected, (state, { payload }) => {});
@@ -54,9 +59,11 @@ const authSlice = createSlice({
       state.userInfo = payload.user;
       state.userToken = payload.userToken;
       state.isAuthenticated = true;
+      state.role = payload.user.role;
     });
     builder.addCase(userGoogleLogin.rejected, (state, { payload }) => {
       state.isAuthenticated = false;
+      state.role = '';
     });
   },
 });
