@@ -12,12 +12,18 @@ const NotaryDocumentDetailsModal = ({ open, handleClose, notarizationData }) => 
 
   const handleConfirm = async () => {
     try {
-      const formattedData = {
-        ...notarizationData,
-        notaryField: notarizationData.notaryField.name,
-        notaryService: notarizationData.notaryService.name,
-      };
-      const response = await NotarizationService.uploadNotarizationDocument(formattedData);
+      const formData = new FormData();
+      formData.append('notarizationService', JSON.stringify(notarizationData.notaryService));
+      formData.append('notarizationField', JSON.stringify(notarizationData.notaryField));
+      formData.append('requesterInfo', JSON.stringify(notarizationData.requesterInfo));
+
+      notarizationData.files.forEach((file) => {
+        if (file) {
+          formData.append('files', file);
+        }
+      });
+
+      const response = await NotarizationService.uploadNotarizationDocument(formData);
       return response;
     } catch (error) {
       console.log(error);
