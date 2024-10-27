@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Box, Divider, Drawer, IconButton, List, Typography } from '@mui/material';
 import { KeyboardDoubleArrowLeft, KeyboardDoubleArrowRight, Logout } from '@mui/icons-material';
 import { dark, primary, white, red } from '../config/theme/themePrimitives';
@@ -31,8 +31,8 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-  const { userInfo, role } = useSelector((state) => state.auth);
   const { user } = useSelector((state) => state.user);
+  const role = user?.role;
 
   const handleLogout = async () => {
     try {
@@ -52,7 +52,7 @@ const Sidebar = () => {
     }
   };
 
-  const renderSidebarItems = () => {
+  const renderSidebarItems = useCallback(() => {
     const items = [];
 
     if (role === 'user') {
@@ -110,7 +110,7 @@ const Sidebar = () => {
     }
 
     return items;
-  };
+  }, [role]);
 
   useEffect(() => {
     const currentMenu = renderSidebarItems().find((item) => item.href === location.pathname);

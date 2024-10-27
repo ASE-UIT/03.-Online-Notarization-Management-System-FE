@@ -9,7 +9,7 @@ export const userLogin = createAsyncThunk('auth/login', async ({ email, password
     thunkAPI.dispatch(setUser(response.user));
     return {
       user: response.user,
-      userToken: response.tokens.access.token,
+      accessToken: response.tokens.access.token,
     };
   } catch (status) {
     return thunkAPI.rejectWithValue(status);
@@ -29,31 +29,5 @@ export const userLogout = createAsyncThunk('auth/logout', async (_, thunkAPI) =>
     return true;
   } catch (status) {
     return thunkAPI.rejectWithValue(status);
-  }
-});
-
-export const refreshAccessToken = createAsyncThunk('auth/refresh', async (_, thunkAPI) => {
-  try {
-    const response = await AuthService.refreshAccessToken();
-    return { userToken: response.tokens.access.token };
-  } catch (status) {
-    return thunkAPI.rejectWithValue(status);
-  }
-});
-
-export const userGoogleLogin = createAsyncThunk('auth/google', async ({ userData, userToken }, thunkAPI) => {
-  if (!userData || !userToken) {
-    return thunkAPI.rejectWithValue('Invalid Google login data');
-  }
-
-  try {
-    thunkAPI.dispatch(setUser({ user: userData }));
-
-    return {
-      user: userData,
-      userToken: userToken,
-    };
-  } catch (error) {
-    return thunkAPI.rejectWithValue(error.message);
   }
 });

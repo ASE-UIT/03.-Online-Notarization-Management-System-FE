@@ -4,13 +4,10 @@ import { EditSharp } from '@mui/icons-material';
 import { black, gray, primary, white } from '../../config/theme/themePrimitives';
 import InfoField from './InfoField';
 import EditUserProfileModal from '../../components/modals/EditUserProfileModal';
-import { useDispatch, useSelector } from 'react-redux';
-import { setUser } from '../../stores/slices/userSlice';
+import { useSelector } from 'react-redux';
 
-const PersonalInformation = ({}) => {
+const PersonalInformation = () => {
   const [open, setOpen] = useState(false);
-  const { userInfo } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
 
   const [formData, setFormData] = useState({

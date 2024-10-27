@@ -11,10 +11,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ToastContainer } from 'react-toastify';
 import UserService from './services/user.service';
 import TokenService from './services/token.service';
-import { userGoogleLogin } from './stores/actions/authAction';
 import Cookies from 'js-cookie';
 import PrivateRoute from './routes/PrivateRoute';
 import PublicRoute from './routes/PublicRoute';
+import { setUser } from './stores/slices/userSlice';
 
 const Home = lazy(() => import('./pages/home/Home'));
 const Services = lazy(() => import('./pages/services/Services'));
@@ -46,13 +46,7 @@ function App() {
         Cookies.set('refreshToken', refreshToken);
         try {
           const user = await UserService.getUserById(TokenService.decodeToken(token).sub);
-          localStorage.setItem('userInfo', JSON.stringify(user));
-          dispatch(
-            userGoogleLogin({
-              userData: user,
-              userToken: token,
-            }),
-          );
+          dispatch(setUser(user));
           window.history.replaceState({}, document.title, window.location.pathname);
         } catch (error) {
           console.error('Failed to fetch user:', error);

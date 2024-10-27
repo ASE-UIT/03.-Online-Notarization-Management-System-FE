@@ -1,26 +1,17 @@
-import { ArrowBack, ArrowDropDown, Password } from '@mui/icons-material';
-import { Box, Button, IconButton, Modal, Typography, MenuItem } from '@mui/material';
-import React, { useState, useEffect, useMemo } from 'react';
+import { ArrowBack } from '@mui/icons-material';
+import { Box, Button, IconButton, Modal, Typography } from '@mui/material';
+import React, { useState, useEffect } from 'react';
 import { black, primary } from '../../config/theme/themePrimitives';
 import LabeledTextField from './LabeledTextField';
 import { toast } from 'react-toastify';
-import UserService from '../../services/user.service';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateUser, fetchUserData } from '../../stores/actions/userAction';
+import { updateUser } from '../../stores/actions/userAction';
 import 'react-toastify/dist/ReactToastify.css';
-import axios from 'axios';
 import ProvinceSelector from '../profile/ProvinceSelector';
-import { setUser } from '../../stores/slices/userSlice';
-import { getProvinces, getDistrictsByProvinceCode, getWardsByDistrictCode } from 'vn-provinces';
 
 const EditUserProfileModal = ({ open, handleClose }) => {
-  {
-    /* User Info Loading  */
-  }
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
-  const { userInfo } = useSelector((state) => state.auth);
-  const [loadingStatus, setLoadingStatus] = useState(false);
 
   const [formData, setFormData] = useState({
     role: '',
@@ -51,11 +42,7 @@ const EditUserProfileModal = ({ open, handleClose }) => {
         street: user?.street || '',
       });
     }
-  }, [open]);
-
-  {
-    /* Handle Saving Codes */
-  }
+  }, [open, user]);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
