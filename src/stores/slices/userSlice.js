@@ -1,11 +1,10 @@
-// src/store/userSlice.js
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchUserData, updateUser } from '../actions/userAction';
-import { useDispatch, useSelector } from 'react-redux';
+import { updateUser } from '../actions/userAction';
+
+const user = JSON.parse(localStorage.getItem('userInfo'));
 
 const initialState = {
-  user: JSON.parse(localStorage.getItem('userInfo')) || null,
-  updateStatus: null,
+  user,
 };
 
 const userSlice = createSlice({
@@ -18,11 +17,9 @@ const userSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(updateUser.pending, (state) => {});
     builder.addCase(updateUser.fulfilled, (state, { payload }) => {
       state.user = payload;
     });
-    builder.addCase(updateUser.rejected, (state) => {});
   },
 });
 

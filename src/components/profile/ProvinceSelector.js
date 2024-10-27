@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import LabeledTextField from '../modals/LabeledTextField';
 import { Box } from '@mui/material';
-import { ArrowDropDown } from '@mui/icons-material';
 import { getProvinces, getDistrictsByProvinceCode, getWardsByDistrictCode } from 'vn-provinces';
 
 const ProvinceSelector = ({ city, district, ward, onCityChange, onDistrictChange, onWardChange }) => {
@@ -42,7 +41,7 @@ const ProvinceSelector = ({ city, district, ward, onCityChange, onDistrictChange
       setDistricts([]);
       setWards([]);
     }
-  }, [inputCity, cities]);
+  }, [inputCity, cities, city]);
 
   useEffect(() => {
     if (district) {
@@ -59,7 +58,7 @@ const ProvinceSelector = ({ city, district, ward, onCityChange, onDistrictChange
     } else {
       setWards([]);
     }
-  }, [inputDistrict, districts]);
+  }, [inputDistrict, districts, district]);
 
   const handleCityChange = (value) => {
     setInputCity(value);

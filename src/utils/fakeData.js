@@ -1,5 +1,3 @@
-import { AddCircleOutline, DocumentScanner, Groups2Rounded, Search, Settings } from '@mui/icons-material';
-
 export const services = [
   {
     title: 'Dịch vụ vay tài sản',
@@ -25,32 +23,5 @@ export const services = [
     title: 'Dịch vụ mua bán tài sản',
     description: 'Dịch vụ mua bán tài sản giúp bạn mua và bán tài sản an toàn.',
     href: '/create-notarization-profile',
-  },
-];
-
-export const sidebarItems = [
-  {
-    type: 'create-notarization-profile',
-    title: 'Tạo hồ sơ công chứng',
-    href: '/notarization',
-    icon: <AddCircleOutline />,
-  },
-  {
-    type: 'history',
-    title: 'Lịch sử',
-    href: '/history',
-    icon: <DocumentScanner />,
-  },
-  {
-    type: 'create-notarization-session',
-    title: 'Tạo phiên công chứng',
-    href: '/create-notarization-session',
-    icon: <Groups2Rounded />,
-  },
-  {
-    type: 'settings',
-    title: 'Cài đặt',
-    href: '/settings',
-    icon: <Settings />,
   },
 ];

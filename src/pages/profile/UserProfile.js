@@ -3,19 +3,11 @@ import { Button, Box, Typography, Avatar } from '@mui/material';
 import { gray, white } from '../../config/theme/themePrimitives';
 import PersonalInformation from '../../components/profile/PersonalInformation';
 import { CloudUpload } from '@mui/icons-material';
-import CircularProgress from '@mui/material/CircularProgress';
-import { toast } from 'react-toastify';
-import { useDispatch, useSelector } from 'react-redux';
-import UserInfo from '../../stores/slices/authSlice';
-import UserService from '../../services/user.service';
-import { updateUser, fetchUserData } from '../../stores/actions/userAction';
+import { useSelector } from 'react-redux';
 import PersonalInformationSkeleton from '../../components/profile/SkeletonPersonalInfo';
-import { setUser } from '../../stores/slices/userSlice';
 
 const UserProfile = () => {
   const [loadingStatus, setLoadingStatus] = useState(false);
-  const { userInfo } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
 
   useEffect(() => {
