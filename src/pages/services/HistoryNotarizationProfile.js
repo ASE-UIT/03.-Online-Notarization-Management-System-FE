@@ -81,8 +81,6 @@ const HistoryNotarizationProfile = () => {
           const notaryDate = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
           let status;
 
-          console.log(statusResponse.status);
-
           if (statusResponse.status === 'pending') status = 'Chờ xử lý';
           if (statusResponse.status === 'processing') status = 'Đang xử lý';
           if (statusResponse.status === 'digitalSignature') status = 'Sẵn sàng ký số';

@@ -54,7 +54,8 @@ const getAllNotarizationService = async () => {
 
 const getHistory = async () => {
   try {
-    const response = await axiosConfig.get(`${NOTARIZATION_ENDPOINT}/history`);
+    const response = await axiosConfig.get(`${NOTARIZATION_ENDPOINT}/get-history-with-status`);
+    console.log(response.data);
     return response.data;
   } catch (error) {
     const status = error.response?.status;
