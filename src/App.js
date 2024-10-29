@@ -27,7 +27,7 @@ const HistoryNotarizationProfile = lazy(() => import('./pages/services/HistoryNo
 const CreateNotarizationSession = lazy(() => import('./pages/services/CreateNotarizationSession'));
 const UserGuide = lazy(() => import('./pages/static/UserGuide'));
 const NotFound = lazy(() => import('./pages/notfound/NotFound'));
-const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const AdminDashboard = lazy(() => import('./pages/admin/dashboard/AdminDashboard'));
 const EmployeeManagement = lazy(() => import('./pages/admin/EmployeeManagement'));
 const UserManagement = lazy(() => import('./pages/admin/UserManagement'));
 const NotaryManagement = lazy(() => import('./pages/admin/NotaryManagement'));
