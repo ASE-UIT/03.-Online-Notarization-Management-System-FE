@@ -26,6 +26,7 @@ const RevenuePerFieldChart = ({ notaryFieldBarChartData, notaryFieldBarChartOpti
         boxShadow: 1,
         borderRadius: 2.5,
         flex: 1,
+        minHeight: '400px',
       }}
     >
       <Typography sx={{ color: black[900], fontSize: 16, fontWeight: 600 }}>Doanh thu từng lĩnh vực</Typography>
