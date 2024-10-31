@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import { Line } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 import { black, white } from '../../../config/theme/themePrimitives';
 import {
   Chart as ChartJS,
@@ -15,7 +15,7 @@ import {
 } from 'chart.js';
 ChartJS.register(BarElement, LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend, Filler);
 
-const RevenueChart = ({ lineChartData, lineChartOptions }) => {
+const RevenuePerFieldChart = ({ notaryFieldBarChartData, notaryFieldBarChartOptions }) => {
   return (
     <Box
       sx={{
@@ -28,12 +28,12 @@ const RevenueChart = ({ lineChartData, lineChartOptions }) => {
         flex: 1,
       }}
     >
-      <Typography sx={{ color: black[900], fontSize: 16, fontWeight: 600 }}>Doanh thu</Typography>
+      <Typography sx={{ color: black[900], fontSize: 16, fontWeight: 600 }}>Doanh thu từng lĩnh vực</Typography>
       <Box sx={{ height: '100%', flex: 1 }}>
-        <Line data={lineChartData} options={lineChartOptions} />
+        <Bar data={notaryFieldBarChartData} options={notaryFieldBarChartOptions} />
       </Box>
     </Box>
   );
 };
 
-export default RevenueChart;
+export default RevenuePerFieldChart;

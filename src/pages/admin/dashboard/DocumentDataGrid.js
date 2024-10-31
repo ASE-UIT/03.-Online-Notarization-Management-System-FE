@@ -13,13 +13,13 @@ const columns = [
   {
     field: 'category',
     headerName: 'Lĩnh vực',
-    width: 180,
+    width: 200,
     renderCell: (params) => <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>{params.value}</Box>,
   },
   {
     field: 'ratio',
     headerName: 'Tỉ lệ',
-    width: 180,
+    width: 150,
     renderCell: (params) => (
       <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
         <LinearProgress
@@ -67,7 +67,7 @@ const DocumentDataGrid = ({ paginationModel, setPaginationModel }) => {
         p: 2,
         boxShadow: 1,
         borderRadius: 2.5,
-        flex: 0.6,
+        flex: 1,
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 1 }}>

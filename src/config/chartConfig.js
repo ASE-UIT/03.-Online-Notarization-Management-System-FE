@@ -1,48 +1,70 @@
-import { blue, gray, green } from './theme/themePrimitives';
+import { blue, gray, green, red, white, yellow } from './theme/themePrimitives';
 
-export const lineChartData = {
-  labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+export const notaryServiceBarChartData = {
+  labels: ['Dịch vụ A', 'Dịch vụ B', 'Dịch vụ C', 'Dịch vụ D'],
   datasets: [
     {
-      label: 'Doanh thu tháng 11',
-      data: [2, 3, 5.5, 8.5, 1.5, 5, 1, 4, 3, 8],
-      borderColor: green[400],
-      backgroundColor: 'rgba(67, 183, 93, 0.2)',
-      fill: true,
-      tension: 0.2,
+      label: 'Tháng trước',
+      data: [120, 150, 80, 200],
+      backgroundColor: 'rgba(0, 149, 255, 0.5)',
+      borderColor: blue[400],
+      borderWidth: 1,
     },
     {
-      label: 'Doanh thu tháng 12',
-      data: [3, 4, 4.5, 7.5, 2.5, 6, 2, 5, 4, 7],
-      borderColor: blue[400],
-      backgroundColor: 'rgba(0, 149, 255, 0.2)',
-      fill: true,
-      tension: 0.2,
+      label: 'Tháng hiện tại',
+      data: [180, 130, 120, 210],
+      backgroundColor: 'rgba(67, 183, 93, 0.5)',
+      borderColor: green[400],
+      borderWidth: 1,
     },
   ],
 };
 
-export const lineChartOptions = {
+export const notaryServiceBarChartOptions = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
     legend: {
-      position: 'bottom',
+      position: 'top',
     },
     tooltip: {
-      mode: 'index',
-      intersect: false,
+      callbacks: {
+        label: function (context) {
+          return `${context.dataset.label}: ${context.raw} triệu đồng`;
+        },
+      },
     },
   },
   scales: {
     x: {
-      type: 'linear',
-      position: 'bottom',
+      beginAtZero: true,
+      title: {
+        display: true,
+        text: 'Dịch vụ',
+        color: gray[500],
+        font: {
+          size: 12,
+        },
+      },
+    },
+    y: {
+      beginAtZero: true,
+      title: {
+        display: true,
+        text: '(triệu đồng)',
+        color: gray[500],
+        font: {
+          size: 12,
+        },
+      },
+      ticks: {
+        callback: (value) => `${value} triệu`,
+      },
     },
   },
 };
 
-export const barChartData = {
+export const notaryFieldBarChartData = {
   labels: ['Lĩnh vực A', 'Lĩnh vực B', 'Lĩnh vực C', 'Lĩnh vực D'],
   datasets: [
     {
@@ -62,7 +84,7 @@ export const barChartData = {
   ],
 };
 
-export const barChartOptions = {
+export const notaryFieldBarChartOptions = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
@@ -104,4 +126,34 @@ export const barChartOptions = {
       },
     },
   },
+};
+
+export const notaryPieChartData = {
+  labels: ['Chờ xử lý', 'Đang xử lý', 'Sẵn sàng ký số', 'Hoàn tất', 'Không hợp lệ'],
+  datasets: [
+    {
+      data: [10, 20, 30, 25, 15],
+      backgroundColor: [gray[300], yellow[300], blue[300], green[300], red[300]],
+      borderColor: white[50],
+      borderWidth: 2,
+    },
+  ],
+};
+
+export const notaryPieChartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: 'right',
+    },
+    tooltip: {
+      callbacks: {
+        label: (context) => {
+          return `${context.label}: ${context.raw}`;
+        },
+      },
+    },
+  },
+  cutout: '30%',
 };
