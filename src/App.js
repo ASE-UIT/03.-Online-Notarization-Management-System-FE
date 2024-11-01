@@ -29,7 +29,7 @@ const UserGuide = lazy(() => import('./pages/static/UserGuide'));
 const NotFound = lazy(() => import('./pages/notfound/NotFound'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const EmployeeManagement = lazy(() => import('./pages/admin/EmployeeManagement'));
-const UserManagement = lazy(() => import('./pages/admin/UserManagement'));
+const UserManagement = lazy(() => import('./pages/admin/user-management/UserManagement'));
 const NotaryManagement = lazy(() => import('./pages/admin/NotaryManagement'));
 const NotarySessionManagement = lazy(() => import('./pages/admin/NotarySessionManagement'));
 
