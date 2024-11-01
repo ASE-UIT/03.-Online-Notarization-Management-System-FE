@@ -50,9 +50,9 @@ function createData(id, profile, date, name, status, service) {
     service,
   };
 }
-let rows = [];
+
 const HistoryNotarizationProfile = () => {
-  const StatusTypes = {
+  const statusTypes = {
     All: 'Tất cả',
     Pending: 'Chờ xử lý',
     Processing: 'Đang xử lý',
@@ -62,10 +62,11 @@ const HistoryNotarizationProfile = () => {
     Rejected: 'Không hợp lệ',
   };
 
-  const [statusFilter, setStatusFilter] = useState(StatusTypes.All);
-  const [statusClicked, setStatusClicked] = useState(StatusTypes.All);
+  const [statusFilter, setStatusFilter] = useState(statusTypes.All);
+  const [statusClicked, setStatusClicked] = useState(statusTypes.All);
   const [searchText, setSearchText] = useState('');
   const [loadingStatus, setLoadingStatus] = useState(false);
+  const [rows, setRows] = useState([]);
   const navigate = useNavigate();
 
   async function getHistoryFromDB() {
@@ -73,28 +74,55 @@ const HistoryNotarizationProfile = () => {
       setLoadingStatus(true);
       const response = await NotarizationService.getHistory();
 
-      rows = await Promise.all(
+      const data = await Promise.all(
         response.map(async (item, index) => {
-          const statusResponse = await NotarizationService.getStatusById(item.id);
+          console.log(item);
+          
+          const date = new Date(item.createdAt);
           const userResponse = await UserService.getUserById(item.userId);
-          const date = new Date(statusResponse.updatedAt);
           const notaryDate = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
           let status;
 
-          if (statusResponse.status === 'pending') status = 'Chờ xử lý';
-          if (statusResponse.status === 'processing') status = 'Đang xử lý';
-          if (statusResponse.status === 'digitalSignature') status = 'Sẵn sàng ký số';
-          if (statusResponse.status === 'completed') status = 'Hoàn tất';
-          if (statusResponse.status === 'reject') status = 'Không hợp lệ';
-          return createData(index + 1, item.id, notaryDate, userResponse.name, status, item.notarizationService.name);
+          if (item.status.status === 'pending') status = 'Chờ xử lý';
+          if (item.status.status === 'processing') status = 'Đang xử lý';
+          if (item.status.status === 'digitalSignature') status = 'Sẵn sàng ký số';
+          if (item.status.status === 'completed') status = 'Hoàn tất';
+          if (item.status.status === 'rejected') status = 'Không hợp lệ';
+          return createData(index + 1, item._id, notaryDate, userResponse.name, status, item.notarizationService.name);
         }),
       );
+      setRows(data);
       setLoadingStatus(false);
     } catch (error) {
       if (error.response && error.response.status === 401) {
         toast.error('Vui lòng đăng nhập');
       }
     }
+  }
+
+  function setStatusColor(params) {
+    let color = '';
+    let backgroundColor = '';
+    if (params === 'Chờ xử lý') {
+      color = '#324155';
+      backgroundColor = '#EBEDEF';
+    } else if (params === 'Đang xử lý') {
+      color = '#FFAA00';
+      backgroundColor = '#FFF7E6';
+    } else if (params === 'Đang xác minh') {
+      color = '#7007C1';
+      backgroundColor = '#F9F0FF';
+    } else if (params === 'Sẵn sàng ký số') {
+      color = '#0095FF';
+      backgroundColor = '#E6F4FF';
+    } else if (params === 'Hoàn tất') {
+      color = '#43B75D';
+      backgroundColor = '#ECF8EF';
+    } else if (params === 'Không hợp lệ') {
+      color = '#EE443F';
+      backgroundColor = '#FDECEC';
+    }
+    return { color, backgroundColor };
   }
 
   useEffect(() => {
@@ -180,59 +208,59 @@ const HistoryNotarizationProfile = () => {
             }}
           >
             <StatusFilterButton
-              statusFilter={StatusTypes.All}
+              statusFilter={statusTypes.All}
               handleFilterByStatus={() => {
-                setStatusFilter(StatusTypes.All);
-                setStatusClicked(StatusTypes.All);
+                setStatusFilter(statusTypes.All);
+                setStatusClicked(statusTypes.All);
               }}
               clickedButton={statusClicked}
             ></StatusFilterButton>
 
             <StatusFilterButton
-              statusFilter={StatusTypes.Pending}
+              statusFilter={statusTypes.Pending}
               handleFilterByStatus={() => {
-                setStatusFilter(StatusTypes.Pending);
-                setStatusClicked(StatusTypes.Pending);
+                setStatusFilter(statusTypes.Pending);
+                setStatusClicked(statusTypes.Pending);
               }}
               clickedButton={statusClicked}
             />
             <StatusFilterButton
-              statusFilter={StatusTypes.Processing}
+              statusFilter={statusTypes.Processing}
               handleFilterByStatus={() => {
-                setStatusFilter(StatusTypes.Processing);
-                setStatusClicked(StatusTypes.Processing);
+                setStatusFilter(statusTypes.Processing);
+                setStatusClicked(statusTypes.Processing);
               }}
               clickedButton={statusClicked}
             />
             <StatusFilterButton
-              statusFilter={StatusTypes.Verification}
+              statusFilter={statusTypes.Verification}
               handleFilterByStatus={() => {
-                setStatusFilter(StatusTypes.Verification);
-                setStatusClicked(StatusTypes.Verification);
+                setStatusFilter(statusTypes.Verification);
+                setStatusClicked(statusTypes.Verification);
               }}
               clickedButton={statusClicked}
             />
             <StatusFilterButton
-              statusFilter={StatusTypes.DigitalSignature}
+              statusFilter={statusTypes.DigitalSignature}
               handleFilterByStatus={() => {
-                setStatusFilter(StatusTypes.DigitalSignature);
-                setStatusClicked(StatusTypes.DigitalSignature);
+                setStatusFilter(statusTypes.DigitalSignature);
+                setStatusClicked(statusTypes.DigitalSignature);
               }}
               clickedButton={statusClicked}
             />
             <StatusFilterButton
-              statusFilter={StatusTypes.Completed}
+              statusFilter={statusTypes.Completed}
               handleFilterByStatus={() => {
-                setStatusFilter(StatusTypes.Completed);
-                setStatusClicked(StatusTypes.Completed);
+                setStatusFilter(statusTypes.Completed);
+                setStatusClicked(statusTypes.Completed);
               }}
               clickedButton={statusClicked}
             />
             <StatusFilterButton
-              statusFilter={StatusTypes.Rejected}
+              statusFilter={statusTypes.Rejected}
               handleFilterByStatus={() => {
-                setStatusFilter(StatusTypes.Rejected);
-                setStatusClicked(StatusTypes.Rejected);
+                setStatusFilter(statusTypes.Rejected);
+                setStatusClicked(statusTypes.Rejected);
               }}
               clickedButton={statusClicked}
             />
@@ -278,6 +306,8 @@ const HistoryNotarizationProfile = () => {
               searchText={searchText}
               rows={rows}
               headCells={headCells}
+              statusTypes={statusTypes}
+              setStatusColor={setStatusColor}
             ></HistoryDataTable>
           )}
         </Box>

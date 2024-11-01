@@ -14,16 +14,6 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import { visuallyHidden } from '@mui/utils';
 
-const StatusTypes = {
-  All: 'Tất cả',
-  Pending: 'Chờ xử lý',
-  Processing: 'Đang xử lý',
-  Verification: 'Đang xác minh',
-  DigitalSignature: 'Sẵn sàng ký số',
-  Completed: 'Hoàn tất',
-  Rejected: 'Không hợp lệ',
-};
-
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -34,36 +24,11 @@ function descendingComparator(a, b, orderBy) {
   return 0;
 }
 
-function SetStatusColor(params) {
-  let color = '';
-  let backgroundColor = '';
-  if (params === 'Chờ xử lý') {
-    color = '#324155';
-    backgroundColor = '#EBEDEF';
-  } else if (params === 'Đang xử lý') {
-    color = '#FFAA00';
-    backgroundColor = '#FFF7E6';
-  } else if (params === 'Đang xác minh') {
-    color = '#7007C1';
-    backgroundColor = '#F9F0FF';
-  } else if (params === 'Sẵn sàng ký số') {
-    color = '#0095FF';
-    backgroundColor = '#E6F4FF';
-  } else if (params === 'Hoàn tất') {
-    color = '#43B75D';
-    backgroundColor = '#ECF8EF';
-  } else if (params === 'Không hợp lệ') {
-    color = '#EE443F';
-    backgroundColor = '#FDECEC';
-  }
-  return { color, backgroundColor };
-}
-
 function getComparator(order, orderBy) {
   return order === 'desc' ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-const HistoryDataTable = ({ filterStatus, searchText, rows, headCells }) => {
+const HistoryDataTable = ({ filterStatus, searchText, rows, headCells, statusTypes, setStatusColor }) => {
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('profile');
   const [selected, setSelected] = React.useState([]);
@@ -173,7 +138,7 @@ const HistoryDataTable = ({ filterStatus, searchText, rows, headCells }) => {
   const visibleRows = React.useMemo(() => {
     let filteredRows = rows;
 
-    if (filterStatus !== StatusTypes.All) {
+    if (filterStatus !== statusTypes.All) {
       filteredRows = rows.filter((row) => row.status === filterStatus);
     }
 
@@ -246,8 +211,8 @@ const HistoryDataTable = ({ filterStatus, searchText, rows, headCells }) => {
                     <TableCell align="left" width={'20%'}>
                       <Typography
                         sx={{
-                          color: SetStatusColor(row.status).color,
-                          backgroundColor: SetStatusColor(row.status).backgroundColor,
+                          color: setStatusColor(row.status).color,
+                          backgroundColor: setStatusColor(row.status).backgroundColor,
                           padding: '4px 16px',
                           borderRadius: '30px',
                           fontSize: '15px',
