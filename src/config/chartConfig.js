@@ -1,25 +1,5 @@
 import { blue, gray, green, red, white, yellow } from './theme/themePrimitives';
 
-export const notaryServiceBarChartData = {
-  labels: ['Dịch vụ A', 'Dịch vụ B', 'Dịch vụ C', 'Dịch vụ D'],
-  datasets: [
-    {
-      label: 'Tháng trước',
-      data: [120, 150, 80, 200],
-      backgroundColor: 'rgba(0, 149, 255, 0.5)',
-      borderColor: blue[400],
-      borderWidth: 1,
-    },
-    {
-      label: 'Tháng hiện tại',
-      data: [180, 130, 120, 210],
-      backgroundColor: 'rgba(67, 183, 93, 0.5)',
-      borderColor: green[400],
-      borderWidth: 1,
-    },
-  ],
-};
-
 export const notaryServiceBarChartOptions = {
   responsive: true,
   maintainAspectRatio: false,
@@ -62,26 +42,6 @@ export const notaryServiceBarChartOptions = {
       },
     },
   },
-};
-
-export const notaryFieldBarChartData = {
-  labels: ['Lĩnh vực A', 'Lĩnh vực B', 'Lĩnh vực C', 'Lĩnh vực D'],
-  datasets: [
-    {
-      label: 'Tháng trước',
-      data: [120, 150, 80, 200],
-      backgroundColor: 'rgba(0, 149, 255, 0.5)',
-      borderColor: blue[400],
-      borderWidth: 1,
-    },
-    {
-      label: 'Tháng hiện tại',
-      data: [180, 130, 120, 210],
-      backgroundColor: 'rgba(67, 183, 93, 0.5)',
-      borderColor: green[400],
-      borderWidth: 1,
-    },
-  ],
 };
 
 export const notaryFieldBarChartOptions = {

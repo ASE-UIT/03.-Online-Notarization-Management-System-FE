@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, LinearProgress, Typography } from '@mui/material';
+import { Autocomplete, Box, LinearProgress, TextField, Typography } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { gray, green, white, black } from '../../../config/theme/themePrimitives';
 
@@ -7,16 +7,19 @@ const columns = [
   {
     field: 'id',
     headerName: 'ID',
+    width: 100,
     renderCell: (params) => <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>{params.value}</Box>,
   },
   {
     field: 'category',
     headerName: 'Lĩnh vực',
+    width: 500,
     renderCell: (params) => <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>{params.value}</Box>,
   },
   {
     field: 'ratio',
     headerName: 'Tỉ lệ',
+    width: 300,
     renderCell: (params) => (
       <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
         <LinearProgress
@@ -38,22 +41,12 @@ const columns = [
   {
     field: 'data',
     headerName: 'Số liệu',
+    width: 250,
     renderCell: (params) => <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>{params.value}</Box>,
   },
 ];
 
-const rows = [
-  { id: 1, category: 'Lĩnh vực A', ratio: 75, data: '500' },
-  { id: 2, category: 'Lĩnh vực B', ratio: 50, data: '300' },
-  { id: 3, category: 'Lĩnh vực C', ratio: 25, data: '120' },
-  { id: 4, category: 'Lĩnh vực D', ratio: 90, data: '800' },
-  { id: 5, category: 'Lĩnh vực E', ratio: 60, data: '450' },
-  { id: 6, category: 'Lĩnh vực E', ratio: 60, data: '450' },
-  { id: 7, category: 'Lĩnh vực E', ratio: 60, data: '450' },
-  { id: 8, category: 'Lĩnh vực E', ratio: 60, data: '450' },
-];
-
-const DocumentDataGrid = ({ paginationModel, setPaginationModel }) => {
+const DocumentDataGrid = ({ period, setPeriod, paginationModel, setPaginationModel, documentFieldData }) => {
   return (
     <Box
       sx={{
@@ -66,12 +59,41 @@ const DocumentDataGrid = ({ paginationModel, setPaginationModel }) => {
         flex: 1,
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 1 }}>
-        <Typography sx={{ color: black[900], fontSize: 16, fontWeight: 600 }}>Tài liệu theo từng lĩnh vực</Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', flexDirection: { xs: 'column', md: 'row' }, mb: 2 }}>
+        <Typography sx={{ flex: 1, color: black[900], fontSize: 16, fontWeight: 600 }}>
+          Tài liệu theo từng lĩnh vực
+        </Typography>
+        <Autocomplete
+          size="small"
+          options={[
+            { id: 'today', name: 'Hôm nay' },
+            { id: 'current_week', name: 'Tuần này' },
+            { id: 'current_month', name: 'Tháng này' },
+            { id: 'current_year', name: 'Năm nay' },
+          ]}
+          getOptionLabel={(option) => option.name}
+          value={period}
+          onChange={(event, newValue) => {
+            if (newValue) setPeriod(newValue);
+          }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              inputProps={{ ...params.inputProps, readOnly: true }}
+              sx={{
+                '& .MuiInputBase-input': {
+                  fontSize: 14,
+                },
+              }}
+              placeholder={'Chọn thời gian'}
+            />
+          )}
+          sx={{ width: '10%', flex: 1 }}
+        />
       </Box>
       <Box sx={{ height: '100%', flex: 1 }}>
         <DataGrid
-          rows={rows}
+          rows={documentFieldData}
           columns={columns}
           paginationModel={paginationModel}
           onPaginationModelChange={setPaginationModel}
