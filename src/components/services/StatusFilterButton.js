@@ -1,34 +1,8 @@
 import React  from 'react';
 import {  Button } from '@mui/material';
 import 'react-toastify/dist/ReactToastify.css';
-import AppsIcon from '@mui/icons-material/Apps';
-import HourglassTopIcon from '@mui/icons-material/HourglassTop';
-import LoopIcon from '@mui/icons-material/Loop';
-import EditNoteIcon from '@mui/icons-material/EditNote';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import ErrorIcon from '@mui/icons-material/Error';
-import VerifiedIcon from '@mui/icons-material/Verified';
 
-const StatusFilterButton = ({ statusFilter, handleFilterByStatus, clickedButton }) => {
-  const StatusTypes = {
-    All: 'Tất cả',
-    Pending: 'Chờ xử lý',
-    Processing: 'Đang xử lý',
-    Verification: 'Đang xác minh',
-    DigitalSignature: 'Sẵn sàng ký số',
-    Completed: 'Hoàn tất',
-    Rejected: 'Không hợp lệ',
-  };
-
-  const iconMap = {
-    [StatusTypes.All]: <AppsIcon sx={{ height: '18px', width: '18px' }} />,
-    [StatusTypes.Pending]: <HourglassTopIcon sx={{ height: '18px', width: '18px' }} />,
-    [StatusTypes.Processing]: <LoopIcon sx={{ height: '18px', width: '18px' }} />,
-    [StatusTypes.DigitalSignature]: <EditNoteIcon sx={{ height: '18px', width: '18px' }} />,
-    [StatusTypes.Verification]: <VerifiedIcon sx={{ height: '18px', width: '18px'}}/>,
-    [StatusTypes.Completed]: <CheckCircleIcon sx={{ height: '18px', width: '18px' }} />,
-    [StatusTypes.Rejected]: <ErrorIcon sx={{ height: '18px', width: '18px' }} />,
-  };
+const StatusFilterButton = ({ statusFilter, handleFilterByStatus, clickedButton, iconMap, }) => {
 
   const renderIconByStatus = (statusFilter) => iconMap[statusFilter] || null;
 

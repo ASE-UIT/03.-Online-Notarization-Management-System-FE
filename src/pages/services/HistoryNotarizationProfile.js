@@ -7,49 +7,16 @@ import { white, black } from '../../config/theme/themePrimitives';
 import StatusFilterButton from '../../components/services/StatusFilterButton';
 import HistoryDataTable from '../../components/services/HistoryDataTable';
 import NotarizationService from '../../services/notarization.service';
-import UserService from '../../services/user.service';
 import { toast } from 'react-toastify';
 import SkeletonHistoryDataTable from '../../components/services/SkeletonHistoryDataTable';
 import { useNavigate } from 'react-router-dom';
-
-const headCells = [
-  {
-    id: 'profile',
-    disablePadding: true,
-    label: 'Số hồ sơ',
-  },
-  {
-    id: 'date',
-    disablePadding: false,
-    label: 'Ngày công chứng',
-  },
-  {
-    id: 'name',
-    disablePadding: false,
-    label: 'Người yêu cầu',
-  },
-  {
-    id: 'status',
-    disablePadding: false,
-    label: 'Tình trạng',
-  },
-  {
-    id: 'service',
-    disablePadding: false,
-    label: 'Loại dịch vụ',
-  },
-];
-
-function createData(id, profile, date, name, status, service) {
-  return {
-    id,
-    profile,
-    date,
-    name,
-    status,
-    service,
-  };
-}
+import AppsIcon from '@mui/icons-material/Apps';
+import HourglassTopIcon from '@mui/icons-material/HourglassTop';
+import LoopIcon from '@mui/icons-material/Loop';
+import EditNoteIcon from '@mui/icons-material/EditNote';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
+import VerifiedIcon from '@mui/icons-material/Verified';
 
 const HistoryNotarizationProfile = () => {
   const statusTypes = {
@@ -61,6 +28,55 @@ const HistoryNotarizationProfile = () => {
     Completed: 'Hoàn tất',
     Rejected: 'Không hợp lệ',
   };
+
+  const iconMap = {
+    [statusTypes.All]: <AppsIcon sx={{ height: '18px', width: '18px' }} />,
+    [statusTypes.Pending]: <HourglassTopIcon sx={{ height: '18px', width: '18px' }} />,
+    [statusTypes.Processing]: <LoopIcon sx={{ height: '18px', width: '18px' }} />,
+    [statusTypes.DigitalSignature]: <EditNoteIcon sx={{ height: '18px', width: '18px' }} />,
+    [statusTypes.Verification]: <VerifiedIcon sx={{ height: '18px', width: '18px'}}/>,
+    [statusTypes.Completed]: <CheckCircleIcon sx={{ height: '18px', width: '18px' }} />,
+    [statusTypes.Rejected]: <ErrorIcon sx={{ height: '18px', width: '18px' }} />,
+  };
+  
+  const headCells = [
+    {
+      id: 'profile',
+      disablePadding: true,
+      label: 'Số hồ sơ',
+    },
+    {
+      id: 'date',
+      disablePadding: false,
+      label: 'Ngày công chứng',
+    },
+    {
+      id: 'name',
+      disablePadding: false,
+      label: 'Người yêu cầu',
+    },
+    {
+      id: 'status',
+      disablePadding: false,
+      label: 'Tình trạng',
+    },
+    {
+      id: 'service',
+      disablePadding: false,
+      label: 'Loại dịch vụ',
+    },
+  ];
+  
+  function createData(id, profile, date, name, status, service) {
+    return {
+      id,
+      profile,
+      date,
+      name,
+      status,
+      service,
+    };
+  }
 
   const [statusFilter, setStatusFilter] = useState(statusTypes.All);
   const [statusClicked, setStatusClicked] = useState(statusTypes.All);
@@ -78,10 +94,11 @@ const HistoryNotarizationProfile = () => {
         response.map(async (item, index) => {          
           const date = new Date(item.createdAt);
           const notaryDate = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
-          let status;
+          let status;          
 
           if (item.status.status === 'pending') status = 'Chờ xử lý';
           if (item.status.status === 'processing') status = 'Đang xử lý';
+          if (item.status.status === 'verification') status = 'Đang xác minh';
           if (item.status.status === 'digitalSignature') status = 'Sẵn sàng ký số';
           if (item.status.status === 'completed') status = 'Hoàn tất';
           if (item.status.status === 'rejected') status = 'Không hợp lệ';
@@ -211,6 +228,7 @@ const HistoryNotarizationProfile = () => {
                 setStatusClicked(statusTypes.All);
               }}
               clickedButton={statusClicked}
+              iconMap={iconMap}
             ></StatusFilterButton>
 
             <StatusFilterButton
@@ -220,6 +238,7 @@ const HistoryNotarizationProfile = () => {
                 setStatusClicked(statusTypes.Pending);
               }}
               clickedButton={statusClicked}
+              iconMap={iconMap}
             />
             <StatusFilterButton
               statusFilter={statusTypes.Processing}
@@ -228,6 +247,7 @@ const HistoryNotarizationProfile = () => {
                 setStatusClicked(statusTypes.Processing);
               }}
               clickedButton={statusClicked}
+              iconMap={iconMap}
             />
             <StatusFilterButton
               statusFilter={statusTypes.Verification}
@@ -236,6 +256,7 @@ const HistoryNotarizationProfile = () => {
                 setStatusClicked(statusTypes.Verification);
               }}
               clickedButton={statusClicked}
+              iconMap={iconMap}
             />
             <StatusFilterButton
               statusFilter={statusTypes.DigitalSignature}
@@ -244,6 +265,7 @@ const HistoryNotarizationProfile = () => {
                 setStatusClicked(statusTypes.DigitalSignature);
               }}
               clickedButton={statusClicked}
+              iconMap={iconMap}
             />
             <StatusFilterButton
               statusFilter={statusTypes.Completed}
@@ -252,6 +274,7 @@ const HistoryNotarizationProfile = () => {
                 setStatusClicked(statusTypes.Completed);
               }}
               clickedButton={statusClicked}
+              iconMap={iconMap}
             />
             <StatusFilterButton
               statusFilter={statusTypes.Rejected}
@@ -260,6 +283,7 @@ const HistoryNotarizationProfile = () => {
                 setStatusClicked(statusTypes.Rejected);
               }}
               clickedButton={statusClicked}
+              iconMap={iconMap}
             />
           </Box>
 
