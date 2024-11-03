@@ -75,11 +75,8 @@ const HistoryNotarizationProfile = () => {
       const response = await NotarizationService.getHistory();
 
       const data = await Promise.all(
-        response.map(async (item, index) => {
-          console.log(item);
-          
+        response.map(async (item, index) => {          
           const date = new Date(item.createdAt);
-          const userResponse = await UserService.getUserById(item.userId);
           const notaryDate = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
           let status;
 
@@ -88,7 +85,7 @@ const HistoryNotarizationProfile = () => {
           if (item.status.status === 'digitalSignature') status = 'Sẵn sàng ký số';
           if (item.status.status === 'completed') status = 'Hoàn tất';
           if (item.status.status === 'rejected') status = 'Không hợp lệ';
-          return createData(index + 1, item._id, notaryDate, userResponse.name, status, item.notarizationService.name);
+          return createData(index + 1, item._id, notaryDate, item.requesterInfo.fullName, status, item.notarizationService.name);
         }),
       );
       setRows(data);
