@@ -3,7 +3,7 @@ import { Avatar, Box, Button, Divider, Menu, MenuItem, Typography } from '@mui/m
 import { CalendarToday, KeyboardArrowDown, KeyboardArrowUp, Schedule } from '@mui/icons-material';
 import { gray, white } from '../../config/theme/themePrimitives';
 
-const NotarizationCard = ({ notarization }) => {
+const NotarizationCard = ({ document }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
     const menuOpen = Boolean(anchorEl);
@@ -18,23 +18,21 @@ const NotarizationCard = ({ notarization }) => {
         setIsMenuOpen(!isMenuOpen);
     };
 
-    // convert ISO date to formatted date and time
-    // const formatDateTime = (isoDate) => {
-    //     const date = new Date(isoDate);
-    //     const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-    //     const hours = date.getHours().toString().padStart(2, '0');
-    //     const minutes = date.getMinutes().toString().padStart(2, '0');
-    //     const formattedTime = `${hours}:${minutes}`;
-    //     return { date: formattedDate, time: formattedTime };
-    // };
+    const formatDateTime = () => {
+        const date = new Date(document.createdAt);
+        const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        const formattedTime = `${hours}:${minutes}`;
+        return { date: formattedDate, time: formattedTime };
+    };
 
-    // convert natorization service and fields to description
-    // const formatDescription = () => {
-    //     const notarizationField = notarization.notarizationField.name;
-    //     const notarizationService = notarization.notarizationService.name;
-    //     const description = `${notarizationField} - ${notarizationService}`;
-    //     return description;
-    // };
+    const formatDescription = () => {
+        const notarizationField = document.notarizationField.name;
+        const notarizationService = document.notarizationService.name;
+        const description = `${notarizationField} - ${notarizationService}`;
+        return description;
+    };
 
     return (
         <Box
@@ -49,7 +47,7 @@ const NotarizationCard = ({ notarization }) => {
         >
             <Box flex={1} display="flex" flexDirection="column" justifyContent="center" alignItems="center" gap={2} height="100%">
                 <Avatar sx={{ width: 50, height: 50, bgcolor: gray[200], color: gray[600] }} />
-                <Typography sx={{ fontSize: 12, fontWeight: 500, color: white[900] }}>{notarization.name}</Typography>
+                <Typography sx={{ fontSize: 12, fontWeight: 500, color: white[900] }}>{document.requesterInfo.fullName}</Typography>
             </Box>
             <Divider
                 orientation="vertical"
@@ -65,11 +63,11 @@ const NotarizationCard = ({ notarization }) => {
             <Box flex={1} display="flex" flexDirection="column" justifyContent="center" alignItems="center" height="100%">
                 <Box display="flex" flexDirection="row" justifyContent="flex-start" alignItems="center" gap={1} width="90%">
                     <Schedule sx={{ fontSize: 18, padding: 1, bgcolor: white, color: gray[500], borderRadius: 1 }} />
-                    <Typography sx={{ fontSize: 12, fontWeight: 500, color: white[900] }}>{notarization.time}</Typography>
+                    <Typography sx={{ fontSize: 12, fontWeight: 500, color: white[900] }}>{formatDateTime().time}</Typography>
                 </Box>
                 <Box display="flex" flexDirection="row" justifyContent="flex-start" alignItems="center" gap={1} width="90%">
                     <CalendarToday sx={{ fontSize: 18, padding: 1, bgcolor: white, color: gray[500], borderRadius: 1 }} />
-                    <Typography sx={{ fontSize: 12, fontWeight: 500, color: white[900] }}>{notarization.date}</Typography>
+                    <Typography sx={{ fontSize: 12, fontWeight: 500, color: white[900] }}>{formatDateTime().date}</Typography>
                 </Box>
             </Box>
             <Divider
@@ -97,7 +95,7 @@ const NotarizationCard = ({ notarization }) => {
                             overflow: 'hidden',
                         }}
                     >
-                        {notarization.note}
+                        {formatDescription()}
                     </Typography>
                 </Box>
                 <Box display="flex" justifyContent="center" alignItems="center">

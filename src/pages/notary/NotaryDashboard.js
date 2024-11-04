@@ -4,101 +4,69 @@ import { black, blue, gray, green } from '../../config/theme/themePrimitives'
 import { Check, HourglassEmpty } from '@mui/icons-material'
 import NotarizationCard from '../../components/notary/NotarizationCard'
 import AnalysisCard from '../../components/notary/AnalysisCard'
+import AnalysisCardSkeleton from '../../components/notary/AnalysisCardSkeleton'
 import NotarizationService from '../../services/notarization.service'
-import UserService from '../../services/user.service'
+import NotarizationCardSkeleton from '../../components/notary/NotarizationCardSkeleton'
 
 const NotaryDashboard = () => {
     const [documents, setDocuments] = useState([]);
-
-    const notatizations = [
-        {
-            id: 1,
-            name: 'Phuc Truong Le Vinh',
-            date: '8/10/2024',
-            time: '09:00 - 09:30',
-            note: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat, molestie ipsum et, consequat nunc. Nulla facilisi. Nullam nec nunc nec nunc.',
-        },
-        {
-            id: 2,
-            name: 'Phuc Truong Le Vinh',
-            date: '8/10/2024',
-            time: '09:00 - 09:30',
-            note: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat, molestie ipsum et, consequat nunc. Nulla facilisi. Nullam nec nunc nec nunc.',
-        },
-        {
-            id: 3,
-            name: 'Phuc Truong Le Vinh',
-            date: '8/10/2024',
-            time: '09:00 - 09:30',
-            note: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat, molestie ipsum et, consequat nunc. Nulla facilisi. Nullam nec nunc nec nunc.',
-        },
-        {
-            id: 4,
-            name: 'Phuc Truong Le Vinh',
-            date: '8/10/2024',
-            time: '09:00 - 09:30',
-            note: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat, molestie ipsum et, consequat nunc. Nulla facilisi. Nullam nec nunc nec nunc.',
-        },
-        {
-            id: 5,
-            name: 'Phuc Truong Le Vinh',
-            date: '8/10/2024',
-            time: '09:00 - 09:30',
-            note: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat, molestie ipsum et, consequat nunc. Nulla facilisi. Nullam nec nunc nec nunc.',
-        },
-    ];
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchNotarizations = async () => {
             try {
                 const response = await NotarizationService.getNotarizationByRole();
-                // const enrichedDocuments = await Promise.all(
-                //     response.map(async (doc) => {
-                //         const user = await UserService.getUserById(doc.userId);
-                //         return { ...doc, user };
-                //     })
-                // );
-                setDocuments(response);
+                setDocuments(Array.isArray(response) ? response : []);
             } catch (error) {
                 console.error("Error fetching notarizations:", error);
+            } finally {
+                setIsLoading(false);
             }
         };
 
         fetchNotarizations();
     }, []);
 
-    console.log('documents', documents);
-
     return (
         <Box
             flex={1}
             display="flex"
+            flexDirection={'row'}
             justifyContent="center"
             alignItems="flex-start"
             padding={2}
             gap={2}
         >
-            <Box display="flex" flexDirection="column" width={'30%'} gap={2}>
-                <AnalysisCard
-                    icon={<Check />}
-                    title="Đã hoàn tất"
-                    mainText="600"
-                    deltaText="+5"
-                    deltaDescription="so với hôm qua"
-                    iconBgColor={green[50]}
-                    iconColor={green[500]}
-                    deltaColor={green[500]}
-                />
-                <AnalysisCard
-                    icon={<HourglassEmpty />}
-                    title="Chờ phê duyệt"
-                    mainText="100"
-                    deltaText="+10"
-                    deltaDescription="so với hôm qua"
-                    iconBgColor={blue[50]}
-                    iconColor={blue[500]}
-                    deltaColor={green[500]}
-                />
+            <Box display="flex" flexDirection={'column'} width={'30%'} gap={2}>
+                {isLoading ? (
+                    <>
+                        <AnalysisCardSkeleton />
+                        <AnalysisCardSkeleton />
+                    </>
+                ) : (
+                    <>
+                        <AnalysisCard
+                            icon={<Check />}
+                            title="Đã hoàn tất"
+                            mainText="600"
+                            deltaText="+5"
+                            deltaDescription="so với hôm qua"
+                            iconBgColor={green[50]}
+                            iconColor={green[500]}
+                            deltaColor={green[500]}
+                        />
+                        <AnalysisCard
+                            icon={<HourglassEmpty />}
+                            title="Chờ phê duyệt"
+                            mainText="100"
+                            deltaText="+10"
+                            deltaDescription="so với hôm qua"
+                            iconBgColor={blue[50]}
+                            iconColor={blue[500]}
+                            deltaColor={green[500]}
+                        />
+                    </>
+                )}
             </Box>
             <Box
                 display="flex"
@@ -123,8 +91,12 @@ const NotaryDashboard = () => {
                     width="100%"
                     gap={2}
                 >
-                    {notatizations.map((notarization) =>
-                        <NotarizationCard key={notarization.id} notarization={notarization} />
+                    {isLoading ? (
+                        <NotarizationCardSkeleton />
+                    ) : (
+                        documents.map((document, index) =>
+                            <NotarizationCard key={index} document={document} />
+                        )
                     )}
                 </Box>
 
@@ -137,8 +109,12 @@ const NotaryDashboard = () => {
                     width="100%"
                     gap={2}
                 >
-                    {notatizations.map((notarization) =>
-                        <NotarizationCard key={notarization.id} notarization={notarization} />
+                    {isLoading ? (
+                        <NotarizationCardSkeleton />
+                    ) : (
+                        documents.map((document, index) =>
+                            <NotarizationCard key={index} document={document} />
+                        )
                     )}
                 </Box>
             </Box>

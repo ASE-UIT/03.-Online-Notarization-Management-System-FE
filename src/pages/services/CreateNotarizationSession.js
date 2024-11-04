@@ -23,7 +23,8 @@ const CreateNotarizationSession = () => {
   const fetchSessions = async () => {
     setLoading(true);
     try {
-      const data = await SessionService.getAllSessions();
+      const data = await SessionService.getSessionsByUserId();
+      console.log(data);
       const sessions = await Promise.all(
         data.map(async (session) => {
           const creatorData = await UserService.getUserById(session.createdBy);
@@ -40,7 +41,6 @@ const CreateNotarizationSession = () => {
       setLoading(false);
     }
   };
-
 
   useEffect(() => {
     fetchSessions();

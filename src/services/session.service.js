@@ -15,9 +15,9 @@ const createSession = async (session) => {
   }
 };
 
-const getAllSessions = async () => {
+const getSessionsByUserId = async () => {
   try {
-    const response = await axiosConfig.get(`${SESSION_ENDPOINT}/getAllSessions`);
+    const response = await axiosConfig.get(`${SESSION_ENDPOINT}/getSessionsByUserId`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -41,7 +41,7 @@ const deleteUserOutOfSession = async (sessionId, email) => {
 
 const SessionService = {
   createSession,
-  getAllSessions,
+  getSessionsByUserId,
   deleteUserOutOfSession,
 };
 
