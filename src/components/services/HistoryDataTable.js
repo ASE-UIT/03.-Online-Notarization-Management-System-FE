@@ -243,7 +243,7 @@ const HistoryDataTable = ({ filterStatus, searchText, rows, headCells, statusTyp
         <TablePagination
           rowsPerPageOptions={[10, 15, 20]}
           component="div"
-          count={visibleRows.length}
+          count={rows.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
