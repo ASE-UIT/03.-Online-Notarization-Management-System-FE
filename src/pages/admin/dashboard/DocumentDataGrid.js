@@ -7,19 +7,18 @@ const columns = [
   {
     field: 'id',
     headerName: 'ID',
-    width: 100,
     renderCell: (params) => <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>{params.value}</Box>,
   },
   {
     field: 'category',
     headerName: 'Lĩnh vực',
-    width: 500,
+    flex: 1,
     renderCell: (params) => <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>{params.value}</Box>,
   },
   {
     field: 'ratio',
     headerName: 'Tỉ lệ',
-    width: 300,
+    flex: 1,
     renderCell: (params) => (
       <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
         <LinearProgress
@@ -41,7 +40,6 @@ const columns = [
   {
     field: 'data',
     headerName: 'Số liệu',
-    width: 250,
     renderCell: (params) => <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>{params.value}</Box>,
   },
 ];

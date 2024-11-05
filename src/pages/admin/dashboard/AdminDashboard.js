@@ -21,7 +21,7 @@ const AdminDashboard = () => {
   const [paymentField, setPaymentField] = useState({});
   const [documentField, setDocumentField] = useState({});
   const [paginationModel, setPaginationModel] = useState({
-    pageSize: 3,
+    pageSize: 5,
     page: 0,
   });
 

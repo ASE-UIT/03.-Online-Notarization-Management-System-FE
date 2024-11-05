@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import CustomNotaryDataGridToolbar from './CustomNotaryDataGridToolbar';
 import { Box, Typography } from '@mui/material';
-import { blue, dark, green, red, yellow } from '../../../config/theme/themePrimitives';
+import CustomSessionDataGridToolbar from './CustomSessionDataGridToolbar';
 import dayjs from 'dayjs';
-
-const NotaryDataGrid = ({ data, paginationModel, setPaginationModel }) => {
+const SessionDataGrid = ({ data, paginationModel, setPaginationModel }) => {
   const [filter, setFilter] = useState('Tất cả');
   const [searchText, setSearchText] = useState('');
 
@@ -20,12 +18,12 @@ const NotaryDataGrid = ({ data, paginationModel, setPaginationModel }) => {
       ),
       renderHeader: () => (
         <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
-          <Typography sx={{ fontSize: 14, fontWeight: 600 }}>Số hồ sơ</Typography>
+          <Typography sx={{ fontSize: 14, fontWeight: 600 }}>Mã phiên</Typography>
         </Box>
       ),
     },
     {
-      field: 'createdAt',
+      field: 'requesterInfo',
       flex: 1,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
@@ -34,12 +32,12 @@ const NotaryDataGrid = ({ data, paginationModel, setPaginationModel }) => {
       ),
       renderHeader: () => (
         <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
-          <Typography sx={{ fontSize: 14, fontWeight: 600 }}>Ngày công chứng</Typography>
+          <Typography sx={{ fontSize: 14, fontWeight: 600 }}>Tên người tạo</Typography>
         </Box>
       ),
     },
     {
-      field: 'fullName',
+      field: 'sessionName',
       flex: 1,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
@@ -48,33 +46,21 @@ const NotaryDataGrid = ({ data, paginationModel, setPaginationModel }) => {
       ),
       renderHeader: () => (
         <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
-          <Typography sx={{ fontSize: 14, fontWeight: 600 }}>Người yêu cầu</Typography>
+          <Typography sx={{ fontSize: 14, fontWeight: 600 }}>Tên phiên</Typography>
         </Box>
       ),
     },
     {
-      field: 'status',
+      field: 'sessionDuration',
       flex: 1,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              px: 2,
-              py: 0.5,
-              backgroundColor: renderBackgroundStatus(params.value),
-              borderRadius: 4,
-            }}
-          >
-            <Typography sx={{ fontSize: 14, color: renderColorStatus(params.value) }}>{getStatus(params.value)}</Typography>
-          </Box>
+          <Typography sx={{ fontSize: 14 }}>{params.value}</Typography>
         </Box>
       ),
       renderHeader: () => (
         <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
-          <Typography sx={{ fontSize: 14, fontWeight: 600 }}>Trạng thái</Typography>
+          <Typography sx={{ fontSize: 14, fontWeight: 600 }}>Thời lượng</Typography>
         </Box>
       ),
     },
@@ -94,71 +80,47 @@ const NotaryDataGrid = ({ data, paginationModel, setPaginationModel }) => {
     },
   ];
 
-  const renderBackgroundStatus = (status) => {
-    switch (status) {
-      case 'pending':
-        return dark[50];
-      case 'processing':
-        return yellow[50];
-      case 'verification':
-        return '#f3ebfa';
-      case 'digitalSignature':
-        return blue[50];
-      case 'completed':
-        return green[50];
-      case 'invalid':
-        return red[50];
+  const calculateDurationAndStatus = (startDate, endDate) => {
+    const start = dayjs(startDate);
+    const end = dayjs(endDate);
+    const durationInDays = end.diff(start, 'day', true);
+
+    let status;
+    if (durationInDays <= 10) {
+      status = 'Phiên ngắn hạn';
+    } else if (durationInDays <= 30) {
+      status = 'Phiên trung hạn';
+    } else {
+      status = 'Phiên dài hạn';
     }
+
+    const hours = Math.floor((durationInDays % 1) * 24);
+    const minutes = Math.round((((durationInDays % 1) * 24) % 1) * 60);
+
+    const durationText =
+      durationInDays > 0
+        ? `${Math.floor(durationInDays)} ngày ${hours} giờ ${minutes} phút`
+        : `${hours} giờ ${minutes} phút`;
+
+    return { durationText, status };
   };
 
-  const renderColorStatus = (status) => {
-    switch (status) {
-      case 'pending':
-        return dark[500];
-      case 'processing':
-        return yellow[500];
-      case 'verification':
-        return '#7007C1';
-      case 'digitalSignature':
-        return blue[500];
-      case 'completed':
-        return green[500];
-      case 'invalid':
-        return red[500];
-    }
-  };
+  const formattedData = data?.results?.map((session) => {
+    const { durationText, status } = calculateDurationAndStatus(session.startDate, session.endDate);
 
-  const getStatus = (status) => {
-    switch (status) {
-      case 'pending':
-        return 'Chờ xử lý';
-      case 'processing':
-        return 'Đang xử lý';
-      case 'verification':
-        return 'Đang xác minh';
-      case 'digitalSignature':
-        return 'Sẵn sàng ký số';
-      case 'completed':
-        return 'Hoàn tất';
-      case 'invalid':
-        return 'Không hợp lệ';
-    }
-  };
-
-  const formattedData = data?.results?.map((record) => ({
-    id: record._id,
-    notaryId: record._id,
-    createdAt: dayjs(record.createdAt).format('DD/MM/YYYY'),
-    fullName: record.requesterInfo.fullName,
-    status: record?.status?.status || null,
-    notaryService: record.notarizationService.name,
-  }));
+    return {
+      id: session._id,
+      requesterInfo: session?.creator?.name,
+      sessionName: session.sessionName,
+      sessionDuration: durationText,
+      notaryService: session.notaryService.name,
+      status,
+    };
+  });
 
   const filteredRows = formattedData?.filter((row) => {
-    const matchesStatus = filter === 'Tất cả' || getStatus(row.status) === filter;
-    const matchesSearch =
-      row.notaryId.toLowerCase().includes(searchText.toLowerCase()) ||
-      row.fullName.toLowerCase().includes(searchText.toLowerCase());
+    const matchesStatus = filter === 'Tất cả' || row.status === filter;
+    const matchesSearch = row?.sessionName?.toLowerCase().includes(searchText.toLowerCase());
     return matchesStatus && matchesSearch;
   });
 
@@ -170,12 +132,12 @@ const NotaryDataGrid = ({ data, paginationModel, setPaginationModel }) => {
         paginationModel={paginationModel}
         onPaginationModelChange={setPaginationModel}
         paginationMode="server"
-        rowCount={data?.totalResults}
+        rowCount={data?.rows?.totalResults}
         rowHeight={80}
         autoPageSize
         slots={{
           toolbar: () => (
-            <CustomNotaryDataGridToolbar
+            <CustomSessionDataGridToolbar
               searchText={searchText}
               setSearchText={setSearchText}
               onFilterChange={setFilter}
@@ -183,8 +145,8 @@ const NotaryDataGrid = ({ data, paginationModel, setPaginationModel }) => {
             />
           ),
         }}
-        checkboxSelection
         disableSelectionOnClick
+        checkboxSelection
         disableRowSelectionOnClick
         disableColumnMenu
         disableColumnResize
@@ -193,4 +155,4 @@ const NotaryDataGrid = ({ data, paginationModel, setPaginationModel }) => {
   );
 };
 
-export default NotaryDataGrid;
+export default SessionDataGrid;
