@@ -8,41 +8,44 @@ import NotaryDataGrid from './NotaryDataGrid';
 import NotarizationService from '../../../services/notarization.service';
 import SessionDataGrid from './SessionDataGrid';
 import SessionService from '../../../services/session.service';
+import StatCard from './StatCard';
+import DataGridSection from './DataGridSection';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const NotaryManagement = () => {
-  const [loading, setLoading] = useState(false);
+  const [notaryLoading, setNotaryLoading] = useState(false);
+  const [sessionLoading, setSessionLoading] = useState(false);
   const [notaryPaginationModel, setNotaryPaginationModel] = useState({
     pageSize: 5,
-    page: 0,
+    page: 1,
   });
   const [sessionPaginationModel, setSessionPaginationModel] = useState({
     pageSize: 5,
-    page: 0,
+    page: 1,
   });
   const [notarizations, setNotarizations] = useState([]);
   const [sessions, setSessions] = useState([]);
 
   const fetchAllNotarizations = async () => {
-    setLoading(true);
+    setNotaryLoading(true);
     try {
       const { page, pageSize } = notaryPaginationModel;
       const result = await NotarizationService.getAllNotarizations('', pageSize, page);
       setNotarizations(result);
     } finally {
-      setLoading(false);
+      setNotaryLoading(false);
     }
   };
 
   const fetchAllSessions = async () => {
-    setLoading(true);
+    setSessionLoading(true);
     try {
       const { page, pageSize } = sessionPaginationModel;
       const result = await SessionService.getAllSessions('', pageSize, page);
       setSessions(result);
     } finally {
-      setLoading(false);
+      setSessionLoading(false);
     }
   };
 
@@ -58,9 +61,6 @@ const NotaryManagement = () => {
     <Box sx={{ display: 'flex', height: '100vh', flexDirection: 'column' }}>
       <Header />
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, p: 2, backgroundColor: gray[50] }}>
-        <Backdrop open={loading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-          <CircularProgress color="inherit" />
-        </Backdrop>
         <Box
           sx={{
             display: 'flex',
@@ -71,86 +71,39 @@ const NotaryManagement = () => {
             gap: 2,
           }}
         >
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              justifyContent: 'center',
-              p: 2,
-              backgroundColor: blue[50],
-              borderRadius: 2,
-              gap: 1,
-              width: { xs: '100%', md: 'auto' },
-              boxSizing: 'border-box',
-              flex: 1,
-            }}
-          >
-            <Avatar sx={{ width: 48, height: 48, backgroundColor: blue[500] }}>
-              <SupervisorAccountRounded sx={{ fontSize: 32 }} />
-            </Avatar>
-            <Typography sx={{ fontSize: 32, fontWeight: 600 }}>54</Typography>
-            <Typography sx={{ fontSize: 16, fontWeight: 500 }}>Số lượng công chứng</Typography>
-          </Box>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              justifyContent: 'center',
-              p: 2,
-              backgroundColor: red[50],
-              borderRadius: 2,
-              gap: 1,
-              width: { xs: '100%', md: 'auto' },
-              boxSizing: 'border-box',
-              flex: 1,
-            }}
-          >
-            <Avatar sx={{ width: 48, height: 48, backgroundColor: red[500] }}>
-              <Diversity3Rounded sx={{ fontSize: 32 }} />
-            </Avatar>
-            <Typography sx={{ fontSize: 32, fontWeight: 600 }}>54</Typography>
-            <Typography sx={{ fontSize: 16, fontWeight: 500 }}>Số lượng phiên công chứng</Typography>
-          </Box>
+          <StatCard
+            backgroundColor={blue[50]}
+            backgroundIconColor={blue[500]}
+            icon={<SupervisorAccountRounded sx={{ fontSize: 32 }} />}
+            count={54}
+            label="Số lượng công chứng"
+          />
+          <StatCard
+            backgroundColor={red[50]}
+            backgroundIconColor={red[500]}
+            icon={<Diversity3Rounded sx={{ fontSize: 32 }} />}
+            count={54}
+            label="Số lượng phiên công chứng"
+          />
         </Box>
 
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            backgroundColor: white[50],
-            borderRadius: 2,
-            p: 2,
-            gap: 2,
-          }}
-        >
-          <Typography sx={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase' }}>Danh sách công chứng</Typography>
+        <DataGridSection title="Danh sách công chứng" loading={notaryLoading}>
           <NotaryDataGrid
             data={notarizations}
             paginationModel={notaryPaginationModel}
             setPaginationModel={setNotaryPaginationModel}
+            loading={notaryLoading}
           />
-        </Box>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            backgroundColor: white[50],
-            borderRadius: 2,
-            p: 2,
-            gap: 2,
-          }}
-        >
-          <Typography sx={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase' }}>
-            Danh sách phiên công chứng
-          </Typography>
+        </DataGridSection>
+
+        <DataGridSection title="Danh sách phiên công chứng" loading={sessionLoading}>
           <SessionDataGrid
             data={sessions}
             paginationModel={sessionPaginationModel}
             setPaginationModel={setSessionPaginationModel}
+            loading={sessionLoading}
           />
-        </Box>
+        </DataGridSection>
       </Box>
     </Box>
   );

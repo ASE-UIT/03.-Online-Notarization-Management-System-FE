@@ -3,80 +3,57 @@ import { DataGrid } from '@mui/x-data-grid';
 import { Box, Typography } from '@mui/material';
 import CustomSessionDataGridToolbar from './CustomSessionDataGridToolbar';
 import dayjs from 'dayjs';
-const SessionDataGrid = ({ data, paginationModel, setPaginationModel }) => {
+const SessionDataGrid = ({ data, paginationModel, setPaginationModel, loading }) => {
   const [filter, setFilter] = useState('Tất cả');
   const [searchText, setSearchText] = useState('');
+
+  const renderTextCell = (value) => (
+    <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
+      <Typography sx={{ fontSize: 14 }}>{value}</Typography>
+    </Box>
+  );
+
+  const renderTextHeader = (label) => (
+    <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
+      <Typography sx={{ fontSize: 14, fontWeight: 600 }}>{label}</Typography>
+    </Box>
+  );
 
   const columns = [
     {
       field: 'id',
+      headerName: 'Mã phiên',
       flex: 1,
-      renderCell: (params) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
-          <Typography sx={{ fontSize: 14 }}>{params.value}</Typography>
-        </Box>
-      ),
-      renderHeader: () => (
-        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
-          <Typography sx={{ fontSize: 14, fontWeight: 600 }}>Mã phiên</Typography>
-        </Box>
-      ),
+      renderCell: (params) => renderTextCell(params.value),
+      renderHeader: () => renderTextHeader('Mã phiên'),
     },
     {
       field: 'requesterInfo',
+      headerName: 'Tên người tạo',
       flex: 1,
-      renderCell: (params) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
-          <Typography sx={{ fontSize: 14 }}>{params.value}</Typography>
-        </Box>
-      ),
-      renderHeader: () => (
-        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
-          <Typography sx={{ fontSize: 14, fontWeight: 600 }}>Tên người tạo</Typography>
-        </Box>
-      ),
+      renderCell: (params) => renderTextCell(params.value),
+      renderHeader: () => renderTextHeader('Tên người tạo'),
     },
     {
       field: 'sessionName',
+      headerName: 'Tên phiên',
       flex: 1,
-      renderCell: (params) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
-          <Typography sx={{ fontSize: 14 }}>{params.value}</Typography>
-        </Box>
-      ),
-      renderHeader: () => (
-        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
-          <Typography sx={{ fontSize: 14, fontWeight: 600 }}>Tên phiên</Typography>
-        </Box>
-      ),
+      renderCell: (params) => renderTextCell(params.value),
+      renderHeader: () => renderTextHeader('Tên phiên'),
     },
     {
       field: 'sessionDuration',
+      headerName: 'Thời lượng',
       flex: 1,
-      renderCell: (params) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
-          <Typography sx={{ fontSize: 14 }}>{params.value}</Typography>
-        </Box>
-      ),
-      renderHeader: () => (
-        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
-          <Typography sx={{ fontSize: 14, fontWeight: 600 }}>Thời lượng</Typography>
-        </Box>
-      ),
+      renderCell: (params) => renderTextCell(params.value),
+      renderHeader: () => renderTextHeader('Thời lượng'),
     },
     {
       field: 'notaryService',
+      headerName: 'Loại dịch vụ',
       flex: 1,
-      renderCell: (params) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%', textWrap: 'wrap' }}>
-          <Typography sx={{ fontSize: 14 }}>{params.value}</Typography>
-        </Box>
-      ),
-      renderHeader: () => (
-        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
-          <Typography sx={{ fontSize: 12, fontWeight: 600 }}>Loại dịch vụ</Typography>
-        </Box>
-      ),
+      renderCell: (params) => renderTextCell(params.value),
+      renderHeader: () => renderTextHeader('Loại dịch vụ'),
     },
   ];
 
@@ -132,7 +109,7 @@ const SessionDataGrid = ({ data, paginationModel, setPaginationModel }) => {
         paginationModel={paginationModel}
         onPaginationModelChange={setPaginationModel}
         paginationMode="server"
-        rowCount={data?.rows?.totalResults}
+        rowCount={data?.totalResults}
         rowHeight={80}
         autoPageSize
         slots={{
@@ -145,6 +122,7 @@ const SessionDataGrid = ({ data, paginationModel, setPaginationModel }) => {
             />
           ),
         }}
+        loading={loading}
         disableSelectionOnClick
         checkboxSelection
         disableRowSelectionOnClick

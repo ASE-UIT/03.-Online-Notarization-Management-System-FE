@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography, Avatar } from '@mui/material';
-import { blue, dark } from '../../config/theme/themePrimitives';
+import { blue, dark } from '../../../config/theme/themePrimitives';
 
 const StatCard = ({ title, value, percentageChange, color, icon }) => {
   return (

@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Box } from '@mui/material';
 import Header from './Header';
-import DocumentDataGrid from './DocumentDataGrid';
+import DocumentByField from './DocumentByField';
 import { notaryFieldBarChartOptions, notaryServiceBarChartOptions } from '../../../config/chartConfig';
 import { gray, blue, green } from '../../../config/theme/themePrimitives';
-import RevenuePerServiceChart from './RevenuePerServiceChart';
-import RevenuePerFieldChart from './RevenuePerFieldChart';
+import RevenueByServiceSection from './RevenueByServiceSection';
+import RevenueByFieldSection from './RevenueByFieldSection';
 import AdminService from '../../../services/admin.service';
 import StatisticSection from './StatisticSection';
 
@@ -20,144 +20,88 @@ const AdminDashboard = () => {
   const [paymentService, setPaymentService] = useState({});
   const [paymentField, setPaymentField] = useState({});
   const [documentField, setDocumentField] = useState({});
-  const [paginationModel, setPaginationModel] = useState({
-    pageSize: 5,
-    page: 0,
+  const [paginationModel, setPaginationModel] = useState({ pageSize: 5, page: 0 });
+
+  const fetchMetrics = useCallback(async (selectedPeriod) => {
+    const [docMetrics, sessMetrics, payMetrics] = await Promise.all([
+      AdminService.getDocumentMetricsByPeriod(selectedPeriod.id),
+      AdminService.getSessionMetricsByPeriod(selectedPeriod.id),
+      AdminService.getPaymentMetricsByPeriod(selectedPeriod.id),
+    ]);
+
+    setDocumentMetrics(docMetrics);
+    setSessionMetrics(sessMetrics);
+    setPaymentMetrics(payMetrics);
+  }, []);
+
+  const fetchData = useCallback(async (serviceMethod, setState, selectedPeriod) => {
+    const data = await serviceMethod(selectedPeriod.id);
+    setState(data);
+  }, []);
+
+  const getChartLabel = (data, periodType) => {
+    switch (data?.[periodType]?.period) {
+      case 'today':
+        return 'Hôm nay';
+      case 'current_week':
+        return 'Tuần này';
+      case 'current_month':
+        return 'Tháng này';
+      case 'current_year':
+        return 'Năm nay';
+      case 'previous_today':
+        return 'Hôm qua';
+      case 'previous_current_week':
+        return 'Tuần trước';
+      case 'previous_current_month':
+        return 'Tháng trước';
+      case 'previous_current_year':
+        return 'Năm trước';
+      default:
+        return '';
+    }
+  };
+
+  const buildChartData = (data, labelAccessor) => ({
+    labels: data.currentPeriod?.totals?.map(labelAccessor) || [],
+    datasets: [
+      {
+        label: getChartLabel(data, 'previousPeriod'),
+        data: data.previousPeriod?.totals?.map((item) => item.totalAmount) || [],
+        backgroundColor: 'rgba(0, 149, 255, 0.5)',
+        borderColor: blue[400],
+        borderWidth: 1,
+      },
+      {
+        label: getChartLabel(data, 'currentPeriod'),
+        data: data.currentPeriod?.totals?.map((item) => item.totalAmount) || [],
+        backgroundColor: 'rgba(67, 183, 93, 0.5)',
+        borderColor: green[400],
+        borderWidth: 1,
+      },
+    ],
   });
-
-  const fetchMetrics = useCallback(
-    async (selectedPeriod) => {
-      const [documentMetrics, sessionMetrics, paymentMetrics] = await Promise.all([
-        AdminService.getDocumentMetricsByPeriod(selectedPeriod.id),
-        AdminService.getSessionMetricsByPeriod(selectedPeriod.id),
-        AdminService.getPaymentMetricsByPeriod(selectedPeriod.id),
-      ]);
-
-      setDocumentMetrics(documentMetrics);
-      setSessionMetrics(sessionMetrics);
-      setPaymentMetrics(paymentMetrics);
-    },
-    [period],
-  );
-
-  const fetchPaymentService = useCallback(
-    async (selectedPeriod) => {
-      const paymentService = await AdminService.getPaymentServiceByPeriod(selectedPeriod.id);
-      setPaymentService(paymentService);
-      console.log(paymentService);
-    },
-    [paymentServicePeriod],
-  );
-
-  const fetchPaymentField = useCallback(
-    async (selectedPeriod) => {
-      const paymentField = await AdminService.getPaymentFieldByPeriod(selectedPeriod.id);
-      setPaymentField(paymentField);
-      console.log(paymentField);
-    },
-    [paymentFieldPeriod],
-  );
-
-  const fetchDocumentField = useCallback(
-    async (selectedPeriod) => {
-      const documentField = await AdminService.getDocumentFieldByPeriod(selectedPeriod.id);
-      setDocumentField(documentField);
-      console.log(documentField);
-    },
-    [documentFieldPeriod],
-  );
-
-  const renderCurrentPeriod = (data) => {
-    if (data?.currentPeriod?.period === 'today') {
-      return 'Hôm nay';
-    } else if (data?.currentPeriod?.period === 'current_week') {
-      return 'Tuần này';
-    } else if (data?.currentPeriod?.period === 'current_month') {
-      return 'Tháng này';
-    } else if (data?.currentPeriod?.period === 'current_year') {
-      return 'Năm nay';
-    }
-  };
-
-  const renderPreviousPeriod = (data) => {
-    if (data?.previousPeriod?.period === 'previous_today') {
-      return 'Hôm qua';
-    } else if (data?.previousPeriod?.period === 'previous_current_week') {
-      return 'Tuần trước';
-    } else if (data?.previousPeriod?.period === 'previous_current_month') {
-      return 'Tháng trước';
-    } else if (data?.previousPeriod?.period === 'previous_current_year') {
-      return 'Năm trước';
-    }
-  };
-
-  const notaryServiceBarChartData = {
-    labels: paymentService.currentPeriod?.totals?.map((item) => item.serviceName) || [],
-    datasets: [
-      {
-        label: renderPreviousPeriod(paymentService),
-        data: paymentService.previousPeriod?.totals?.map((item) => item.totalAmount) || [],
-        backgroundColor: 'rgba(0, 149, 255, 0.5)',
-        borderColor: blue[400],
-        borderWidth: 1,
-      },
-      {
-        label: renderCurrentPeriod(paymentService),
-        data: paymentService.currentPeriod?.totals?.map((item) => item.totalAmount) || [],
-        backgroundColor: 'rgba(67, 183, 93, 0.5)',
-        borderColor: green[400],
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const notaryFieldBarChartData = {
-    labels: paymentField.currentPeriod?.totals?.map((item) => item.fieldName) || [],
-    datasets: [
-      {
-        label: renderPreviousPeriod(paymentField),
-        data: paymentField.previousPeriod?.totals?.map((item) => item.totalAmount) || [],
-        backgroundColor: 'rgba(0, 149, 255, 0.5)',
-        borderColor: blue[400],
-        borderWidth: 1,
-      },
-      {
-        label: renderCurrentPeriod(paymentField),
-        data: paymentField.currentPeriod?.totals?.map((item) => item.totalAmount) || [],
-        backgroundColor: 'rgba(67, 183, 93, 0.5)',
-        borderColor: green[400],
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const formattedDocumentFieldData = documentField.currentPeriod?.totals?.map((item, index) => ({
-    id: index + 1,
-    category: item.notarizationFieldName,
-    ratio: item.amount,
-    data: `${item.amount}`,
-  }));
 
   useEffect(() => {
     fetchMetrics(period);
-  }, [period]);
+  }, [period, fetchMetrics]);
 
   useEffect(() => {
-    fetchPaymentService(paymentServicePeriod);
-  }, [paymentServicePeriod]);
+    fetchData(AdminService.getPaymentServiceByPeriod, setPaymentService, paymentServicePeriod);
+  }, [paymentServicePeriod, fetchData]);
 
   useEffect(() => {
-    fetchPaymentField(paymentFieldPeriod);
-  }, [paymentFieldPeriod]);
+    fetchData(AdminService.getPaymentFieldByPeriod, setPaymentField, paymentFieldPeriod);
+  }, [paymentFieldPeriod, fetchData]);
 
   useEffect(() => {
-    fetchDocumentField(documentFieldPeriod);
-  }, [documentFieldPeriod]);
+    fetchData(AdminService.getDocumentFieldByPeriod, setDocumentField, documentFieldPeriod);
+  }, [documentFieldPeriod, fetchData]);
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', flexDirection: 'column' }}>
       <Header />
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, p: 2, backgroundColor: gray[50] }}>
+      <Box sx={{ flex: 1, p: 2, backgroundColor: gray[50], display: 'flex', flexDirection: 'column', gap: 2 }}>
         <StatisticSection
           period={period}
           setPeriod={setPeriod}
@@ -165,24 +109,28 @@ const AdminDashboard = () => {
           sessionMetrics={sessionMetrics}
           paymentMetrics={paymentMetrics}
         />
-        <DocumentDataGrid
+        <DocumentByField
           period={documentFieldPeriod}
           setPeriod={setDocumentFieldPeriod}
           paginationModel={paginationModel}
           setPaginationModel={setPaginationModel}
-          documentFieldData={formattedDocumentFieldData}
+          documentFieldData={documentField.currentPeriod?.totals?.map((item, index) => ({
+            id: index + 1,
+            category: item.notarizationFieldName,
+            ratio: item.amount,
+            data: `${item.amount}`,
+          }))}
         />
-
-        <RevenuePerServiceChart
+        <RevenueByServiceSection
           period={paymentServicePeriod}
           setPeriod={setPaymentServicePeriod}
-          notaryServiceBarChartData={notaryServiceBarChartData}
+          notaryServiceBarChartData={buildChartData(paymentService, (item) => item.serviceName)}
           notaryServiceBarChartOptions={notaryServiceBarChartOptions}
         />
-        <RevenuePerFieldChart
+        <RevenueByFieldSection
           period={paymentFieldPeriod}
           setPeriod={setPaymentFieldPeriod}
-          notaryFieldBarChartData={notaryFieldBarChartData}
+          notaryFieldBarChartData={buildChartData(paymentField, (item) => item.fieldName)}
           notaryFieldBarChartOptions={notaryFieldBarChartOptions}
         />
       </Box>
