@@ -27,7 +27,10 @@ function descendingComparator(a, b, orderBy) {
 
 function SetStatusColor(params) {
   let color = '';
-  if(params === 'Trực tuyến') color = '#EE443F'; else color = '#FFAA00'
+  if(params === 'Trực tuyến') color = '#00ff00'; 
+  if(params === 'Ngoại tuyến') color = '#666666';
+  if(params === 'Bị cấm') color = '#FFAA00';
+  if(params === 'Đã bị xóa') color = '#EE443F';
   return  color;
 }
 
@@ -35,14 +38,12 @@ function getComparator(order, orderBy) {
   return order === 'desc' ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-const DataTable = ({ filterStatus, searchText, rows, headCells, filterList }) => {
-  console.log(rows);
-  
+const DataTable = ({ filterStatus, searchText, rows, headCells, filterList, paginationModel }) => { 
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('profile');
   const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [page, setPage] = React.useState(paginationModel.page-1);
+
 
   function EnhancedTableHead(props) {
     const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
@@ -138,7 +139,7 @@ const DataTable = ({ filterStatus, searchText, rows, headCells, filterList }) =>
   };
 
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * paginationModel.pageSize - rows.length) : 0;
 
   const visibleRows = React.useMemo(() => {
     let filteredRows = rows;
@@ -159,8 +160,8 @@ const DataTable = ({ filterStatus, searchText, rows, headCells, filterList }) =>
     }
     setSelected([]);
 
-    return filteredRows.sort(getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-  }, [filterStatus, searchText, order, orderBy, page, rowsPerPage]);
+    return filteredRows.sort(getComparator(order, orderBy)).slice(page * paginationModel.pageSize, page * paginationModel.pageSize + paginationModel.pageSize);
+  }, [filterStatus, searchText, order, orderBy, page, paginationModel.pageSize]);
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -271,7 +272,7 @@ const DataTable = ({ filterStatus, searchText, rows, headCells, filterList }) =>
         <TablePagination
           component="div"
           count={rows.length}
-          rowsPerPage={rowsPerPage}
+          rowsPerPage={paginationModel.pageSize}
           page={page}
           onPageChange={handleChangePage}
           labelRowsPerPage={''}
