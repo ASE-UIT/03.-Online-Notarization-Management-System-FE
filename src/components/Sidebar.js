@@ -99,10 +99,10 @@ const Sidebar = () => {
           href: '/admin/notary-management',
         },
         {
-          type: 'notary-session-management',
-          icon: <Groups2Rounded />,
-          title: 'Quản lý phiên công chứng',
-          href: '/admin/notary-session-management',
+          type: 'settings',
+          icon: <Settings />,
+          title: 'Cài đặt',
+          href: '/admin/settings',
         },
       );
     } else if (role === 'secretary') {
