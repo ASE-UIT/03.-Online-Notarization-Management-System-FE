@@ -64,7 +64,7 @@ const userLineChartOptions = {
   },
 };
 
-const UserOverview = () => {
+const UserOverview = ({ userCount })  => {
   return (
     <Box
       sx={{
@@ -95,8 +95,8 @@ const UserOverview = () => {
         <Avatar sx={{ width: 48, height: 48, backgroundColor: blue[500] }}>
           <SupervisorAccountRounded sx={{ fontSize: 32 }} />
         </Avatar>
-        <Typography sx={{ fontSize: 32, fontWeight: 600 }}>54</Typography>
-        <Typography sx={{ fontSize: 16, fontWeight: 500 }}>Số lượng công chứng</Typography>
+        <Typography sx={{ fontSize: 32, fontWeight: 600 }}>{userCount}</Typography>
+        <Typography sx={{ fontSize: 16, fontWeight: 500 }}>Số lượng người dùng</Typography>
       </Box>
 
       {/* Chart Section */}

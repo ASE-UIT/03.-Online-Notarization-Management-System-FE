@@ -40,11 +40,16 @@ const updateUserById = async (id, updateBody) => {
     }
   }
 };
+const getAllUsers = async () => {
+  const response = await axiosConfig.get(`${USER_ENDPOINT}`);
+  return response.data;
+}
 
 const UserService = {
   getUserById,
   searchUserByEmail,
   updateUserById,
+  getAllUsers
 };
 
 export default UserService;
