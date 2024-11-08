@@ -1,12 +1,156 @@
-import React from 'react';
-import { white, gray, black, primary } from '../../config/theme/themePrimitives';
+import React, { useState, useCallback } from 'react';
+import { white, gray, black } from '../../config/theme/themePrimitives';
 import { Close } from '@mui/icons-material';
 import AvatarWithCloseButton from '../static/AvatarWithCloseButton';
-import { Box, Button, circularProgressClasses, IconButton, Modal, Typography } from '@mui/material';
+import { Box, Button, IconButton, Modal, Typography, Autocomplete, TextField } from '@mui/material';
 import SessionService from '../../services/session.service';
+import UserService from '../../services/user.service';
 import { toast } from 'react-toastify';
 
+const AddGuest = ({
+    value,
+    options,
+    handleInputChange,
+    handleAddGuest,
+    loading,
+}) => (
+    <Box sx={{ mb: 2 }}>
+        <Typography variant="body2">Thêm khách mời</Typography>
+        <Box
+            sx={{
+                display: 'flex',
+                alignItems: 'center',
+                mt: 1,
+                backgroundColor: gray[50],
+                borderRadius: 1,
+            }}
+        >
+            {/* Guest Autocomplete */}
+            <Autocomplete
+                value={value}
+                loading={loading}
+                options={options}
+                getOptionLabel={(option) => option?.email || option}
+                onInputChange={handleInputChange}
+                sx={{ flexGrow: 1 }}
+                renderInput={(params) => (
+                    <TextField
+                        {...params}
+                        variant="outlined"
+                        placeholder="Nhập email khách mời"
+                        sx={{
+                            flexGrow: 1,
+                            '& fieldset': { border: 'none' },
+                            '& .MuiInputBase-input': { fontSize: '14px' },
+                        }}
+                        onKeyDown={(event) => event.key === 'Enter' && handleAddGuest()}
+                    />
+                )}
+                renderOption={(props, option) => (
+                    <li
+                        {...props}
+                        key={typeof option === 'string' ? option : option.id}
+                        style={{ fontSize: '14px', fontWeight: 'regular' }}
+                    >
+                        {typeof option === 'string' ? option : option.email}
+                    </li>
+                )}
+                loadingText={
+                    <Typography sx={{ fontSize: '14px', fontWeight: 'regular', color: gray[600] }}>
+                        Đang tải...
+                    </Typography>
+                }
+                noOptionsText={
+                    <Typography sx={{ fontSize: '14px', fontWeight: 'regular', color: gray[600] }}>
+                        Không tìm thấy kết quả
+                    </Typography>
+                }
+            />
+
+            <Button
+                size="small"
+                variant="contained"
+                onClick={handleAddGuest}
+                sx={{ fontSize: 14, backgroundColor: white[50], color: black[900], textTransform: 'none', mr: 1 }}
+            >
+                Thêm
+            </Button>
+        </Box>
+    </Box>
+);
+
 const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
+    const [email, setEmail] = useState([]);
+    const [options, setOptions] = useState([]);
+    const [users, setUsers] = useState(session.users);
+    const [loading, setLoading] = useState(false);
+
+    const debounce = (func, wait) => {
+        let timeout;
+        return (...args) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    };
+
+    const handleRemoveGuest = (emailToRemove) => {
+        setUsers((prev) => prev.filter((user) => user.email !== emailToRemove));
+    };
+
+    const handleInputChange = (event, newValue) => {
+        setEmail(newValue);
+        fetchEmails(newValue);
+    };
+
+    const fetchEmails = useCallback(
+        debounce(async (value) => {
+            setLoading(true);
+            try {
+                const response = await UserService.searchUserByEmail(value);
+                setOptions(response);
+            } catch (error) {
+                setOptions([]);
+            } finally {
+                setLoading(false);
+            }
+        }, 1500),
+        []
+    );
+
+    const handleAddGuest = () => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const existingUser = options.find((option) => option.email === email);
+
+        if (!email) {
+            toast.error('Vui lòng nhập địa chỉ email.');
+            return;
+        }
+
+        if (!emailRegex.test(email)) {
+            toast.error('Địa chỉ email không hợp lệ.');
+            return;
+        }
+
+        if (!existingUser) {
+            toast.error('Không tìm thấy người dùng.');
+            return;
+        }
+
+        if (users.find((user) => user.email === email)) {
+            toast.error('Người dùng này đã được thêm.');
+            return;
+        }
+
+        const response = SessionService.addUser(session._id, [email]);
+        console.log('response addUser', response);
+        if (response) {
+            toast.success('Thêm người dùng thành công');
+        } else if (response.code === 403) {
+            toast.error('Bạn không phải là người tạo phiên công chứng');
+        }
+        setUsers((prev) => [...prev, existingUser]);
+    };
+
     const formatDate = (dateStr) => {
         const date = new Date(dateStr);
         return date.toLocaleDateString('vi-VN');
@@ -22,6 +166,7 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
 
     const handleDeleteUser = async (email) => {
         try {
+            setUsers((prev) => prev.filter((user) => user.email !== email));
             const response = await SessionService.deleteUserOutOfSession(session.id, email);
             if (response.status === 200) {
                 toast.success('Xóa người dùng thành công');
@@ -165,6 +310,17 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
                     </Box>
                 </Box>
 
+                {/* Add Guest */}
+                <AddGuest
+                    value={email}
+                    options={options}
+                    handleInputChange={handleInputChange}
+                    handleAddGuest={handleAddGuest}
+                    users={users}
+                    handleRemoveGuest={handleRemoveGuest}
+                    loading={loading}
+                />
+
                 {/* Guests */}
                 <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 2 }}>
                     <AvatarWithCloseButton
@@ -174,7 +330,7 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
                         name={session.creator.name}
                         isCreator={true}
                     />
-                    {session.users.map((guest, index) => (
+                    {users.map((guest, index) => (
                         <AvatarWithCloseButton
                             key={index}
                             email={guest.email}
@@ -182,36 +338,6 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
                         />
                     ))}
                 </Box>
-
-                {/* Actions
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-                    <Button
-                        variant="outlined"
-                        sx={{
-                            minWidth: 120,
-                            fontSize: 14,
-                            fontWeight: 600,
-                            textTransform: 'none',
-                            border: `1px solid ${black[100]}`,
-                            color: black[600],
-                        }}
-                        onClick={onClose}
-                    >
-                        Đóng
-                    </Button>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        sx={{
-                            minWidth: 120,
-                            fontSize: 14,
-                            fontWeight: 600,
-                            textTransform: 'none',
-                        }}
-                    >
-                        Hủy phiên công chứng
-                    </Button>
-                </Box> */}
             </Box>
         </Modal>
     );

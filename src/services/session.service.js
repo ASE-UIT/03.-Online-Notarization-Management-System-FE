@@ -39,10 +39,23 @@ const deleteUserOutOfSession = async (sessionId, email) => {
   }
 };
 
+const addUser = async (sessionId, emails) => {
+  try {
+    const response = await axiosConfig.patch(`${SESSION_ENDPOINT}/addUser/${sessionId}`, { emails });
+    return response;
+  } catch (error) {
+    if (error.response) {
+      return error.response.data;
+    }
+    return error.message;
+  }
+};
+
 const SessionService = {
   createSession,
   getAllSessions,
   deleteUserOutOfSession,
+  addUser,
 };
 
 export default SessionService;
