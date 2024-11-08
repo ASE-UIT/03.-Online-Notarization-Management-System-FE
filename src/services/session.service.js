@@ -51,11 +51,24 @@ const addUser = async (sessionId, emails) => {
   }
 };
 
+const getSessionsByUserId = async () => {
+  try {
+    const response = await axiosConfig.get(`${SESSION_ENDPOINT}/getSessionsByUserId`);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      return error.response.data;
+    }
+    return error.message;
+  }
+}
+
 const SessionService = {
   createSession,
   getAllSessions,
   deleteUserOutOfSession,
   addUser,
+  getSessionsByUserId,
 };
 
 export default SessionService;
