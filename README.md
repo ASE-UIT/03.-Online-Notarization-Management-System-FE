@@ -1,70 +1,81 @@
-# Getting Started with Create React App
+## CongChungOnline Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This repository contains the frontend code for **CongChungOnline**, a platform for online notarization services that leverages blockchain and NFT for document storage. This frontend interacts with the provided backend to facilitate the user experience.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **User Authentication:** Users can sign in or register to access platform services.
+- **Notarization Profile Creation:** Users can create a notarization profile to store their document information.
+- **Notarization Service & Field Selection:** Users can choose the appropriate notary service and field for their documents.
+- **Document Upload:** Users can upload their documents for notarization.
+- **Session Creation:** Users can create sessions to notarize multiple documents together.
+- **Notarization Status Tracking:** Users can track the progress of their notarization requests.
+- **User Guide:** Provides detailed instructions and visual guidance for using the platform.
+- **Responsive Design:** Ensures a seamless user experience across different devices.
 
-### `npm start`
+## Technologies
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Frontend:** React, Material-UI, React Router, React Intersection Observer, React Toastify
+- **State Management:** Redux Toolkit
+- **Testing:** Jest, React Testing Library
+- **Linting:** ESLint, Prettier
+- **Version Control:** Git
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Installation
 
-### `npm test`
+1. Clone the repository:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+   ```bash
+   git clone https://github.com/ASE-UIT/congchungonline-fe.git
+   cd congchungonline-fe
+   ```
 
-### `npm run build`
+2. Install dependencies:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+   ```bash
+   npm install
+   ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+3. Set up environment variables:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+   Copy the `.env.example` file to `.env` and update the values as needed.
 
-### `npm run eject`
+   ```bash
+   cp .env.example .env
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+4. Start the development server:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+   ```bash
+   npm start
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Environment Variables
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+# Backend API base URL
+REACT_APP_API_BASE_URL=http://localhost:3000
+```
 
-## Learn More
+## Running the Application
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+1. Make sure the backend is running.
+2. Run `npm start` to start the development server.
+3. The application will be accessible at `http://localhost:3000`.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Testing
 
-### Code Splitting
+To run the unit tests:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```bash
+npm run test
+```
 
-### Analyzing the Bundle Size
+## Contribution
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Contributions are welcome! Please feel free to submit issues or pull requests.
 
-### Making a Progressive Web App
+## License
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This project is licensed under the MIT License.
+```
