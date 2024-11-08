@@ -7,52 +7,19 @@ import { white, black } from '../../config/theme/themePrimitives';
 import StatusFilterButton from '../../components/services/StatusFilterButton';
 import HistoryDataTable from '../../components/services/HistoryDataTable';
 import NotarizationService from '../../services/notarization.service';
-import UserService from '../../services/user.service';
 import { toast } from 'react-toastify';
 import SkeletonHistoryDataTable from '../../components/services/SkeletonHistoryDataTable';
 import { useNavigate } from 'react-router-dom';
+import AppsIcon from '@mui/icons-material/Apps';
+import HourglassTopIcon from '@mui/icons-material/HourglassTop';
+import LoopIcon from '@mui/icons-material/Loop';
+import EditNoteIcon from '@mui/icons-material/EditNote';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
+import VerifiedIcon from '@mui/icons-material/Verified';
 
-const headCells = [
-  {
-    id: 'profile',
-    disablePadding: true,
-    label: 'Số hồ sơ',
-  },
-  {
-    id: 'date',
-    disablePadding: false,
-    label: 'Ngày công chứng',
-  },
-  {
-    id: 'name',
-    disablePadding: false,
-    label: 'Người yêu cầu',
-  },
-  {
-    id: 'status',
-    disablePadding: false,
-    label: 'Tình trạng',
-  },
-  {
-    id: 'service',
-    disablePadding: false,
-    label: 'Loại dịch vụ',
-  },
-];
-
-function createData(id, profile, date, name, status, service) {
-  return {
-    id,
-    profile,
-    date,
-    name,
-    status,
-    service,
-  };
-}
-let rows = [];
 const HistoryNotarizationProfile = () => {
-  const StatusTypes = {
+  const statusTypes = {
     All: 'Tất cả',
     Pending: 'Chờ xử lý',
     Processing: 'Đang xử lý',
@@ -62,10 +29,60 @@ const HistoryNotarizationProfile = () => {
     Rejected: 'Không hợp lệ',
   };
 
-  const [statusFilter, setStatusFilter] = useState(StatusTypes.All);
-  const [statusClicked, setStatusClicked] = useState(StatusTypes.All);
+  const iconMap = {
+    [statusTypes.All]: <AppsIcon sx={{ height: '18px', width: '18px' }} />,
+    [statusTypes.Pending]: <HourglassTopIcon sx={{ height: '18px', width: '18px' }} />,
+    [statusTypes.Processing]: <LoopIcon sx={{ height: '18px', width: '18px' }} />,
+    [statusTypes.DigitalSignature]: <EditNoteIcon sx={{ height: '18px', width: '18px' }} />,
+    [statusTypes.Verification]: <VerifiedIcon sx={{ height: '18px', width: '18px'}}/>,
+    [statusTypes.Completed]: <CheckCircleIcon sx={{ height: '18px', width: '18px' }} />,
+    [statusTypes.Rejected]: <ErrorIcon sx={{ height: '18px', width: '18px' }} />,
+  };
+  
+  const headCells = [
+    {
+      id: 'profile',
+      disablePadding: true,
+      label: 'Số hồ sơ',
+    },
+    {
+      id: 'date',
+      disablePadding: false,
+      label: 'Ngày công chứng',
+    },
+    {
+      id: 'name',
+      disablePadding: false,
+      label: 'Người yêu cầu',
+    },
+    {
+      id: 'status',
+      disablePadding: false,
+      label: 'Tình trạng',
+    },
+    {
+      id: 'service',
+      disablePadding: false,
+      label: 'Loại dịch vụ',
+    },
+  ];
+  
+  function createData(id, profile, date, name, status, service) {
+    return {
+      id,
+      profile,
+      date,
+      name,
+      status,
+      service,
+    };
+  }
+
+  const [statusFilter, setStatusFilter] = useState(statusTypes.All);
+  const [statusClicked, setStatusClicked] = useState(statusTypes.All);
   const [searchText, setSearchText] = useState('');
   const [loadingStatus, setLoadingStatus] = useState(false);
+  const [rows, setRows] = useState([]);
   const navigate = useNavigate();
 
   async function getHistoryFromDB() {
@@ -73,30 +90,53 @@ const HistoryNotarizationProfile = () => {
       setLoadingStatus(true);
       const response = await NotarizationService.getHistory();
 
-      rows = await Promise.all(
-        response.map(async (item, index) => {
-          const statusResponse = await NotarizationService.getStatusById(item.id);
-          const userResponse = await UserService.getUserById(item.userId);
-          const date = new Date(statusResponse.updatedAt);
+      const data = await Promise.all(
+        response.map(async (item, index) => {          
+          const date = new Date(item.createdAt);
           const notaryDate = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
-          let status;
+          let status;          
 
-          console.log(statusResponse.status);
-
-          if (statusResponse.status === 'pending') status = 'Chờ xử lý';
-          if (statusResponse.status === 'processing') status = 'Đang xử lý';
-          if (statusResponse.status === 'digitalSignature') status = 'Sẵn sàng ký số';
-          if (statusResponse.status === 'completed') status = 'Hoàn tất';
-          if (statusResponse.status === 'reject') status = 'Không hợp lệ';
-          return createData(index + 1, item.id, notaryDate, userResponse.name, status, item.notarizationService.name);
+          if (item.status.status === 'pending') status = 'Chờ xử lý';
+          if (item.status.status === 'processing') status = 'Đang xử lý';
+          if (item.status.status === 'verification') status = 'Đang xác minh';
+          if (item.status.status === 'digitalSignature') status = 'Sẵn sàng ký số';
+          if (item.status.status === 'completed') status = 'Hoàn tất';
+          if (item.status.status === 'rejected') status = 'Không hợp lệ';
+          return createData(index + 1, item._id, notaryDate, item.requesterInfo.fullName, status, item.notarizationService.name);
         }),
       );
+      setRows(data);
       setLoadingStatus(false);
     } catch (error) {
       if (error.response && error.response.status === 401) {
         toast.error('Vui lòng đăng nhập');
       }
     }
+  }
+
+  function setStatusColor(params) {
+    let color = '';
+    let backgroundColor = '';
+    if (params === 'Chờ xử lý') {
+      color = '#324155';
+      backgroundColor = '#EBEDEF';
+    } else if (params === 'Đang xử lý') {
+      color = '#FFAA00';
+      backgroundColor = '#FFF7E6';
+    } else if (params === 'Đang xác minh') {
+      color = '#7007C1';
+      backgroundColor = '#F9F0FF';
+    } else if (params === 'Sẵn sàng ký số') {
+      color = '#0095FF';
+      backgroundColor = '#E6F4FF';
+    } else if (params === 'Hoàn tất') {
+      color = '#43B75D';
+      backgroundColor = '#ECF8EF';
+    } else if (params === 'Không hợp lệ') {
+      color = '#EE443F';
+      backgroundColor = '#FDECEC';
+    }
+    return { color, backgroundColor };
   }
 
   useEffect(() => {
@@ -182,61 +222,68 @@ const HistoryNotarizationProfile = () => {
             }}
           >
             <StatusFilterButton
-              statusFilter={StatusTypes.All}
+              statusFilter={statusTypes.All}
               handleFilterByStatus={() => {
-                setStatusFilter(StatusTypes.All);
-                setStatusClicked(StatusTypes.All);
+                setStatusFilter(statusTypes.All);
+                setStatusClicked(statusTypes.All);
               }}
               clickedButton={statusClicked}
+              iconMap={iconMap}
             ></StatusFilterButton>
 
             <StatusFilterButton
-              statusFilter={StatusTypes.Pending}
+              statusFilter={statusTypes.Pending}
               handleFilterByStatus={() => {
-                setStatusFilter(StatusTypes.Pending);
-                setStatusClicked(StatusTypes.Pending);
+                setStatusFilter(statusTypes.Pending);
+                setStatusClicked(statusTypes.Pending);
               }}
               clickedButton={statusClicked}
+              iconMap={iconMap}
             />
             <StatusFilterButton
-              statusFilter={StatusTypes.Processing}
+              statusFilter={statusTypes.Processing}
               handleFilterByStatus={() => {
-                setStatusFilter(StatusTypes.Processing);
-                setStatusClicked(StatusTypes.Processing);
+                setStatusFilter(statusTypes.Processing);
+                setStatusClicked(statusTypes.Processing);
               }}
               clickedButton={statusClicked}
+              iconMap={iconMap}
             />
             <StatusFilterButton
-              statusFilter={StatusTypes.Verification}
+              statusFilter={statusTypes.Verification}
               handleFilterByStatus={() => {
-                setStatusFilter(StatusTypes.Verification);
-                setStatusClicked(StatusTypes.Verification);
+                setStatusFilter(statusTypes.Verification);
+                setStatusClicked(statusTypes.Verification);
               }}
               clickedButton={statusClicked}
+              iconMap={iconMap}
             />
             <StatusFilterButton
-              statusFilter={StatusTypes.DigitalSignature}
+              statusFilter={statusTypes.DigitalSignature}
               handleFilterByStatus={() => {
-                setStatusFilter(StatusTypes.DigitalSignature);
-                setStatusClicked(StatusTypes.DigitalSignature);
+                setStatusFilter(statusTypes.DigitalSignature);
+                setStatusClicked(statusTypes.DigitalSignature);
               }}
               clickedButton={statusClicked}
+              iconMap={iconMap}
             />
             <StatusFilterButton
-              statusFilter={StatusTypes.Completed}
+              statusFilter={statusTypes.Completed}
               handleFilterByStatus={() => {
-                setStatusFilter(StatusTypes.Completed);
-                setStatusClicked(StatusTypes.Completed);
+                setStatusFilter(statusTypes.Completed);
+                setStatusClicked(statusTypes.Completed);
               }}
               clickedButton={statusClicked}
+              iconMap={iconMap}
             />
             <StatusFilterButton
-              statusFilter={StatusTypes.Rejected}
+              statusFilter={statusTypes.Rejected}
               handleFilterByStatus={() => {
-                setStatusFilter(StatusTypes.Rejected);
-                setStatusClicked(StatusTypes.Rejected);
+                setStatusFilter(statusTypes.Rejected);
+                setStatusClicked(statusTypes.Rejected);
               }}
               clickedButton={statusClicked}
+              iconMap={iconMap}
             />
           </Box>
 
@@ -280,6 +327,8 @@ const HistoryNotarizationProfile = () => {
               searchText={searchText}
               rows={rows}
               headCells={headCells}
+              statusTypes={statusTypes}
+              setStatusColor={setStatusColor}
             ></HistoryDataTable>
           )}
         </Box>

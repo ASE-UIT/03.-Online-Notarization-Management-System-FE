@@ -15,9 +15,15 @@ const createSession = async (session) => {
   }
 };
 
-const getAllSessions = async () => {
+const getAllSessions = async (sortBy = null, limit, page) => {
   try {
-    const response = await axiosConfig.get(`${SESSION_ENDPOINT}/getAllSessions`);
+    const response = await axiosConfig.get(`${SESSION_ENDPOINT}/getAllSessions`, {
+      params: {
+        sortBy,
+        limit,
+        page: page + 1,
+      },
+    });
     return response.data;
   } catch (error) {
     if (error.response) {
