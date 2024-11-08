@@ -10,12 +10,15 @@ import SessionDataGrid from './SessionDataGrid';
 import SessionService from '../../../services/session.service';
 import StatCard from './StatCard';
 import DataGridSection from './DataGridSection';
+import AdminService from '../../../services/admin.service';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const NotaryManagement = () => {
   const [notaryLoading, setNotaryLoading] = useState(false);
   const [sessionLoading, setSessionLoading] = useState(false);
+  const [totalNotarizations, setTotalNotarizations] = useState(0);
+  const [totalSessions, setTotalSessions] = useState(0);
   const [notaryPaginationModel, setNotaryPaginationModel] = useState({
     pageSize: 25,
     page: 0,
@@ -49,6 +52,19 @@ const NotaryManagement = () => {
     }
   };
 
+  const fetchTotals = async () => {
+    try {
+      const [notarizationsResult, sessionsResult] = await Promise.all([
+        AdminService.getDocumentMetricsByPeriod('current_year'),
+        AdminService.getSessionMetricsByPeriod('current_year'),
+      ]);
+      setTotalNotarizations(notarizationsResult.currentPeriod.documentCount);
+      setTotalSessions(sessionsResult.currentPeriod.sessionCount);
+    } catch (error) {
+      console.error('Error fetching totals:', error);
+    }
+  };
+
   useEffect(() => {
     fetchAllNotarizations();
   }, [notaryPaginationModel]);
@@ -56,6 +72,10 @@ const NotaryManagement = () => {
   useEffect(() => {
     fetchAllSessions();
   }, [sessionPaginationModel]);
+
+  useEffect(() => {
+    fetchTotals();
+  }, [totalNotarizations, totalSessions]);
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', flexDirection: 'column' }}>
@@ -75,14 +95,14 @@ const NotaryManagement = () => {
             backgroundColor={blue[50]}
             backgroundIconColor={blue[500]}
             icon={<SupervisorAccountRounded sx={{ fontSize: 32 }} />}
-            count={54}
+            count={totalNotarizations}
             label="Số lượng công chứng"
           />
           <StatCard
             backgroundColor={red[50]}
             backgroundIconColor={red[500]}
             icon={<Diversity3Rounded sx={{ fontSize: 32 }} />}
-            count={54}
+            count={totalSessions}
             label="Số lượng phiên công chứng"
           />
         </Box>
