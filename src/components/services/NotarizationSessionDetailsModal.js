@@ -6,6 +6,7 @@ import { Box, Button, IconButton, Modal, Typography, Autocomplete, TextField } f
 import SessionService from '../../services/session.service';
 import UserService from '../../services/user.service';
 import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
 
 const AddGuest = ({
     value,
@@ -84,6 +85,7 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
     const [options, setOptions] = useState([]);
     const [users, setUsers] = useState(session.users);
     const [loading, setLoading] = useState(false);
+    const { user } = useSelector((state) => state.user);
 
     const debounce = (func, wait) => {
         let timeout;
@@ -142,7 +144,6 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
         }
 
         const response = SessionService.addUser(session._id, [email]);
-        console.log('response addUser', response);
         if (response) {
             toast.success('Thêm người dùng thành công');
         } else if (response.code === 403) {
@@ -165,18 +166,12 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
     };
 
     const handleDeleteUser = async (email) => {
-        try {
-            setUsers((prev) => prev.filter((user) => user.email !== email));
-            const response = await SessionService.deleteUserOutOfSession(session.id, email);
-            if (response.status === 200) {
-                toast.success('Xóa người dùng thành công');
-            } else if (response.code === 403) {
-                toast.error('Bạn không phải là người tạo phiên công chứng');
-            }
-        } catch (error) {
-            toast.error('Xóa người dùng khỏi thất bại');
-        }
+        setUsers((prev) => prev.filter((user) => user.email !== email));
+        const response = await SessionService.deleteUserOutOfSession(session._id, email);
+        return response;
     };
+
+    const isCreator = user.email === session.creator.email;
 
     return (
         <Modal
@@ -335,6 +330,7 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
                             key={index}
                             email={guest.email}
                             onRemove={() => handleDeleteUser(guest.email)}
+                            onHideRemoveIcon={!isCreator}
                         />
                     ))}
                 </Box>

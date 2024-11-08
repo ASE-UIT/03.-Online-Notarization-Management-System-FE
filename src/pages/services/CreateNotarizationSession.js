@@ -21,7 +21,7 @@ const CreateNotarizationSession = () => {
   const fetchSessions = async () => {
     setLoading(true);
     const response = await SessionService.getSessionsByUserId();
-    setSessions(response.results);
+    setSessions(response.results || []);
     setLoading(false);
   };
 
