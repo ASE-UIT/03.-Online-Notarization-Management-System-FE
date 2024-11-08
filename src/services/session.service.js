@@ -67,11 +67,11 @@ const getSessionsByUserId = async () => {
     }
     return error.message;
   }
-}
+};
 
 const SessionService = {
   createSession,
-  getAllSessions,
+  getSessionsByUserId,
   deleteUserOutOfSession,
   addUser,
   getSessionsByUserId,

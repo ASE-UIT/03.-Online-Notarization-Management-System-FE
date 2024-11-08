@@ -63,8 +63,8 @@ const SessionCard = React.memo(({ session }) => {
       sx={{
         flexBasis: {
           xs: '100%',
-          sm: 'calc(50% - 24px)',
-          md: 'calc(33.33% - 24px)',
+          sm: 'calc(70% - 24px)',
+          md: 'calc(50% - 24px)',
         },
         mb: 2,
         display: 'flex',
