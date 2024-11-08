@@ -8,7 +8,7 @@ const SessionDataGrid = ({ data, paginationModel, setPaginationModel, loading })
   const [searchText, setSearchText] = useState('');
 
   const renderTextCell = (value) => (
-    <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
+    <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%', textWrap: 'wrap' }}>
       <Typography sx={{ fontSize: 14 }}>{value}</Typography>
     </Box>
   );
@@ -102,7 +102,7 @@ const SessionDataGrid = ({ data, paginationModel, setPaginationModel, loading })
   });
 
   return (
-    <Box sx={{ height: 500, width: '100%' }}>
+    <Box sx={{ maxHeight: 500, width: '100%' }}>
       <DataGrid
         rows={filteredRows}
         columns={columns}
@@ -110,8 +110,8 @@ const SessionDataGrid = ({ data, paginationModel, setPaginationModel, loading })
         onPaginationModelChange={setPaginationModel}
         paginationMode="server"
         rowCount={data?.totalResults}
-        rowHeight={80}
-        autoPageSize
+        rowHeight={70}
+        pageSizeOptions={[25, 50, 100]}
         slots={{
           toolbar: () => (
             <CustomSessionDataGridToolbar

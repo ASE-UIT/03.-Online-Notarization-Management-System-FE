@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Header from './Header';
-import { Avatar, Backdrop, Box, CircularProgress, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import { blue, gray, red, white } from '../../../config/theme/themePrimitives';
 import { Diversity3Rounded, SupervisorAccountRounded } from '@mui/icons-material';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
@@ -17,12 +17,12 @@ const NotaryManagement = () => {
   const [notaryLoading, setNotaryLoading] = useState(false);
   const [sessionLoading, setSessionLoading] = useState(false);
   const [notaryPaginationModel, setNotaryPaginationModel] = useState({
-    pageSize: 5,
-    page: 1,
+    pageSize: 25,
+    page: 0,
   });
   const [sessionPaginationModel, setSessionPaginationModel] = useState({
-    pageSize: 5,
-    page: 1,
+    pageSize: 25,
+    page: 0,
   });
   const [notarizations, setNotarizations] = useState([]);
   const [sessions, setSessions] = useState([]);
@@ -31,7 +31,7 @@ const NotaryManagement = () => {
     setNotaryLoading(true);
     try {
       const { page, pageSize } = notaryPaginationModel;
-      const result = await NotarizationService.getAllNotarizations('', pageSize, page);
+      const result = await NotarizationService.getAllNotarizations(null, pageSize, page);
       setNotarizations(result);
     } finally {
       setNotaryLoading(false);
@@ -42,7 +42,7 @@ const NotaryManagement = () => {
     setSessionLoading(true);
     try {
       const { page, pageSize } = sessionPaginationModel;
-      const result = await SessionService.getAllSessions('', pageSize, page);
+      const result = await SessionService.getAllSessions(null, pageSize, page);
       setSessions(result);
     } finally {
       setSessionLoading(false);

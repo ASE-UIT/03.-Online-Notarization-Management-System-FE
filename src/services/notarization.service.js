@@ -75,13 +75,13 @@ const uploadNotarizationDocument = async (document) => {
   }
 };
 
-const getAllNotarizations = async (sortBy, limit = 10, page = 1) => {
+const getAllNotarizations = async (sortBy = null, limit, page) => {
   try {
     const response = await axiosConfig.get(`${NOTARIZATION_ENDPOINT}/getAllNotarization`, {
       params: {
         sortBy,
         limit,
-        page,
+        page: page + 1,
       },
     });
     return response.data;

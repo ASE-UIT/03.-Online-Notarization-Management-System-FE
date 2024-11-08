@@ -15,13 +15,13 @@ const createSession = async (session) => {
   }
 };
 
-const getAllSessions = async (sortBy, limit = 10, page = 1) => {
+const getAllSessions = async (sortBy = null, limit, page) => {
   try {
     const response = await axiosConfig.get(`${SESSION_ENDPOINT}/getAllSessions`, {
       params: {
         sortBy,
         limit,
-        page,
+        page: page + 1,
       },
     });
     return response.data;
