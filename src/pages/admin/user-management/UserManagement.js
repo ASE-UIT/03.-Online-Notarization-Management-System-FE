@@ -110,7 +110,7 @@ const UserManagement = () => {
             item.name || '', 
             item.email || '', 
             status, 
-            item.notaryCount || '', 
+            item.documentCount || '', 
             item.userType || ''
           );
         })
