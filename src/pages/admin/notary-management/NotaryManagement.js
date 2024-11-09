@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Header from './Header';
 import { Box } from '@mui/material';
 import { blue, gray, red, white } from '../../../config/theme/themePrimitives';
@@ -30,7 +30,7 @@ const NotaryManagement = () => {
   const [notarizations, setNotarizations] = useState([]);
   const [sessions, setSessions] = useState([]);
 
-  const fetchAllNotarizations = async () => {
+  const fetchAllNotarizations = useCallback(async () => {
     setNotaryLoading(true);
     try {
       const { page, pageSize } = notaryPaginationModel;
@@ -39,9 +39,9 @@ const NotaryManagement = () => {
     } finally {
       setNotaryLoading(false);
     }
-  };
+  }, [notaryPaginationModel]);
 
-  const fetchAllSessions = async () => {
+  const fetchAllSessions = useCallback(async () => {
     setSessionLoading(true);
     try {
       const { page, pageSize } = sessionPaginationModel;
@@ -50,7 +50,7 @@ const NotaryManagement = () => {
     } finally {
       setSessionLoading(false);
     }
-  };
+  }, [sessionPaginationModel]);
 
   const fetchTotals = async () => {
     try {
@@ -67,11 +67,11 @@ const NotaryManagement = () => {
 
   useEffect(() => {
     fetchAllNotarizations();
-  }, [notaryPaginationModel]);
+  }, [notaryPaginationModel, fetchAllNotarizations]);
 
   useEffect(() => {
     fetchAllSessions();
-  }, [sessionPaginationModel]);
+  }, [sessionPaginationModel, fetchAllSessions]);
 
   useEffect(() => {
     fetchTotals();
