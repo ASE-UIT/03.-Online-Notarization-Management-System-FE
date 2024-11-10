@@ -10,13 +10,13 @@ const NotarizationCardSkeleton = () => {
       justifyContent="center"
       alignItems="flex-start"
       width="90%"
-      height="100px"
-      border={`2px solid ${gray[200]}`}
+      height="70px"
+      border={`1px solid ${gray[200]}`}
       borderRadius={1}
       padding={2}
     >
       <Box flex={1} display="flex" flexDirection="column" justifyContent="center" alignItems="center" gap={2} height="100%">
-        <Skeleton variant="circular" width={50} height={50} />
+        <Skeleton variant="circular" width={40} height={40} />
         <Skeleton variant="text" width={80} height={20} />
       </Box>
 
@@ -24,8 +24,8 @@ const NotarizationCardSkeleton = () => {
         orientation="vertical"
         flexItem
         sx={{
-          height: '80px',
-          width: '1px',
+          height: '50px',
+          width: '0.5px',
           bgcolor: gray[200],
           alignSelf: 'center',
         }}
@@ -40,8 +40,8 @@ const NotarizationCardSkeleton = () => {
         orientation="vertical"
         flexItem
         sx={{
-          height: '80px',
-          width: '1px',
+          height: '50px',
+          width: '0.5px',
           bgcolor: gray[200],
           alignSelf: 'center',
         }}

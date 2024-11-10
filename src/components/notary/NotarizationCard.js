@@ -37,81 +37,174 @@ const NotarizationCard = ({ document }) => {
     return (
         <Box
             display="flex"
-            flexDirection="row"
+            flexDirection={{ xs: 'column', sm: 'row' }}
             justifyContent="center"
-            alignItems="flex-start"
+            alignItems={{ xs: 'flex-start', sm: 'center' }}
             width="95%"
-            height="120px"
-            border={`2px solid ${gray[200]}`}
+            border={`1px solid ${gray[200]}`}
             borderRadius={1}
+            padding={1}
+            gap={2}
         >
-            <Box flex={1} display="flex" flexDirection="column" justifyContent="center" alignItems="center" gap={2} height="100%">
-                <Avatar sx={{ width: 50, height: 50, bgcolor: gray[200], color: gray[600] }} />
-                <Typography sx={{ fontSize: 12, fontWeight: 500, color: white[900] }}>{document.requesterInfo.fullName}</Typography>
+            <Box
+                flex={1}
+                display="flex"
+                flexDirection="column"
+                justifyContent="center"
+                alignItems="center"
+                gap={1}
+                height="100%"
+                width="100%"
+            >
+                <Avatar
+                    sx={{
+                        width: { xs: 30, sm: 40 },
+                        height: { xs: 30, sm: 40 },
+                        bgcolor: gray[200],
+                        color: gray[600]
+                    }}
+                />
+                <Typography
+                    sx={{
+                        fontSize: { xs: 10, sm: 12 },
+                        fontWeight: 500,
+                        color: white[900]
+                    }}
+                >
+                    {document.requesterInfo.fullName}
+                </Typography>
             </Box>
+
             <Divider
                 orientation="vertical"
                 flexItem
                 sx={{
-                    height: '80px',
-                    width: '1px',
+                    height: { xs: '0', sm: '48px' },
+                    width: '0.5px',
                     bgcolor: gray[200],
                     alignSelf: 'center',
+                    display: { xs: 'none', sm: 'block' }
                 }}
             />
 
-            <Box flex={1} display="flex" flexDirection="column" justifyContent="center" alignItems="center" height="100%">
-                <Box display="flex" flexDirection="row" justifyContent="flex-start" alignItems="center" gap={1} width="90%">
-                    <Schedule sx={{ fontSize: 18, padding: 1, bgcolor: white, color: gray[500], borderRadius: 1 }} />
-                    <Typography sx={{ fontSize: 12, fontWeight: 500, color: white[900] }}>{formatDateTime().time}</Typography>
-                </Box>
-                <Box display="flex" flexDirection="row" justifyContent="flex-start" alignItems="center" gap={1} width="90%">
-                    <CalendarToday sx={{ fontSize: 18, padding: 1, bgcolor: white, color: gray[500], borderRadius: 1 }} />
-                    <Typography sx={{ fontSize: 12, fontWeight: 500, color: white[900] }}>{formatDateTime().date}</Typography>
-                </Box>
-            </Box>
-            <Divider
-                orientation="vertical"
-                flexItem
-                sx={{
-                    height: '80px',
-                    width: '1px',
-                    bgcolor: gray[200],
-                    alignSelf: 'center',
-                }}
-            />
-
-            <Box flex={2} display="flex" flexDirection="row" justifyContent="center" alignItems="center" height="100%" gap={2}>
-                <Box flex={1} display="flex" flexDirection="column" justifyContent="center" alignItems="flex-start" marginLeft={2}>
-                    <Typography sx={{ fontSize: 12, fontWeight: 500, color: gray[800] }}>GHI CHÚ</Typography>
+            <Box
+                flex={1}
+                display="flex"
+                flexDirection="column"
+                justifyContent="center"
+                alignItems="center"
+                height="100%"
+                gap={1}
+            >
+                <Box
+                    display="flex"
+                    flexDirection="row"
+                    justifyContent="flex-start"
+                    alignItems="center"
+                    gap={1}
+                    width="90%"
+                >
+                    <Schedule sx={{ fontSize: 15, padding: 1, bgcolor: white, color: gray[500], borderRadius: 1 }} />
                     <Typography
                         sx={{
-                            fontSize: 12,
+                            fontSize: { xs: 10, sm: 12 },
+                            fontWeight: 500,
+                            color: white[900]
+                        }}
+                    >
+                        {formatDateTime().time}
+                    </Typography>
+                </Box>
+                <Box
+                    display="flex"
+                    flexDirection="row"
+                    justifyContent="flex-start"
+                    alignItems="center"
+                    gap={1}
+                    width="90%"
+                >
+                    <CalendarToday sx={{ fontSize: 15, padding: 1, bgcolor: white, color: gray[500], borderRadius: 1 }} />
+                    <Typography
+                        sx={{
+                            fontSize: { xs: 10, sm: 12 },
+                            fontWeight: 500,
+                            color: white[900]
+                        }}
+                    >
+                        {formatDateTime().date}
+                    </Typography>
+                </Box>
+            </Box>
+
+            <Divider
+                orientation="vertical"
+                flexItem
+                sx={{
+                    height: { xs: '0', sm: '48px' },
+                    width: '0.5px',
+                    bgcolor: gray[200],
+                    alignSelf: 'center',
+                    display: { xs: 'none', sm: 'block' }
+                }}
+            />
+
+            <Box
+                flex={2}
+                display="flex"
+                flexDirection={{ xs: 'column', sm: 'row' }}
+                justifyContent="center"
+                alignItems="center"
+                gap={2}
+            >
+                <Box
+                    flex={1}
+                    display="flex"
+                    flexDirection="column"
+                    justifyContent="center"
+                    alignItems="flex-start"
+                    marginLeft={2}
+                    sx={{
+                        width: { xs: '100%', sm: 'auto' },
+                        textAlign: 'left'
+                    }}
+                >
+                    <Typography sx={{ fontSize: 10, fontWeight: 500, color: gray[800] }}>GHI CHÚ</Typography>
+                    <Typography
+                        sx={{
+                            fontSize: { xs: 10, sm: 12 },
                             fontWeight: 500,
                             color: gray[600],
                             display: '-webkit-box',
                             WebkitBoxOrient: 'vertical',
                             WebkitLineClamp: 2,
-                            overflow: 'hidden',
+                            overflow: 'hidden'
                         }}
                     >
                         {formatDescription()}
                     </Typography>
                 </Box>
-                <Box display="flex" justifyContent="center" alignItems="center">
+                <Box
+                    display="flex"
+                    justifyContent={{ xs: 'flex-end', sm: 'center' }}
+                    alignItems="center"
+                    width={{ xs: '100%', sm: 'auto' }}
+                >
                     <Button
                         onClick={handleMenuClick}
                         sx={{
                             bgcolor: gray[200],
                             color: gray[700],
                             borderRadius: 1,
+                            width: { xs: '100%', sm: 'auto' },
+                            maxWidth: '100px',
                             '&:hover': {
                                 bgcolor: gray[700],
                                 color: gray[200]
                             },
                             textTransform: 'none',
                             paddingY: '2px',
-                            marginRight: 2
+                            marginRight: { xs: 0, sm: 2 },
+                            fontSize: { xs: 8, sm: 10 }
                         }}
                         endIcon={isMenuOpen ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
                     >
@@ -124,11 +217,11 @@ const NotarizationCard = ({ document }) => {
                         onClose={handleMenuClose}
                         anchorOrigin={{
                             vertical: 'top',
-                            horizontal: 'left',
+                            horizontal: 'left'
                         }}
                         transformOrigin={{
                             vertical: 'top',
-                            horizontal: 'left',
+                            horizontal: 'left'
                         }}
                     >
                         <MenuItem onClick={handleMenuClose}>MenuItem</MenuItem>
