@@ -35,7 +35,7 @@ const NotaryManagement = lazy(() => import('./pages/admin/notary-management/Nota
 const NotarySessionManagement = lazy(() => import('./pages/admin/NotarySessionManagement'));
 const NotaryDashboard = lazy(() => import('./pages/notary/NotaryDashboard'));
 const NotarizationDocuments = lazy(() => import('./pages/notary/NotarizationDocuments'));
-const NotarizationHistory = lazy(() => import('./pages/notary/NotarizationHistory'));
+const NotarizationHistory = lazy(() => import('./pages/notary/NotarizationHistory'))
 
 function App() {
   const dispatch = useDispatch();
