@@ -32,7 +32,6 @@ const AdminDashboard = lazy(() => import('./pages/admin/dashboard/AdminDashboard
 const EmployeeManagement = lazy(() => import('./pages/admin/EmployeeManagement'));
 const UserManagement = lazy(() => import('./pages/admin/user-management/UserManagement'));
 const NotaryManagement = lazy(() => import('./pages/admin/notary-management/NotaryManagement'));
-const NotarySessionManagement = lazy(() => import('./pages/admin/NotarySessionManagement'));
 
 function App() {
   const dispatch = useDispatch();
