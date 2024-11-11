@@ -2,7 +2,6 @@ import axios from 'axios';
 import { API_BASE_URL } from '../services/config';
 import Cookies from 'js-cookie';
 import AuthService from '../services/auth.service';
-import { toast } from 'react-toastify';
 
 const axiosConfig = axios.create({
   baseURL: API_BASE_URL,
@@ -37,9 +36,9 @@ axiosConfig.interceptors.response.use(
       });
     }
 
-    if (error.response?.status !== 410) {
-      toast.error(error.response?.data?.message || error?.message);
-    }
+    // if (error.response?.status !== 410) {
+    //   toast.error(error.response?.data?.message || error?.message);
+    // }
 
     const originalRequest = error.config;
     if (error.response && error.response.status === 401 && originalRequest) {

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Box, Divider, Drawer, IconButton, List, Typography } from '@mui/material';
-import { KeyboardDoubleArrowLeft, KeyboardDoubleArrowRight, Logout } from '@mui/icons-material';
+import { HistoryEdu, KeyboardDoubleArrowLeft, KeyboardDoubleArrowRight, Logout } from '@mui/icons-material';
 import { dark, primary, white, red } from '../config/theme/themePrimitives';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -99,16 +99,35 @@ const Sidebar = () => {
           href: '/admin/notary-management',
         },
         {
-          type: 'notary-session-management',
-          icon: <Groups2Rounded />,
-          title: 'Quản lý phiên công chứng',
-          href: '/admin/notary-session-management',
+          type: 'settings',
+          icon: <Settings />,
+          title: 'Cài đặt',
+          href: '/admin/settings',
         },
       );
     } else if (role === 'secretary') {
     } else if (role === 'notary') {
+      items.push(
+        {
+          type: 'dashboard',
+          icon: <GridViewRounded />,
+          title: 'Dashboard',
+          href: '/notary/dashboard',
+        },
+        {
+          type: 'notarization-documents',
+          icon: <HistoryEdu />,
+          title: 'Tài liệu công chứng',
+          href: '/notary/notarization-documents',
+        },
+        {
+          type: 'notarization-history',
+          icon: <DocumentScanner />,
+          title: 'Lịch sử công chứng',
+          href: '/notary/notarization-history',
+        },
+      );
     }
-
     return items;
   }, [role]);
 

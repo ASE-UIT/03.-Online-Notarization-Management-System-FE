@@ -1,25 +1,4 @@
-import { layouts, plugins } from 'chart.js';
 import { blue, gray, green, red, white, yellow } from './theme/themePrimitives';
-
-export const notaryServiceBarChartData = {
-  labels: ['Dịch vụ A', 'Dịch vụ B', 'Dịch vụ C', 'Dịch vụ D'],
-  datasets: [
-    {
-      label: 'Tháng trước',
-      data: [120, 150, 80, 200],
-      backgroundColor: 'rgba(0, 149, 255, 0.5)',
-      borderColor: blue[400],
-      borderWidth: 1,
-    },
-    {
-      label: 'Tháng hiện tại',
-      data: [180, 130, 120, 210],
-      backgroundColor: 'rgba(67, 183, 93, 0.5)',
-      borderColor: green[400],
-      borderWidth: 1,
-    },
-  ],
-};
 
 export const notaryServiceBarChartOptions = {
   responsive: true,
@@ -63,26 +42,6 @@ export const notaryServiceBarChartOptions = {
       },
     },
   },
-};
-
-export const notaryFieldBarChartData = {
-  labels: ['Lĩnh vực A', 'Lĩnh vực B', 'Lĩnh vực C', 'Lĩnh vực D'],
-  datasets: [
-    {
-      label: 'Tháng trước',
-      data: [120, 150, 80, 200],
-      backgroundColor: 'rgba(0, 149, 255, 0.5)',
-      borderColor: blue[400],
-      borderWidth: 1,
-    },
-    {
-      label: 'Tháng hiện tại',
-      data: [180, 130, 120, 210],
-      backgroundColor: 'rgba(67, 183, 93, 0.5)',
-      borderColor: green[400],
-      borderWidth: 1,
-    },
-  ],
 };
 
 export const notaryFieldBarChartOptions = {
@@ -160,49 +119,49 @@ export const notaryPieChartOptions = {
 };
 
 export const adminPieChartData = {
-    labels: ['Công chứng viên', 
-             'Thư ký', 
-             'Trợ lý VPCC', 
-             'Chuyên viên pháp lý'],
-    datasets: [
-      {
-        data: [10, 20, 30, 25],
-        backgroundColor: [red[300], blue[300], green[300], yellow[300]],
-        borderColor: white[50],
-        borderWidth: 2,
-      },
-    ],
-  };
+  labels: ['Công chứng viên', 
+           'Thư ký', 
+           'Trợ lý VPCC', 
+           'Chuyên viên pháp lý'],
+  datasets: [
+    {
+      data: [10, 20, 30, 25],
+      backgroundColor: [red[300], blue[300], green[300], yellow[300]],
+      borderColor: white[50],
+      borderWidth: 2,
+    },
+  ],
+};
 
 export const adminPieChartOptions = {
-    responsive: true,
-  maintainAspectRatio: false,
-  layout: {
-    padding: {
-        right: 50,
+  responsive: true,
+maintainAspectRatio: false,
+layout: {
+  padding: {
+      right: 50,
+  }
+},
+plugins: {
+  legend: {
+    position: 'right',
+    labels: {
+      font: {
+          size: 16,
+          family: 'Roboto',
+          weight: 400,
+          lineheight: 24
+      },
+      color: '#000',
+      boxWidth: 20,
+      padding: 24,
     }
   },
-  plugins: {
-    legend: {
-      position: 'right',
-      labels: {
-        font: {
-            size: 16,
-            family: 'Roboto',
-            weight: 400,
-            lineheight: 24
-        },
-        color: '#000',
-        boxWidth: 20,
-        padding: 24,
-      }
-    },
-    tooltip: {
-      callbacks: {
-        label: (context) => {
-          return `${context.label}: ${context.raw}`;
-        },
+  tooltip: {
+    callbacks: {
+      label: (context) => {
+        return `${context.label}: ${context.raw}`;
       },
     },
   },
+},
 }

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, TextField, Button, IconButton, Autocomplete } from '@mui/material';
-import ShortcutRoundedIcon from '@mui/icons-material/ShortcutRounded';
 import FileUploadRoundedIcon from '@mui/icons-material/FileUploadRounded';
 import { black, dark, gray, primary, red, white } from '../../config/theme/themePrimitives';
 import UploadedFileList from '../../components/services/UploadedFileList';
@@ -8,6 +7,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import NotaryDocumentDetailsModal from '../../components/modals/NotaryDocumentDetailsModal';
 import NotarizationService from '../../services/notarization.service';
+import { ChevronRightRounded } from '@mui/icons-material';
 
 const CreateNotarizationProfile = () => {
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -20,6 +20,45 @@ const CreateNotarizationProfile = () => {
   const [requesterInfo, setRequesterInfo] = useState({});
 
   const [openModal, setOpenModal] = useState(false);
+
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleDragEnter = (event) => {
+    event.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (event) => {
+    event.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (event) => {
+    event.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+    setIsDragging(false);
+    const files = Array.from(event.dataTransfer.files);
+    handleFileUpload(files);
+  };
+
+  const handleFileUpload = (files) => {
+    const validFormats = ['.pdf', '.docx', '.png', '.jpg'];
+
+    files.forEach((file) => {
+      const isValid = validFormats.some((format) => file.name.toLowerCase().endsWith(format));
+      if (!isValid) {
+        toast.error(`${file.name}: Tài liệu được tải lên không có định dạng hợp lệ`);
+        return;
+      }
+
+      setUploadedFiles((prev) => [...prev, file]);
+    });
+  };
+
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     const validFormats = ['.pdf', '.docx', '.png', '.jpg'];
@@ -117,7 +156,7 @@ const CreateNotarizationProfile = () => {
   }, [notarizationData]);
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       {/* Header */}
       <Box
         sx={{
@@ -125,15 +164,15 @@ const CreateNotarizationProfile = () => {
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          py: 10,
+          py: 6,
           backgroundColor: gray[50],
         }}
       >
         <Box sx={{ px: { xs: 2, sm: 5, md: 10 } }}>
-          <Typography variant="h2" textAlign="center" color={dark[500]} sx={{ maxWidth: 900, mx: 'auto', fontWeight: 700 }}>
+          <Typography variant="h3" textAlign="center" color={dark[500]} sx={{ maxWidth: 900, mx: 'auto', fontWeight: 700 }}>
             Tạo hồ sơ công chứng
           </Typography>
-          <Typography variant="body2" textAlign="center" color={dark[500]} sx={{ mt: 4 }}>
+          <Typography variant="body2" textAlign="center" color={dark[500]} sx={{ mt: 2 }}>
             Chú ý: Những mục đánh dấu
             <span style={{ color: red[500] }}> * </span> là bắt buộc.
           </Typography>
@@ -157,109 +196,132 @@ const CreateNotarizationProfile = () => {
             gap: 2,
           }}
         >
-          <Autocomplete
-            size="small"
-            loading={loadingNotarization}
-            options={notarizationField}
-            getOptionLabel={(option) => option.name}
-            onChange={(e, value) => setSelectedField(value)}
-            sx={{ flex: 1, backgroundColor: white[50] }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Lĩnh vực công chứng"
-                inputProps={{ ...params.inputProps, readOnly: true }} // Prevents user from typing
-              />
-            )}
-            value={selectedField}
-            onOpen={fetchNotarizationField}
-          />
-          <Autocomplete
-            size="small"
-            loading={loadingNotarization}
-            options={notarizationService}
-            getOptionLabel={(option) => option.name}
-            onChange={(e, value) => setSelectedService(value)}
-            sx={{ flex: 1, backgroundColor: white[50] }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Dịch vụ công chứng"
-                inputProps={{ ...params.inputProps, readOnly: true }} // Prevents user from typing
-              />
-            )}
-            value={selectedService}
-            onOpen={fetchNotarizationService}
-          />
+          <Box sx={{ flex: 1 }}>
+            <Typography sx={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', color: black[900], mb: 1 }}>
+              Lĩnh vực công chứng
+            </Typography>
+            <Autocomplete
+              size="small"
+              loading={loadingNotarization}
+              options={notarizationField}
+              getOptionLabel={(option) => option.name}
+              onChange={(e, value) => setSelectedField(value)}
+              sx={{ backgroundColor: white[50] }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder="Chọn lĩnh vực công chứng"
+                  inputProps={{ ...params.inputProps, readOnly: true, style: { fontSize: '0.875rem' } }}
+                />
+              )}
+              value={selectedField}
+              onOpen={fetchNotarizationField}
+            />
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Typography sx={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', color: black[900], mb: 1 }}>
+              Lĩnh vực công chứng
+            </Typography>
+            <Autocomplete
+              size="small"
+              loading={loadingNotarization}
+              options={notarizationService}
+              getOptionLabel={(option) => option.name}
+              onChange={(e, value) => setSelectedService(value)}
+              sx={{ backgroundColor: white[50], fontSize: '0.875rem' }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder="Chọn dịch vụ công chứng"
+                  inputProps={{ ...params.inputProps, readOnly: true, style: { fontSize: '0.875rem' } }}
+                />
+              )}
+              value={selectedService}
+              onOpen={fetchNotarizationService}
+            />
+          </Box>
         </Box>
 
-        <Box display="flex" flexDirection="column" gap={2} mt={2}>
-          <Typography variant="body2" color="textPrimary" fontWeight="bold">
-            Thông tin người yêu cầu công chứng
-          </Typography>
+        <Box display="flex" flexDirection="column" mt={2}>
           <Box
             sx={{
               display: 'flex',
-              flexDirection: { xs: 'column', sm: 'row' },
-              gap: 4,
+              flexDirection: { xs: 'column', sm: 'column', md: 'row' },
+              gap: 2,
             }}
           >
-            <TextField
-              size="small"
-              fullWidth
-              label={
-                <>
-                  Họ và tên <span style={{ color: red[500] }}>*</span>
-                </>
-              }
-              name="fullName"
-              variant="outlined"
-              sx={{ backgroundColor: white[50] }}
-              value={requesterInfo.fullName}
-              onChange={handleInputChange}
-            />
-            <TextField
-              size="small"
-              fullWidth
-              label={
-                <>
-                  CMND/CCCD/Hộ chiếu số <span style={{ color: red[500] }}>*</span>
-                </>
-              }
-              name="citizenId"
-              variant="outlined"
-              sx={{ backgroundColor: white[50] }}
-              value={requesterInfo.citizenId}
-              onChange={handleInputChange}
-            />
-            <TextField
-              size="small"
-              fullWidth
-              label={
-                <>
-                  Số điện thoại <span style={{ color: red[500] }}>*</span>
-                </>
-              }
-              name="phoneNumber"
-              variant="outlined"
-              sx={{ backgroundColor: white[50] }}
-              value={requesterInfo.phoneNumber}
-              onChange={handleInputChange}
-            />
-            <TextField
-              size="small"
-              fullWidth
-              label={
-                <>
-                  Địa chỉ Email <span style={{ color: red[500] }}>*</span>
-                </>
-              }
-              name="email"
-              variant="outlined"
-              sx={{ backgroundColor: white[50] }}
-              value={requesterInfo.email}
-              onChange={handleInputChange}
-            />
+            <Box sx={{ flex: 1 }}>
+              <Typography sx={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', color: black[900], mb: 1 }}>
+                Họ và tên <span style={{ color: red[500] }}>*</span>
+              </Typography>
+              <TextField
+                size="small"
+                fullWidth
+                name="fullName"
+                variant="outlined"
+                sx={{ backgroundColor: white[50] }}
+                value={requesterInfo.fullName}
+                onChange={handleInputChange}
+                inputProps={{
+                  style: { fontSize: '0.875rem' },
+                  placeholder: 'Nhập họ và tên',
+                }}
+              />
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <Typography sx={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', color: black[900], mb: 1 }}>
+                Số điện thoại <span style={{ color: red[500] }}>*</span>
+              </Typography>
+              <TextField
+                size="small"
+                fullWidth
+                name="phoneNumber"
+                variant="outlined"
+                sx={{ backgroundColor: white[50] }}
+                value={requesterInfo.phoneNumber}
+                onChange={handleInputChange}
+                inputProps={{
+                  style: { fontSize: '0.875rem' },
+                  placeholder: 'Nhập số điện thoại',
+                }}
+              />
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <Typography sx={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', color: black[900], mb: 1 }}>
+                Số CMND/CCCD <span style={{ color: red[500] }}>*</span>
+              </Typography>
+              <TextField
+                size="small"
+                fullWidth
+                name="citizenId"
+                variant="outlined"
+                sx={{ backgroundColor: white[50] }}
+                value={requesterInfo.citizenId}
+                onChange={handleInputChange}
+                inputProps={{
+                  style: { fontSize: '0.875rem' },
+                  placeholder: 'Nhập số CMND/CCCD/Hộ chiếu',
+                }}
+              />
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <Typography sx={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', color: black[900], mb: 1 }}>
+                Email <span style={{ color: red[500] }}>*</span>
+              </Typography>
+              <TextField
+                size="small"
+                fullWidth
+                name="email"
+                variant="outlined"
+                sx={{ backgroundColor: white[50] }}
+                value={requesterInfo.email}
+                onChange={handleInputChange}
+                inputProps={{
+                  style: { fontSize: '0.875rem' },
+                  placeholder: 'Nhập địa chỉ email',
+                }}
+              />
+            </Box>
           </Box>
         </Box>
       </Box>
@@ -267,38 +329,46 @@ const CreateNotarizationProfile = () => {
       {/* Upload Section */}
       <Box
         sx={{
+          height: '100%',
           display: 'flex',
           flexDirection: 'column',
           gap: 2,
-          py: 5,
           alignItems: 'center',
           backgroundColor: gray[50],
+          p: 4,
         }}
       >
         <Box
           sx={{
             display: 'flex',
             backgroundColor: white[50],
-            p: 2,
+            p: isDragging ? 4 : 2,
             boxShadow: 1,
             borderRadius: 2,
-            width: { xs: '90%', sm: '80%', md: '60%' },
+            width: { xs: '90%', sm: '80%', md: '68%' },
             justifyContent: 'center',
             alignItems: 'center',
+            transition: 'padding 0.3s',
           }}
         >
           <Box
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
             sx={{
               width: '100%',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: 1,
               p: 4,
               borderRadius: 1,
-              backgroundColor: gray[50],
+              backgroundColor: isDragging ? gray[200] : gray[50],
               borderStyle: 'dashed',
               borderColor: black[200],
+              transition: 'background-color 0.3s',
             }}
           >
             <IconButton
@@ -316,10 +386,10 @@ const CreateNotarizationProfile = () => {
               <input type="file" hidden multiple onChange={handleFileChange} accept=".pdf,.docx,.png,.jpg" />
             </IconButton>
 
-            <Typography variant="body2" color="textPrimary" fontWeight="bold" textAlign={'center'}>
+            <Typography sx={{ fontSize: 14, fontWeight: 600, color: black[900], textAlign: 'center' }}>
               Kéo thả hoặc nhấn vào đây để thêm tài liệu
             </Typography>
-            <Typography variant="caption" color="textSecondary" textAlign="center">
+            <Typography sx={{ fontSize: 12, fontWeight: 500, color: black[400], textAlign: 'center' }}>
               Tài liệu phải có định dạng .pdf, .docx, .png hoặc .jpg
             </Typography>
           </Box>
@@ -329,7 +399,23 @@ const CreateNotarizationProfile = () => {
         {uploadedFiles.length > 0 && <UploadedFileList files={uploadedFiles} onRemove={handleRemove} />}
 
         {uploadedFiles.length > 0 && (
-          <Button variant="contained" color="primary" startIcon={<ShortcutRoundedIcon />} onClick={handleOpenModal}>
+          <Button
+            sx={{
+              px: 4,
+              textTransform: 'none',
+              fontSize: 16,
+              fontWeight: 600,
+              ':hover': {
+                transform: 'scale(1.05)',
+                backgroundColor: primary[600],
+              },
+              transition: 'transform 0.3s',
+            }}
+            variant="contained"
+            color="primary"
+            endIcon={<ChevronRightRounded />}
+            onClick={handleOpenModal}
+          >
             Tiếp tục
           </Button>
         )}
