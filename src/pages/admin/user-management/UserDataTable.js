@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
@@ -14,6 +15,7 @@ import { visuallyHidden } from '@mui/utils';
 import CircleRoundedIcon from '@mui/icons-material/CircleRounded';
 import { Avatar, Typography, Button } from '@mui/material';
 import TablePagination from '@mui/material/TablePagination';
+import UserDetailModal from './UserDetailModal';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -52,8 +54,9 @@ const UserDataTable = ({
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('profile');
   const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = React.useState(paginationModel.page - 1);
-  const [pageSize, setPageSize] = React.useState(paginationModel.pageSize);
+  const [openModal, setOpenModal] = useState(false);
+  const [userId, setUserId] = useState('');
+
   function EnhancedTableHead(props) {
     const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
     const createSortHandler = (property) => (event) => {
@@ -65,10 +68,17 @@ const UserDataTable = ({
         <TableRow
           sx={{
             backgroundColor: '#F9FAFB',
-            borderRadius: '8px',
+            /* borderRadius: '8px', */
           }}
         >
-          <TableCell padding="checkbox" sx={{ borderRadius: '8px' }}>
+          <TableCell
+            padding="checkbox"
+            sx={
+              {
+                /* borderRadius: '8px' */
+              }
+            }
+          >
             <Checkbox
               color="primary"
               indeterminate={numSelected > 0 && numSelected < rowCount}
@@ -82,7 +92,7 @@ const UserDataTable = ({
               align={'left'}
               padding={headCell.disablePadding ? 'none' : 'normal'}
               sortDirection={orderBy === headCell.id ? order : false}
-              sx={{ borderRadius: '8px', width: '20%', fontSize: '16px' }}
+              sx={{ /* borderRadius: '8px', */ width: '20%', fontSize: '16px' }}
             >
               <TableSortLabel
                 active={orderBy === headCell.id}
@@ -119,30 +129,22 @@ const UserDataTable = ({
   };
 
   const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelected = rows.map((n) => n.id);
-      setSelected(newSelected);
-      return;
-    }
+    return;
+  };
+
+  const handleClick = (event, id, userId) => {
+    let newSelected = [];
+    newSelected = newSelected.concat(selected, id);
+    setSelected(newSelected);
+    setUserId(userId);
+
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
     setSelected([]);
   };
-
-  const handleClick = (event, id) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
-    }
-    setSelected(newSelected);
-  };
-
   const handlePageChange = (_, newPage) => {
     setPaginationModel((prev) => ({ ...prev, page: newPage + 1 }));
   };
@@ -152,8 +154,8 @@ const UserDataTable = ({
     setPaginationModel((prev) => ({ ...prev, pageSize: newPageSize, page: 1 }));
   };
 
-  const emptyRows =/* 
-    paginationModel.page > 0 ? Math.max(0, paginationModel.page * paginationModel.pageSize - rows.length) :  */0;
+  const emptyRows = /* 
+    paginationModel.page > 0 ? Math.max(0, paginationModel.page * paginationModel.pageSize - rows.length) :  */ 0;
 
   const visibleRows = React.useMemo(() => {
     let filteredRows = rows;
@@ -185,9 +187,9 @@ const UserDataTable = ({
   }, [filterStatus, searchText, order, orderBy, rows]);
 
   return (
-    <Box sx={{ width: '100%', maxHeight: '45vh' }}>
-      <Paper sx={{ width: '100%', maxHeight: '100%' }}>
-        <TableContainer sx={{ maxHeight: '45vh' }}>
+    <Box sx={{ width: '100%', maxHeight: '45vh', borderRadius: '24px' }}>
+      <Paper sx={{ width: '100%', maxHeight: '100%', borderRadius: '24px', boxShadow: 'none' }}>
+        <TableContainer sx={{ maxHeight: '45vh', borderRadius: '24px 24px 0px 0px' }}>
           <Table stickyHeader loading={loading} sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={'medium'}>
             <EnhancedTableHead
               numSelected={selected.length}
@@ -211,7 +213,7 @@ const UserDataTable = ({
                 return (
                   <TableRow
                     hover
-                    onClick={(event) => handleClick(event, row.id)}
+                    onClick={(event) => handleClick(event, row.ordinalNumber, row.id)}
                     role="checkbox"
                     aria-checked={isItemSelected}
                     tabIndex={-1}
@@ -304,13 +306,14 @@ const UserDataTable = ({
           loading={loading}
           sx={{
             backgroundColor: '#FFF',
-            borderRadius: '8px',
+            borderRadius: '0 0 24px 24px',
             '& .MuiSelect-icon': {
               display: 'none',
             },
           }}
         />
       </Paper>
+      <UserDetailModal open={openModal} handleClose={handleCloseModal} userId={userId}></UserDetailModal>
     </Box>
   );
 };

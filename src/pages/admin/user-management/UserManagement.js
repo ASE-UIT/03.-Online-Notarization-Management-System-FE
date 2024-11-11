@@ -100,8 +100,8 @@ const UserManagement = () => {
           if (item.status === 'deleted') status = 'Đã bị xóa ';
 
           return createData(
-            index + 1,
-            index + 1,
+            item.id,
+            index + 1 + (page - 1) * pageSize,
             item.name || '',
             item.email || '',
             status,
@@ -225,8 +225,10 @@ const UserManagement = () => {
         <Box
           sx={{
             border: !loadingStatus ? '1px solid var(--black-50, #E0E0E0)' : 'none',
-            borderRadius: '8px',
+            borderRadius: '24px',
             background: white[50],
+            p: '8px',
+            paddingBottom: '64px',
           }}
         >
           {loadingStatus ? (
