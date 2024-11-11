@@ -272,6 +272,7 @@ const Home = () => {
 				onClick={handleChatboxClick}
 			>
 				<AssistantIcon
+					data-testid = 'assistant-icon'
 					sx={{
 						position: "fixed",
 						width: "3vw",
@@ -305,6 +306,7 @@ const Home = () => {
 				}}
 			>
 				<PhoneIcon
+					data-testid ='phone-icon'
 					sx={{
 						position: "fixed",
 						width: "3vw",

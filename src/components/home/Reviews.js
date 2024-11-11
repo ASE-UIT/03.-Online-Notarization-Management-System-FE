@@ -2,7 +2,7 @@ import { Box, Container, Typography, IconButton } from '@mui/material';
 import { ArrowCircleLeftRounded, ArrowCircleRightRounded, StarHalfRounded, StarRounded } from '@mui/icons-material';
 import { useMemo, useState } from 'react';
 import { dark, primary } from '../../config/theme/themePrimitives';
-
+import React from 'react';
 const Reviews = () => {
   const reviews = useMemo(
     () => [
