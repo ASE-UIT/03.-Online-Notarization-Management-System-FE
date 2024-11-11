@@ -121,9 +121,8 @@ const iconMap = {
   [filterList.LegalSpecialist]: <RuleIcon sx={{ height: '18px', width: '18px' }} />,
 };
 
-function createData(id, ordinalNumber, name, position, status, salary) {
+function createData(ordinalNumber, name, position, status, salary) {
   return {
-    id,
     ordinalNumber,
     name,
     position,
@@ -161,7 +160,7 @@ const EmployeeManagement = () => {
           if(item.status === 'suspended') status = 'Bị cấm';
           if(item.status === 'deleted') status = 'Đã bị xóa ';
 
-          return createData(index+1,index+1,item.name,role,status,'');
+          return createData((index+1)+((page-1)*pageSize),item.name,role,status,'');
         })
       )
       setData(rows);
@@ -298,6 +297,8 @@ const EmployeeManagement = () => {
             headCells={headCells}
             filterList={filterList}
             paginationModel={paginationModel}
+            setPaginationModel={setPaginationModel}
+            loading={loadingStatus}
           ></DataTable>
           )}
         </Box>

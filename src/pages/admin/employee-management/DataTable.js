@@ -27,23 +27,32 @@ function descendingComparator(a, b, orderBy) {
 
 function SetStatusColor(params) {
   let color = '';
-  if(params === 'Trực tuyến') color = '#00ff00'; 
-  if(params === 'Ngoại tuyến') color = '#666666';
-  if(params === 'Bị cấm') color = '#FFAA00';
-  if(params === 'Đã bị xóa') color = '#EE443F';
-  return  color;
+  if (params === 'Trực tuyến') color = '#00ff00';
+  if (params === 'Ngoại tuyến') color = '#666666';
+  if (params === 'Bị cấm') color = '#FFAA00';
+  if (params === 'Đã bị xóa') color = '#EE443F';
+  return color;
 }
 
 function getComparator(order, orderBy) {
   return order === 'desc' ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-const DataTable = ({ filterStatus, searchText, rows, headCells, filterList, paginationModel }) => { 
+const DataTable = ({
+  filterStatus,
+  searchText,
+  rows,
+  headCells,
+  filterList,
+  paginationModel,
+  setPaginationModel,
+  loading,
+}) => {
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('profile');
   const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = React.useState(paginationModel.page-1);
-
+  const [page, setPage] = React.useState(paginationModel.page - 1);
+  const [pageSize, setPageSize] = React.useState(paginationModel.pageSize);
 
   function EnhancedTableHead(props) {
     const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
@@ -73,7 +82,7 @@ const DataTable = ({ filterStatus, searchText, rows, headCells, filterList, pagi
               align={'left'}
               padding={headCell.disablePadding ? 'none' : 'normal'}
               sortDirection={orderBy === headCell.id ? order : false}
-              sx={{ borderRadius: '8px', width: '20%' , fontSize: '16px'}}
+              sx={{ borderRadius: '8px', width: '20%', fontSize: '16px' }}
             >
               <TableSortLabel
                 active={orderBy === headCell.id}
@@ -134,10 +143,9 @@ const DataTable = ({ filterStatus, searchText, rows, headCells, filterList, pagi
     setSelected(newSelected);
   };
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+  const handleChangePage = (_, newPage) => {
+    setPaginationModel((prev) => ({ ...prev, page: newPage + 1 }));
   };
-
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * paginationModel.pageSize - rows.length) : 0;
 
@@ -151,23 +159,23 @@ const DataTable = ({ filterStatus, searchText, rows, headCells, filterList, pagi
     if (searchText) {
       filteredRows = filteredRows.filter(
         (row) =>
-          row.ordinalNumber.toLowerCase().includes(searchText.toLowerCase()) ||
-          row.name.toLowerCase().includes(searchText.toLowerCase()) ||
-          row.position.toLowerCase().includes(searchText.toLowerCase()) ||
-          row.status.toLowerCase().includes(searchText.toLowerCase()) ||
-          row.salary.toLowerCase().includes(searchText.toLowerCase()),
+          row.ordinalNumber?.toString().toLowerCase().includes(searchText.toLowerCase()) ||
+          row.name?.toString().toLowerCase().includes(searchText.toLowerCase()) ||
+          row.position?.toString().toLowerCase().includes(searchText.toLowerCase()) ||
+          row.status?.toString().toLowerCase().includes(searchText.toLowerCase()) ||
+          row.salary?.toString().toLowerCase().includes(searchText.toLowerCase()),
       );
     }
     setSelected([]);
 
-    return filteredRows.sort(getComparator(order, orderBy)).slice(page * paginationModel.pageSize, page * paginationModel.pageSize + paginationModel.pageSize);
-  }, [filterStatus, searchText, order, orderBy, page, paginationModel.pageSize]);
+    return filteredRows.sort(getComparator(order, orderBy));
+  }, [filterStatus, searchText, order, orderBy, rows]);
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Paper sx={{ width: '100%' }}>
-        <TableContainer>
-          <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={'medium'}>
+    <Box sx={{ width: '100%', maxHeight: '45vh' }}>
+      <Paper sx={{ width: '100%', maxHeight: '100%' }}>
+        <TableContainer sx={{ maxHeight: '45vh' }}>
+          <Table stickyHeader loading={loading} sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={'medium'}>
             <EnhancedTableHead
               numSelected={selected.length}
               order={order}
@@ -179,20 +187,21 @@ const DataTable = ({ filterStatus, searchText, rows, headCells, filterList, pagi
             <TableBody
               sx={{
                 backgroundColor: '#FFF',
+                loading: loading,
               }}
             >
               {visibleRows.map((row, index) => {
-                const isItemSelected = selected.includes(row.id);
+                const isItemSelected = selected.includes(row.ordinalNumber);
                 const labelId = `enhanced-table-checkbox-${index}`;
 
                 return (
                   <TableRow
                     hover
-                    onClick={(event) => handleClick(event, row.id)}
+                    onClick={(event) => handleClick(event, row.ordinalNumber)}
                     role="checkbox"
                     aria-checked={isItemSelected}
                     tabIndex={-1}
-                    key={row.id}
+                    key={row.ordinalNumber}
                     selected={isItemSelected}
                     sx={{ cursor: 'pointer' }}
                   >
@@ -272,20 +281,20 @@ const DataTable = ({ filterStatus, searchText, rows, headCells, filterList, pagi
         <TablePagination
           component="div"
           count={rows.length}
+          paginationMode="server"
           rowsPerPage={paginationModel.pageSize}
-          page={page}
+          page={paginationModel.page - 1}
           onPageChange={handleChangePage}
           labelRowsPerPage={''}
+          loading={loading}
           sx={{
             backgroundColor: '#FFF',
             borderRadius: '8px',
             '& .MuiSelect-icon': {
-              display: 'none'
-            }
+              display: 'none',
+            },
           }}
-          
         />
-
       </Paper>
     </Box>
   );
