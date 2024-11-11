@@ -1,5 +1,5 @@
 import { ArrowBack } from '@mui/icons-material';
-import { Box, Button, IconButton, Modal, Typography, Tabs, Tab, Avatar, TextField } from '@mui/material';
+import { Box, Button, IconButton, Modal, Typography, Tabs, Tab, Avatar, TextField, Grid } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import { black, gray, primary, white } from '../../../config/theme/themePrimitives';
 import { toast } from 'react-toastify';
@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import InfoField from './InfoField';
 import DetailModalSkeleton from './DetailModalSkeleton';
 import UserService from '../../../services/user.service';
+import NotaryDocumentCard from './NotaryDocumentCard';
 
 const EditUserProfileModal = ({ open, handleClose, userId }) => {
   const [tabValue, setTabValue] = useState(0);
@@ -29,6 +30,57 @@ const EditUserProfileModal = ({ open, handleClose, userId }) => {
     email: '',
     id: '',
   });
+
+  const documents = [
+    {
+      docType: 'Công chứng hợp đồng mua bán nhà đất',
+      documentId: '6722157ce89b01001f5ca296',
+      date: '24/09/2024',
+      status: 'Đang xử lý',
+    },
+    {
+      docType: 'Công chứng hợp đồng mua bán nhà đất',
+      documentId: '6722157ce89b01001f5ca297',
+      date: '25/09/2024',
+      status: 'Hoàn thành',
+    },
+    {
+      docType: 'Công chứng hợp đồng mua bán nhà đất',
+      documentId: '6722157ce89b01001f5ca298',
+      date: '26/09/2024',
+      status: 'Chờ xác nhận',
+    },
+    {
+      docType: 'Công chứng hợp đồng mua bán nhà đất',
+      documentId: '6722157ce89b01001f5ca299',
+      date: '27/09/2024',
+      status: 'Đang xử lý',
+    },
+    {
+      docType: 'Công chứng hợp đồng mua bán nhà đất',
+      documentId: '6722157ce89b01001f5ca300',
+      date: '28/09/2024',
+      status: 'Hoàn thành',
+    },
+    {
+      docType: 'Công chứng hợp đồng mua bán nhà đất',
+      documentId: '6722157ce89b01001f5ca301',
+      date: '29/09/2024',
+      status: 'Chờ xác nhận',
+    },
+    {
+      docType: 'Công chứng hợp đồng mua bán nhà đất',
+      documentId: '6722157ce89b01001f5ca302',
+      date: '30/09/2024',
+      status: 'Đang xử lý',
+    },
+    {
+      docType: 'Công chứng hợp đồng mua bán nhà đất',
+      documentId: '6722157ce89b01001f5ca303',
+      date: '01/10/2024',
+      status: 'Hoàn thành',
+    },
+  ];
 
   const fetchUserData = async () => {
     setLoading(true);
@@ -189,7 +241,40 @@ const EditUserProfileModal = ({ open, handleClose, userId }) => {
 
           {/* Tab Notary Docs */}
           <TabPanel value={tabValue} index={1}>
-            <Typography>Danh sách tài liệu công chứng sẽ hiển thị ở đây.</Typography>
+            <Box
+              sx={{
+                maxWidth: '100%',
+                maxHeight: '40vh',
+                overflowY: 'auto',
+                margin: 'center',
+                justifyItems: 'center',
+                justifyContent: 'space-between',
+
+                p: 1,
+                backgroundColor: '#fff',
+                borderRadius: '8px',
+              }}
+            >
+              <Grid container spacing={3} alignItems="center">
+                {documents.map((doc, index) => (
+                  <Grid
+                    item
+                    xs={12}
+                    sm={12}
+                    md={6}
+                    key={index}
+                    onClick={() => alert(`Clicked on document ID: ${doc.documentId}`)}
+                  >
+                    <NotaryDocumentCard
+                      docType={doc.docType}
+                      documentId={doc.documentId}
+                      date={doc.date}
+                      status={doc.status}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
           </TabPanel>
         </Box>
       </Box>

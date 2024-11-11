@@ -154,8 +154,12 @@ const UserDataTable = ({
     setPaginationModel((prev) => ({ ...prev, pageSize: newPageSize, page: 1 }));
   };
 
-  const emptyRows = /* 
-    paginationModel.page > 0 ? Math.max(0, paginationModel.page * paginationModel.pageSize - rows.length) :  */ 0;
+  const emptyRows =
+    paginationModel.page > 0 && paginationModel.pageSize === 5
+      ? rows.length % paginationModel.pageSize === 0
+        ? 0
+        : paginationModel.pageSize - Math.max(rows.length % paginationModel.pageSize) + 1
+      : 0;
 
   const visibleRows = React.useMemo(() => {
     let filteredRows = rows;
@@ -182,7 +186,6 @@ const UserDataTable = ({
       );
     }
     setSelected([]);
-
     return filteredRows.sort(getComparator(order, orderBy));
   }, [filterStatus, searchText, order, orderBy, rows]);
 
