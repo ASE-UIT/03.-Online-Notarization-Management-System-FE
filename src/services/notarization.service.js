@@ -65,7 +65,6 @@ const getHistory = async () => {
 
 const uploadNotarizationDocument = async (document) => {
   try {
-    console.log('document', document);
     const response = await axiosConfig.post(`${NOTARIZATION_ENDPOINT}/upload-files`, document);
     return response.data;
   } catch (error) {
