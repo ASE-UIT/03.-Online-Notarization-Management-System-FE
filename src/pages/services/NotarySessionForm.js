@@ -24,7 +24,7 @@ const CustomAutocomplete = ({
 }) => (
   <Autocomplete
     loading={loading}
-    options={options}
+    options={options || []}
     getOptionLabel={(option) => option.name}
     onChange={onChange}
     renderInput={(params) => (
@@ -156,7 +156,7 @@ const GuestSection = ({
       <Autocomplete
         value={value}
         loading={loading}
-        options={options}
+        options={options || []}
         getOptionLabel={(option) => option?.email || option}
         onInputChange={handleInputChange}
         sx={{ flexGrow: 1 }}
@@ -264,15 +264,13 @@ const NotarySessionForm = ({ open, setOpen, handleSuccess }) => {
       setLoading(true);
       try {
         const response = await UserService.searchUserByEmail(value);
-        setOptions(response);
+        setOptions(response || []);
       } catch (error) {
         setOptions([]);
       } finally {
         setLoading(false);
       }
-    }, 1500),
-    []
-  );
+    }, 1500), []);
 
   const handleInputChange = (event, newValue) => {
     setEmail(newValue);
@@ -313,7 +311,6 @@ const NotarySessionForm = ({ open, setOpen, handleSuccess }) => {
       }
     }
   };
-
 
   useEffect(() => {
     setNotarizationServices([]);
@@ -448,7 +445,7 @@ const NotarySessionForm = ({ open, setOpen, handleSuccess }) => {
             <Box sx={{ flex: '1 1 30%', mr: { xs: 0, sm: 2 }, mb: { xs: 2, sm: 0 } }}>
               <Typography variant="body2">Lĩnh vực công chứng</Typography>
               <CustomAutocomplete
-                options={notarizationFields}
+                options={notarizationFields || []}
                 value={notaryField}
                 onChange={(e, value) => setNotaryField(value)}
                 placeholder="Chọn lĩnh vực công chứng"
@@ -460,7 +457,7 @@ const NotarySessionForm = ({ open, setOpen, handleSuccess }) => {
             <Box sx={{ flex: '1 1 30%', mr: { xs: 0, sm: 2 }, mb: { xs: 2, sm: 0 } }}>
               <Typography variant="body2">Dịch vụ công chứng</Typography>
               <CustomAutocomplete
-                options={notarizationServices}
+                options={notarizationServices || []}
                 value={notaryService}
                 onChange={(e, value) => setNotaryService(value)}
                 placeholder="Chọn dịch vụ công chứng"
@@ -504,7 +501,7 @@ const NotarySessionForm = ({ open, setOpen, handleSuccess }) => {
           {/* Guests */}
           <GuestSection
             value={email}
-            options={options}
+            options={options || []}
             handleInputChange={handleInputChange}
             handleAddGuest={handleAddGuest}
             users={users}
