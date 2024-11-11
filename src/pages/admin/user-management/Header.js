@@ -1,7 +1,8 @@
 import React from 'react';
 import { Box, Typography, Button, IconButton } from '@mui/material';
-import { white } from '../../../config/theme/themePrimitives';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import { white, black,yellow } from '../../../config/theme/themePrimitives';
+
+import { NotificationsRounded } from '@mui/icons-material';
 
 
 const Header = () => {
@@ -22,15 +23,24 @@ const Header = () => {
           </Typography>
         </Box>
 
-        {/* Tra cứu hồ sơ */}
-        <IconButton sx={{
-            display: 'flex',
-            p: '6px',
-            borderRadius: '8px',
-            background: '#FFF7E6',
-            height: 'fit-content',
-        }}>
-            <NotificationsNoneIcon sx={{width: '24px', height: '24px', fill: '#FFAA00'}}></NotificationsNoneIcon>
+        <IconButton
+          sx={{
+            p: 1,
+            backgroundColor: black[50],
+            borderRadius: 1,
+            transition: 'background-color 0.2s ease',
+            '&:hover': {
+              backgroundColor: yellow[50],
+              boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
+              transform: 'scale(1.05)',
+            },
+            '&:hover .MuiSvgIcon-root': {
+              color: yellow[500],
+              transform: 'scale(1.05)',
+            },
+          }}
+        >
+          <NotificationsRounded sx={{ fontSize: '1.5rem', color: black[500] }} />
         </IconButton>
       </Box>
     </Box>

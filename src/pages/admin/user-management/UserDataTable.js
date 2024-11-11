@@ -27,24 +27,33 @@ function descendingComparator(a, b, orderBy) {
 
 function SetStatusColor(params) {
   let color = '';
-  if(params === 'Trực tuyến') color = '#00ff00'; 
-  if(params === 'Ngoại tuyến') color = '#666666';
-  if(params === 'Bị cấm') color = '#FFAA00';
-  if(params === 'Đã bị xóa') color = '#EE443F';
-  return  color;
+  if (params === 'Trực tuyến') color = '#00ff00';
+  if (params === 'Ngoại tuyến') color = '#666666';
+  if (params === 'Bị cấm') color = '#FFAA00';
+  if (params === 'Đã bị xóa') color = '#EE443F';
+  return color;
 }
 
 function getComparator(order, orderBy) {
   return order === 'desc' ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-const UserDataTable = ({ filterStatus, searchText, rows, headCells, filterList, paginationModel }) => {
-  
+const UserDataTable = ({
+  filterStatus,
+  searchText,
+  rows,
+  count,
+  headCells,
+  filterList,
+  paginationModel,
+  setPaginationModel,
+  loading,
+}) => {
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('profile');
   const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = React.useState(paginationModel.page-1);
-
+  const [page, setPage] = React.useState(paginationModel.page - 1);
+  const [pageSize, setPageSize] = React.useState(paginationModel.pageSize);
   function EnhancedTableHead(props) {
     const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
     const createSortHandler = (property) => (event) => {
@@ -73,7 +82,7 @@ const UserDataTable = ({ filterStatus, searchText, rows, headCells, filterList, 
               align={'left'}
               padding={headCell.disablePadding ? 'none' : 'normal'}
               sortDirection={orderBy === headCell.id ? order : false}
-              sx={{ borderRadius: '8px', width: '20%' , fontSize: '16px'}}
+              sx={{ borderRadius: '8px', width: '20%', fontSize: '16px' }}
             >
               <TableSortLabel
                 active={orderBy === headCell.id}
@@ -134,12 +143,17 @@ const UserDataTable = ({ filterStatus, searchText, rows, headCells, filterList, 
     setSelected(newSelected);
   };
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+  const handlePageChange = (_, newPage) => {
+    setPaginationModel((prev) => ({ ...prev, page: newPage + 1 }));
   };
 
+  const handleRowsPerPageChange = (event) => {
+    const newPageSize = parseInt(event.target.value, 10);
+    setPaginationModel((prev) => ({ ...prev, pageSize: newPageSize, page: 1 }));
+  };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * paginationModel.pageSize - rows.length) : 0;
+  const emptyRows =/* 
+    paginationModel.page > 0 ? Math.max(0, paginationModel.page * paginationModel.pageSize - rows.length) :  */0;
 
   const visibleRows = React.useMemo(() => {
     let filteredRows = rows;
@@ -151,35 +165,43 @@ const UserDataTable = ({ filterStatus, searchText, rows, headCells, filterList, 
     if (searchText) {
       filteredRows = filteredRows.filter(
         (row) =>
-          (row.ordinalNumber?.toString().toLowerCase().includes(searchText.toLowerCase()) || '') ||
-        (row.name?.toLowerCase().includes(searchText.toLowerCase()) || '') ||
-        (row.email?.toLowerCase().includes(searchText.toLowerCase()) || '') ||
-        (row.status?.toLowerCase().includes(searchText.toLowerCase()) || '') ||
-        (row.notaryCount?.toString().toLowerCase().includes(searchText.toLowerCase()) || '') ||
-        (row.userType?.toLowerCase().includes(searchText.toLowerCase()) || '')
+          row.ordinalNumber?.toString().toLowerCase().includes(searchText.toLowerCase()) ||
+          '' ||
+          row.name?.toLowerCase().includes(searchText.toLowerCase()) ||
+          '' ||
+          row.email?.toLowerCase().includes(searchText.toLowerCase()) ||
+          '' ||
+          row.status?.toLowerCase().includes(searchText.toLowerCase()) ||
+          '' ||
+          row.notaryCount?.toString().toLowerCase().includes(searchText.toLowerCase()) ||
+          '' ||
+          row.userType?.toLowerCase().includes(searchText.toLowerCase()) ||
+          '',
       );
     }
     setSelected([]);
 
-    return filteredRows.sort(getComparator(order, orderBy)).slice(page * paginationModel.pageSize, page * paginationModel.pageSize + paginationModel.pageSize);
-  }, [filterStatus, searchText, order, orderBy, page, paginationModel.pageSize]);
+    return filteredRows.sort(getComparator(order, orderBy));
+  }, [filterStatus, searchText, order, orderBy, rows]);
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Paper sx={{ width: '100%' }}>
-        <TableContainer>
-          <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={'medium'}>
+    <Box sx={{ width: '100%', maxHeight: '45vh' }}>
+      <Paper sx={{ width: '100%', maxHeight: '100%' }}>
+        <TableContainer sx={{ maxHeight: '45vh' }}>
+          <Table stickyHeader loading={loading} sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={'medium'}>
             <EnhancedTableHead
               numSelected={selected.length}
               order={order}
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={rows.length}
+              rowCount={count}
             />
             <TableBody
               sx={{
                 backgroundColor: '#FFF',
+                maxHeight: '40vh',
+                loading: loading,
               }}
             >
               {visibleRows.map((row, index) => {
@@ -271,22 +293,23 @@ const UserDataTable = ({ filterStatus, searchText, rows, headCells, filterList, 
           </Table>
         </TableContainer>
         <TablePagination
+          rowsPerPageOptions={[5, 10, 25, 50, 100]}
           component="div"
-          count={rows.length}
+          count={count || 0}
+          paginationMode="server"
           rowsPerPage={paginationModel.pageSize}
-          page={page}
-          onPageChange={handleChangePage}
-          labelRowsPerPage={''}
+          page={paginationModel.page - 1}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
+          loading={loading}
           sx={{
             backgroundColor: '#FFF',
             borderRadius: '8px',
             '& .MuiSelect-icon': {
-              display: 'none'
-            }
+              display: 'none',
+            },
           }}
-          
         />
-
       </Paper>
     </Box>
   );

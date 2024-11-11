@@ -1,9 +1,9 @@
-import  React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Box, TextField, InputAdornment } from '@mui/material';
 import UserOverview from './UserOverview';
 import UserDataTable from './UserDataTable';
 import Header from './Header';
-import { gray,black, white } from '../../../config/theme/themePrimitives';
+import { gray, black, white } from '../../../config/theme/themePrimitives';
 import FilterButton from './FilterButton';
 import AppsIcon from '@mui/icons-material/Apps';
 
@@ -44,9 +44,6 @@ const headCells = [
   },
 ];
 
-
-
-
 const filterList = {
   All: 'Tất cả',
   NewUser: 'Người dùng mới',
@@ -79,76 +76,72 @@ const UserManagement = () => {
   const [searchText, setSearchText] = useState('');
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [data, setData] = useState([]);
+  const [userCount, setUserCount] = useState(0);
   const [paginationModel, setPaginationModel] = useState({
-    pageSize: 5,
+    pageSize: 10,
     page: 1,
   });
 
- 
-  const fetchAllUsers = async () => {
+  const fetchAllUsers = useCallback(async () => {
     setLoadingStatus(true);
-    try{
-      const {page, pageSize} = paginationModel;
-      const response = await UserService.getAllUsers();   
-      
+    try {
+      const { page, pageSize } = paginationModel;
+      const response = await UserService.getAllUsers('user', null, pageSize, page);
       const users = Array.isArray(response.results) ? response.results : [];
-
+      setUserCount(response.totalResults);
 
       const rows = await Promise.all(
         users.map(async (item, index) => {
           let status, userType, notaryCount;
 
-
-          if(item.status === 'inactive') status = 'Ngoại tuyến';
-          if(item.status === 'active') status = 'Trực tuyến';
-          if(item.status === 'suspended') status = 'Bị cấm';
-          if(item.status === 'deleted') status = 'Đã bị xóa ';
+          if (item.status === 'inactive') status = 'Ngoại tuyến';
+          if (item.status === 'active') status = 'Trực tuyến';
+          if (item.status === 'suspended') status = 'Bị cấm';
+          if (item.status === 'deleted') status = 'Đã bị xóa ';
 
           return createData(
-            index + 1, 
-            index + 1, 
-            item.name || '', 
-            item.email || '', 
-            status, 
-            item.documentCount || '', 
-            item.userType || ''
+            index + 1,
+            index + 1,
+            item.name || '',
+            item.email || '',
+            status,
+            item.documentCount || '',
+            item.userType || '',
           );
-        })
-      )
+        }),
+      );
       setData(rows);
-
-    }
-    finally{
+    } finally {
       setLoadingStatus(false);
     }
-  }
+  }, [paginationModel]);
 
   useEffect(() => {
     fetchAllUsers();
-  }, [paginationModel])
+  }, [paginationModel, fetchAllUsers]);
 
   return (
-    <Box sx={{
-      display: 'flex',
-      height: '100vh',
-      flexDirection: 'column',
-      backgroundColor: gray[50]
-    }}>
-      
+    <Box
+      sx={{
+        display: 'flex',
+        height: '100vh',
+        flexDirection: 'column',
+        backgroundColor: gray[50],
+      }}
+    >
       {/* Header Section */}
       <Header></Header>
 
       {/* User Overview Section */}
-      <UserOverview userCount={data.length}></UserOverview>
+      <UserOverview userCount={userCount}></UserOverview>
 
-      
       {/* User Data Table Section */}
       <Box
         sx={{
           display: 'flex',
           flexDirection: 'column',
           p: '10px',
-          gap: '10px'
+          gap: '10px',
         }}
       >
         <Box
@@ -243,9 +236,12 @@ const UserManagement = () => {
               filterStatus={filterOption}
               searchText={searchText}
               rows={data}
+              count={userCount}
               headCells={headCells}
-                filterList={filterList}
-                paginationModel={paginationModel}
+              filterList={filterList}
+              paginationModel={paginationModel}
+              setPaginationModel={setPaginationModel}
+              loading={loadingStatus}
             ></UserDataTable>
           )}
         </Box>
