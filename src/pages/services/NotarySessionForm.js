@@ -72,62 +72,54 @@ const CustomAutocomplete = ({
 );
 
 const DateTimePickerSection = ({
-  label,
   startDate,
   setStartDate,
   startTime,
   setStartTime,
   isSubmitting
 }) => (
-  <Box>
-    <Typography variant="body2">{label}</Typography>
-    <Box sx={{ display: 'flex', flexDirection: 'row', mb: 2 }}>
-      {/* Date Picker */}
-      <Box sx={{ mr: { xs: 0, sm: 2 }, mb: { xs: 2, sm: 0 } }}>
-        <DatePicker
-          value={startDate}
-          onChange={(newValue) => setStartDate(newValue)}
-          slotProps={{
-            textField: {
-              variant: 'outlined',
-              fullWidth: true,
-              sx: {
-                '& fieldset': { border: 'none' },
-                mt: 1,
-                backgroundColor: gray[50],
-                borderRadius: 1,
-                '& .MuiInputBase-input': { fontSize: 14 },
-              },
-            },
-          }}
-          format='DD/MM/YYYY'
-          disabled={isSubmitting}
-        />
-      </Box>
-      {/* Time Picker */}
-      <Box sx={{ mr: { xs: 0, sm: 2 }, mb: { xs: 2, sm: 0 } }}>
-        <TimePicker
-          value={startTime}
-          onChange={(newValue) => setStartTime(newValue)}
-          ampm={false}
-          slotProps={{
-            textField: {
-              variant: 'outlined',
-              fullWidth: true,
-              sx: {
-                '& fieldset': { border: 'none' },
-                mt: 1,
-                backgroundColor: gray[50],
-                borderRadius: 1,
-                '& .MuiInputBase-input': { fontSize: 14 },
-              },
-            },
-          }}
-          format='HH:mm'
-          disabled={isSubmitting}
-        />
-      </Box>
-    </Box>
+  <Box sx={{ display: 'flex', flexDirection: 'row', mb: 2, gap: 2 }}>
+    {/* Date Picker */}
+    <DatePicker
+      value={startDate}
+      onChange={(newValue) => setStartDate(newValue)}
+      slotProps={{
+        textField: {
+          variant: 'outlined',
+          fullWidth: true,
+          sx: {
+            '& fieldset': { border: 'none' },
+            mt: 1,
+            backgroundColor: gray[50],
+            borderRadius: 1,
+            '& .MuiInputBase-input': { fontSize: 14 },
+          },
+        },
+      }}
+      format='DD/MM/YYYY'
+      disabled={isSubmitting}
+    />
+    {/* Time Picker */}
+    <TimePicker
+      value={startTime}
+      onChange={(newValue) => setStartTime(newValue)}
+      ampm={false}
+      slotProps={{
+        textField: {
+          variant: 'outlined',
+          fullWidth: true,
+          sx: {
+            '& fieldset': { border: 'none' },
+            mt: 1,
+            backgroundColor: gray[50],
+            borderRadius: 1,
+            '& .MuiInputBase-input': { fontSize: 14 },
+          },
+        },
+      }}
+      format='HH:mm'
+      disabled={isSubmitting}
+    />
   </Box>
 );
 
@@ -471,27 +463,29 @@ const NotarySessionForm = ({ open, setOpen, handleSuccess }) => {
             </Box>
           </Box>
 
-          <Box sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            gap: 2,
-          }}>
-            <DateTimePickerSection
-              label="Thời gian bắt đầu"
-              startDate={startDate}
-              setStartDate={setStartDate}
-              startTime={startTime}
-              setStartTime={setStartTime}
-              isSubmitting={isSubmitting}
-            />
-            <DateTimePickerSection
-              label="Thời gian kết thúc"
-              startDate={endDate}
-              setStartDate={setEndDate}
-              startTime={endTime}
-              setStartTime={setEndTime}
-              isSubmitting={isSubmitting}
-            />
+
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', mb: 2 }}>
+            <Box sx={{ flex: '1 1 30%', mr: { xs: 0, sm: 2 }, mb: { xs: 2, sm: 0 } }}>
+              <Typography variant="body2">Thời gian bắt đầu</Typography>
+              <DateTimePickerSection
+                startDate={startDate}
+                setStartDate={setStartDate}
+                startTime={startTime}
+                setStartTime={setStartTime}
+                isSubmitting={isSubmitting}
+              />
+            </Box>
+
+            <Box sx={{ flex: '1 1 30%', mr: { xs: 0, sm: 2 }, mb: { xs: 2, sm: 0 } }}>
+              <Typography variant="body2">Thời gian kết thúc</Typography>
+              <DateTimePickerSection
+                startDate={endDate}
+                setStartDate={setEndDate}
+                startTime={endTime}
+                setStartTime={setEndTime}
+                isSubmitting={isSubmitting}
+              />
+            </Box>
           </Box>
 
           {/* Duration */}
@@ -542,8 +536,8 @@ const NotarySessionForm = ({ open, setOpen, handleSuccess }) => {
             </Button>
           </Box>
         </LocalizationProvider>
-      </Box>
-    </Modal>
+      </Box >
+    </Modal >
   );
 };
 

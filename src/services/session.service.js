@@ -45,10 +45,36 @@ const deleteUserOutOfSession = async (sessionId, email) => {
   }
 };
 
+const addUser = async (sessionId, emails) => {
+  try {
+    const response = await axiosConfig.patch(`${SESSION_ENDPOINT}/addUser/${sessionId}`, { emails });
+    return response;
+  } catch (error) {
+    if (error.response) {
+      return error.response.data;
+    }
+    return error.message;
+  }
+};
+
+const getSessionsByUserId = async () => {
+  try {
+    const response = await axiosConfig.get(`${SESSION_ENDPOINT}/getSessionsByUserId`);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      return error.response.data;
+    }
+    return error.message;
+  }
+};
+
 const SessionService = {
   createSession,
-  getAllSessions,
+  getSessionsByUserId,
   deleteUserOutOfSession,
+  addUser,
+  getSessionsByUserId,
 };
 
 export default SessionService;
