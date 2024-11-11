@@ -71,6 +71,7 @@ const getSessionsByUserId = async () => {
 
 const SessionService = {
   createSession,
+  getAllSessions,
   getSessionsByUserId,
   deleteUserOutOfSession,
   addUser,
