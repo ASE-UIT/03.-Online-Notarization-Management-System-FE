@@ -255,16 +255,30 @@ const NotarySessionForm = ({ open, setOpen, handleSuccess }) => {
     debounce(async (value) => {
       setLoading(true);
       try {
-        const response = await UserService.searchUserByEmail(value);
-        setOptions(response);
+        const trimmedValue = value.trim();
+        if (!trimmedValue) {
+          setOptions([]);
+          return;
+        }
+
+        const response = await UserService.searchUserByEmail(trimmedValue);
+        if (response.length === 0) {
+          setOptions([]);
+          toast.error('Không tìm thấy người dùng.');
+        } else {
+          setOptions(response);
+        }
       } catch (error) {
+        console.error('Error fetching emails:', error);
         setOptions([]);
+        toast.error('Không tìm thấy người dùng.');
       } finally {
         setLoading(false);
       }
     }, 1500),
     []
   );
+
 
   const handleInputChange = (event, newValue) => {
     setEmail(newValue);

@@ -8,7 +8,6 @@ import NotarySessionForm from './NotarySessionForm';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 import SessionService from '../../services/session.service';
-import UserService from '../../services/user.service';
 
 const CreateNotarizationSession = () => {
   const [openNotarySessionForm, setOpenNotarySessionForm] = useState(false);
@@ -22,18 +21,9 @@ const CreateNotarizationSession = () => {
   const fetchSessions = async () => {
     setLoading(true);
     try {
-      const data = await SessionService.getSessionsByUserId();
-      console.log(data);
-      const sessions = await Promise.all(
-        data.map(async (session) => {
-          const creatorData = await UserService.getUserById(session.createdBy);
-          return {
-            ...session,
-            creator: creatorData,
-          };
-        }),
-      );
-      setSessions(sessions);
+      const sessions = await SessionService.getSessionsByUserId();
+      console.log(sessions);
+      setSessions(sessions.results);
     } catch (error) {
       console.error('Error fetching sessions:', error);
     } finally {
