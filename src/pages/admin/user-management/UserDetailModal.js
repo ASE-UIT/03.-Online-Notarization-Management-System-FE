@@ -91,12 +91,12 @@ const EditUserProfileModal = ({ open, handleClose, userId }) => {
         isEmailVerified: response?.isEmailVerified || false,
         name: response?.name || '',
         email: response?.email || '',
-        phone: response?.phone || '',
-        identification: response?.identification || '',
-        city: response?.city || '',
-        district: response?.district || '',
-        ward: response?.ward || '',
-        street: response?.street || '',
+        phone: response?.phoneNumber || '',
+        identification: response?.citizenId || '',
+        city: response.address?.province || '',
+        district: response.address?.district || '',
+        ward: response.address?.town || '',
+        street: response.address?.street || '',
       });
     } finally {
       setLoading(false);
@@ -122,13 +122,6 @@ const EditUserProfileModal = ({ open, handleClose, userId }) => {
     );
   }
 
-  function ProcessAddress(address) {
-    const { city, district, ward, street } = userData;
-    const addressParts = [street, ward, district, city].filter((part) => part);
-    const fullAddress = addressParts.join(', ');
-    return fullAddress;
-  }
-
   return (
     <Modal open={open} onClose={handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
       <Box
@@ -139,7 +132,7 @@ const EditUserProfileModal = ({ open, handleClose, userId }) => {
           transform: 'translate(-50%, -50%)',
           width: '70vw',
           bgcolor: 'background.paper',
-          p: '24px',
+          p: 1,
           borderRadius: 2,
           background: '#FFF',
         }}
@@ -159,7 +152,7 @@ const EditUserProfileModal = ({ open, handleClose, userId }) => {
           }}
         >
           {/* Avatar Section */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2 }}>
             <Avatar src="/avatar.png" sx={{ width: 96, height: 96, borderRadius: '50%' }} />
             <Box flex={1} display="flex" flexDirection="column" gap={1}>
               <Typography variant="h5">{!loading ? userData.name : ''}</Typography>
@@ -224,6 +217,18 @@ const EditUserProfileModal = ({ open, handleClose, userId }) => {
                 >
                   <InfoField caption={'Email'} value={userData.email}></InfoField>
                   <InfoField caption={'Số điện thoại'} value={userData.phone}></InfoField>
+                  </Box>
+                  
+                  <Box
+                  sx={{
+                    display: 'flex',
+                    gap: '16px',
+                    alignSelf: 'stretch',
+                  }}
+                >
+                    <InfoField caption={'Tỉnh/Thành phố'} value={userData.city}></InfoField>
+                    <InfoField caption={'Quận/Huyện'} value={userData.district}></InfoField>
+                    <InfoField caption={'Xã/Phường'} value={userData.ward}></InfoField>
                 </Box>
 
                 <Box
@@ -233,7 +238,7 @@ const EditUserProfileModal = ({ open, handleClose, userId }) => {
                     alignSelf: 'stretch',
                   }}
                 >
-                  <InfoField caption={'Địa chỉ liên hệ'} value={ProcessAddress()}></InfoField>
+                  <InfoField caption={'Số nhà, đường/phố'} value={userData.street}></InfoField>
                 </Box>
               </Box>
             )}
