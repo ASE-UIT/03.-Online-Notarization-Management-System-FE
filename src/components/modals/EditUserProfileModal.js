@@ -34,12 +34,12 @@ const EditUserProfileModal = ({ open, handleClose }) => {
         isEmailVerified: user?.isEmailVerified || false,
         name: user?.name || '',
         email: user?.email || '',
-        phone: user?.phone || '',
-        identification: user?.identification || '',
-        city: user?.city || '',
-        district: user?.district || '',
-        ward: user?.ward || '',
-        street: user?.street || '',
+        phone: user?.phoneNumber || '',
+        identification: user?.citizenId || '',
+        city: user.address?.province || '',
+        district: user.address?.district || '',
+        ward: user.address?.town || '',
+        street: user.address?.street || '',
       });
     }
   }, [open, user]);
@@ -52,16 +52,16 @@ const EditUserProfileModal = ({ open, handleClose }) => {
   };
 
   const isFormDataValid = ({ name, identification, email, phone, city, district, ward, street }) => {
-    // Revert this Comment along changing the code below once the backend code is done
+    
     const validations = [
       { valid: /^[A-Za-zÀ-ỹ\s]+$/.test(name), message: 'Vui lòng nhập Họ tên hợp lệ' },
-      // { valid: /^[0-9]{9}$|^[0-9]{12}$/.test(identification), message: 'Vui lòng nhập đúng số CCCD' },
-      // { valid: /^\+?[0-9]{10,15}$/.test(phone), message: 'Vui lòng nhập đúng Số điện thoại' },
+      { valid: /^[0-9]{9}$|^[0-9]{12}$/.test(identification), message: 'Vui lòng nhập đúng số CCCD' },
+      { valid: /^\+?[0-9]{10,15}$/.test(phone), message: 'Vui lòng nhập đúng Số điện thoại' },
       {
         valid: /^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*(\.[a-zA-Z]{2,})$/.test(email),
         message: 'Vui lòng nhập email hợp lệ',
       },
-      // { valid: city && district && ward && street, message: 'Vui lòng điền đầy đủ thông tin địa chỉ' },
+      { valid: city && district && ward && street, message: 'Vui lòng điền đầy đủ thông tin địa chỉ' },
     ];
 
     for (let { valid, message } of validations) {
@@ -78,22 +78,16 @@ const EditUserProfileModal = ({ open, handleClose }) => {
     if (!isFormDataValid(formData)) {
     } else {
       const updateBody = {
-        // Change these comment into code once the back end code for these field is added
-        // Because of the current back end code and database only provide 3 fields (and only 2 of them can be updated by user)
-        // I comment these line of code and only left out 2 updatable field
-
-        // role: formData.role,
-        // isEmailVerified: formData.isEmailVerified,
-        // phone: formData.phone,
-        // city: formData.city,
-        // district: formData.district,
-        // ward: formData.ward,
-        // street: formData.street,
+        phoneNumber: formData.phone,
         name: formData.name,
         email: formData.email,
+        address: {
+          province: formData.city,
+          district: formData.district,
+          town: formData.ward,
+          street: formData.street,
+        },
       };
-      console.log(user.id);
-      console.log(updateBody);
       dispatch(updateUser({ id: user.id, updatedUserInfo: updateBody }))
         .unwrap()
         .then(() => {
