@@ -80,8 +80,8 @@ const EmployeeManagement = () => {
   const getEmployeesCount = async () => {
     setLoadingStatus(true);
     try{
-      const response = await AdminService.getEmployeesCount ();         
-
+      const response = await AdminService.getEmployeesCount ();
+               
       setNotaryCount(response.notaryCount);
       setSecretaryCount(response.secretaryCount);
     }
@@ -94,8 +94,8 @@ const EmployeeManagement = () => {
     setLoadingStatus(true);
     try{
       const {page, pageSize} = paginationModel;
-      const response = await AdminService.getEmployeesMetrics(null,pageSize,page-1);         
-
+      const response = await AdminService.getEmployeesMetrics(null,pageSize,page-1);      
+          
       const rows = await Promise.all(
         response.results.map(async (item, index) => {
           let role, status;

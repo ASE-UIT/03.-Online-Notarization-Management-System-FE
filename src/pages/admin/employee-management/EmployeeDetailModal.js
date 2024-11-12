@@ -21,29 +21,40 @@ const EmployeeDetailModal = ({ open, handleClose, employeeId, }) => {
   
   const [tabValue, setTabValue] = useState(0);
   const [loadingInfo, setLoadingInfo] = useState(false);
-  const [formData, setFormData] = React.useState({
+  const [formData, setFormData] = useState({
     role: '',
     phone: '',
     name: '',
     email: '',
     id: '',
+    createdAt: '',
+    citizenId: '',
+    address: ''
   });
 
   const getEmployeeInfo = async () => {
     setLoadingInfo(true);
     try {
       const response = await UserService.getUserById(employeeId);
-
-      let role;
+      const date = new Date(response.createdAt);
+      const startDate = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
+      const citizenId = (response.citizenId) ? response.citizenId : '';
+      const address = (response.address) ? (response.address.street + ',' + response.address.town + ',' + response.address.district + ',' + response.address.province) : '';
+    
+      let  role;
 
       if (response.role === 'notary') role = 'Công chứng viên';
       if (response.role === 'secretary') role = 'Thư ký';
 
       setFormData({
-        role: role,
-        name: response.name,
-        email: response.email,
-        id: response.id,
+        role: role || '',
+        name: response.name || '',
+        email: response.email || '',
+        id: response.id || '',
+        createdAt: startDate || '',
+        phone: response.phoneNumber || '',
+        citizenId: citizenId || '',
+        address: address || '',
       });
     } finally {
       setLoadingInfo(false);
@@ -120,7 +131,7 @@ const EmployeeDetailModal = ({ open, handleClose, employeeId, }) => {
             )}
             {loadingInfo ? (
               <Box flex={1} minWidth="250px">
-                
+                <Skeleton variant="text" height={30} />
               </Box>
             ) : (
               <Typography
@@ -185,7 +196,7 @@ const EmployeeDetailModal = ({ open, handleClose, employeeId, }) => {
               {loadingInfo ? (
                 <SkeletonDetailModal caption={'CMND/CCCD'}></SkeletonDetailModal>
               ) : (
-                <InfoField caption={'CMND/CCCD'} value={'052204011546'}></InfoField>
+                <InfoField caption={'CMND/CCCD'} value={formData.citizenId}></InfoField>
               )}
 
               
@@ -207,7 +218,7 @@ const EmployeeDetailModal = ({ open, handleClose, employeeId, }) => {
               {loadingInfo ? (
                 <SkeletonDetailModal caption={'Số điện thoại'}></SkeletonDetailModal>
               ) : (
-                <InfoField caption={'Số điện thoại'} value={'0977859215'}></InfoField>
+                <InfoField caption={'Số điện thoại'} value={formData.phone}></InfoField>
               )}
 
               
@@ -223,7 +234,7 @@ const EmployeeDetailModal = ({ open, handleClose, employeeId, }) => {
               {loadingInfo ? (
                 <SkeletonDetailModal caption={'Địa chỉ liên hệ'}></SkeletonDetailModal>
               ) : (
-                <InfoField caption={'Địa chỉ liên hệ'} value={'Đông Hòa, Dĩ An, Bình Dương'}></InfoField>
+                <InfoField caption={'Địa chỉ liên hệ'} value={formData.address}></InfoField>
               )}
               
             </Box>
@@ -256,12 +267,6 @@ const EmployeeDetailModal = ({ open, handleClose, employeeId, }) => {
               ) : (
                 <InfoField caption={'Mã số công chứng viên'} value={formData.id}></InfoField>
               )}
-
-              {loadingInfo ? (
-                <SkeletonDetailModal caption={'Vị trí công việc'}></SkeletonDetailModal>
-              ) : (
-                <InfoField caption={'Vị trí công việc'} value={formData.role}></InfoField>
-              )}
             </Box>
 
             <Box
@@ -272,19 +277,16 @@ const EmployeeDetailModal = ({ open, handleClose, employeeId, }) => {
               }}
             >
               {loadingInfo ? (
-                <SkeletonDetailModal caption={'Ngày cấp chứng chỉ'}></SkeletonDetailModal>
+                <SkeletonDetailModal caption={'Vị trí công việc'}></SkeletonDetailModal>
               ) : (
-                <InfoField caption={'Ngày cấp chứng chỉ'} value={'hzquangco@gmail.com'}></InfoField>
+                <InfoField caption={'Vị trí công việc'} value={formData.role}></InfoField>
               )}
 
               {loadingInfo ? (
-                <SkeletonDetailModal caption={'Nơi cấp chứng chỉ'}></SkeletonDetailModal>
+                <SkeletonDetailModal caption={'Ngày bắt đầu'}></SkeletonDetailModal>
               ) : (
-                <InfoField caption={'Nơi cấp chứng chỉ'} value={'0977859215'}></InfoField>
-              )}
-              
-
-              
+                <InfoField caption={'Ngày bắt đầu'} value={formData.createdAt}></InfoField>
+              )} 
             </Box>
           </Box>
         </TabPanel>
