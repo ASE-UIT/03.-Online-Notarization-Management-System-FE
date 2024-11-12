@@ -11,7 +11,6 @@
     "@mui/x-data-grid": "^7.18.0",
     "@mui/x-date-pickers": "^7.18.0",
     "@reduxjs/toolkit": "^2.2.7",
-    "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.7",
@@ -55,9 +54,11 @@
     ]
   },
   "devDependencies": {
+    "@babel/core": "^7.26.0",
     "@babel/preset-env": "^7.26.0",
     "@babel/preset-react": "^7.25.9",
     "@eslint/js": "^9.11.1",
+    "@testing-library/jest-dom": "^6.6.3",
     "babel-jest": "^29.7.0",
     "eslint": "^8.57.1",
     "eslint-config-airbnb-base": "^15.0.0",
@@ -65,6 +66,7 @@
     "eslint-plugin-import": "^2.30.0",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-security": "^3.0.1",
+    "identity-obj-proxy": "^3.0.0",
     "jest": "^27.5.1",
     "prettier": "^3.3.3"
   }

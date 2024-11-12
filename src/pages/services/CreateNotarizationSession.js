@@ -31,16 +31,15 @@ const CreateNotarizationSession = () => {
             ...session,
             creator: creatorData,
           };
-        })
+        }),
       );
       setSessions(sessions);
     } catch (error) {
-      console.error("Error fetching sessions:", error);
+      console.error('Error fetching sessions:', error);
     } finally {
       setLoading(false);
     }
   };
-
 
   useEffect(() => {
     fetchSessions();
@@ -63,13 +62,11 @@ const CreateNotarizationSession = () => {
       if (value === '') {
         setSearchingSessions([]);
       } else {
-        const searchResult = sessions.filter((session) =>
-          session.sessionName.toLowerCase().includes(value.toLowerCase())
-        );
+        const searchResult = sessions.filter((session) => session.sessionName.toLowerCase().includes(value.toLowerCase()));
         setSearchingSessions(searchResult);
       }
     }, 300),
-    [sessions]
+    [sessions],
   );
 
   const handleChange = (e) => {
@@ -81,9 +78,10 @@ const CreateNotarizationSession = () => {
 
   const indexOfLastSession = currentPage * sessionsPerPage;
   const indexOfFirstSession = indexOfLastSession - sessionsPerPage;
-  const currentSessions = searchingSessions.length > 0
-    ? searchingSessions.slice(indexOfFirstSession, indexOfLastSession)
-    : sessions.slice(indexOfFirstSession, indexOfLastSession);
+  const currentSessions =
+    searchingSessions.length > 0
+      ? searchingSessions.slice(indexOfFirstSession, indexOfLastSession)
+      : sessions.slice(indexOfFirstSession, indexOfLastSession);
 
   const totalSessions = searchingSessions.length > 0 ? searchingSessions.length : sessions.length;
   const totalPages = Math.ceil(totalSessions / sessionsPerPage);
@@ -100,14 +98,14 @@ const CreateNotarizationSession = () => {
           sm: 'calc(50% - 24px)',
           md: 'calc(33.33% - 24px)',
         },
-        mb: 2
+        mb: 2,
       }}
       key={index}
     >
-      <Skeleton variant="rectangular" width="100%" height={140} />
-      <Skeleton width="60%" height={30} sx={{ mt: 1 }} />
-      <Skeleton width="80%" height={20} />
-      <Skeleton width="40%" height={20} />
+      <Skeleton data-testid="loading-skeleton" variant="rectangular" width="100%" height={140} />
+      <Skeleton data-testid="loading-skeleton" width="60%" height={30} sx={{ mt: 1 }} />
+      <Skeleton data-testid="loading-skeleton" width="80%" height={20} />
+      <Skeleton data-testid="loading-skeleton" width="40%" height={20} />
     </Box>
   ));
 
