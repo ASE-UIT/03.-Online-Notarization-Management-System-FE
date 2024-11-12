@@ -83,12 +83,14 @@ const HistoryNotarizationProfile = () => {
   const [searchText, setSearchText] = useState('');
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [rows, setRows] = useState([]);
+  const [fullData, setFullData] = useState([]);
   const navigate = useNavigate();
 
   async function getHistoryFromDB() {
     try {
       setLoadingStatus(true);
       const response = await NotarizationService.getHistory();
+      setFullData(response);
 
       const data = await Promise.all(
         response.map(async (item, index) => {          
@@ -329,6 +331,7 @@ const HistoryNotarizationProfile = () => {
               headCells={headCells}
               statusTypes={statusTypes}
               setStatusColor={setStatusColor}
+              data={fullData}
             ></HistoryDataTable>
           )}
         </Box>

@@ -118,21 +118,6 @@ export const notaryPieChartOptions = {
   cutout: '30%',
 };
 
-export const adminPieChartData = {
-  labels: ['Công chứng viên', 
-           'Thư ký', 
-           'Trợ lý VPCC', 
-           'Chuyên viên pháp lý'],
-  datasets: [
-    {
-      data: [10, 20, 30, 25],
-      backgroundColor: [red[300], blue[300], green[300], yellow[300]],
-      borderColor: white[50],
-      borderWidth: 2,
-    },
-  ],
-};
-
 export const adminPieChartOptions = {
   responsive: true,
 maintainAspectRatio: false,

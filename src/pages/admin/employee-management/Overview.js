@@ -1,13 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Avatar,  Typography } from '@mui/material';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import HailRoundedIcon from '@mui/icons-material/HailRounded';
 import { Pie } from 'react-chartjs-2';
-import { adminPieChartData, adminPieChartOptions, } from '../../../config/chartConfig';
+import { adminPieChartOptions, } from '../../../config/chartConfig';
+import { white, red, yellow, green, blue } from '../../../config/theme/themePrimitives';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const Overview = () => {
+const Overview = ({count , notaryCount, secretaryCount}) => {
+  const adminPieChartData = {
+    labels: ['Công chứng viên', 
+             'Thư ký', 
+             'Trợ lý VPCC', 
+             'Chuyên viên pháp lý'],
+    datasets: [
+      {
+        data: [notaryCount, secretaryCount, 0, 0],
+        backgroundColor: [red[300], blue[300], green[300], yellow[300]],
+        borderColor: white[50],
+        borderWidth: 2,
+      },
+    ],
+  };
   return (
     <Box
         sx={{
@@ -50,7 +65,7 @@ const Overview = () => {
               lineHeight: 'normal',
             }}
           >
-            54
+            {count}
           </Typography>
 
           <Typography

@@ -13,6 +13,7 @@ import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import { visuallyHidden } from '@mui/utils';
+import HistoryDetailModal from '../modals/HistoryDetailModal';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -28,12 +29,15 @@ function getComparator(order, orderBy) {
   return order === 'desc' ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-const HistoryDataTable = ({ filterStatus, searchText, rows, headCells, statusTypes, setStatusColor }) => {
+const HistoryDataTable = ({ filterStatus, searchText, rows, headCells, statusTypes, setStatusColor, data }) => {
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('profile');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [open, setOpen] = React.useState(false);
+  const [notaryId, setNotaryId] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
 
   function EnhancedTableHead(props) {
     const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
@@ -100,29 +104,26 @@ const HistoryDataTable = ({ filterStatus, searchText, rows, headCells, statusTyp
   };
 
   const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelected = rows.map((n) => n.id);
-      setSelected(newSelected);
       return;
-    }
-    setSelected([]);
   };
 
-  const handleClick = (event, id) => {
-    const selectedIndex = selected.indexOf(id);
+  const handleClick = (event, id, notaryId) => {
+    setLoading(true);
     let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
-    }
+    newSelected = newSelected.concat(selected, id); 
     setSelected(newSelected);
+    setNotaryId(notaryId);      
+    setOpen(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 200)
   };
+
+  const handleCloseModal = () => {
+    setOpen(false);
+    setSelected([]);
+    
+  }
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -182,7 +183,7 @@ const HistoryDataTable = ({ filterStatus, searchText, rows, headCells, statusTyp
                 return (
                   <TableRow
                     hover
-                    onClick={(event) => handleClick(event, row.id)}
+                    onClick={(event) => handleClick(event, row.id, row.profile)}
                     role="checkbox"
                     aria-checked={isItemSelected}
                     tabIndex={-1}
@@ -255,6 +256,7 @@ const HistoryDataTable = ({ filterStatus, searchText, rows, headCells, statusTyp
           }}
         />
       </Paper>
+       {notaryId && <HistoryDetailModal open={open} handleClose={handleCloseModal} data={data} notaryId={notaryId} load={loading}></HistoryDetailModal>}
     </Box>
   );
 };

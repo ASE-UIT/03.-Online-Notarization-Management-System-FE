@@ -14,6 +14,8 @@ import { visuallyHidden } from '@mui/utils';
 import CircleRoundedIcon from '@mui/icons-material/CircleRounded';
 import { Avatar, Typography, Button } from '@mui/material';
 import TablePagination from '@mui/material/TablePagination';
+import EmployeeDetailModal from './EmployeeDetailModal';
+
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -47,12 +49,15 @@ const DataTable = ({
   paginationModel,
   setPaginationModel,
   loading,
+  count,
 }) => {
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('profile');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(paginationModel.page - 1);
   const [pageSize, setPageSize] = React.useState(paginationModel.pageSize);
+  const [open, setOpen] = React.useState(false);
+  const [employeeId, setEmployeeId] = React.useState('');
 
   function EnhancedTableHead(props) {
     const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
@@ -65,10 +70,9 @@ const DataTable = ({
         <TableRow
           sx={{
             backgroundColor: '#F9FAFB',
-            borderRadius: '8px',
           }}
         >
-          <TableCell padding="checkbox" sx={{ borderRadius: '8px' }}>
+          <TableCell padding="checkbox">
             <Checkbox
               color="primary"
               indeterminate={numSelected > 0 && numSelected < rowCount}
@@ -82,7 +86,7 @@ const DataTable = ({
               align={'left'}
               padding={headCell.disablePadding ? 'none' : 'normal'}
               sortDirection={orderBy === headCell.id ? order : false}
-              sx={{ borderRadius: '8px', width: '20%', fontSize: '16px' }}
+              sx={{ width: '20%', fontSize: '16px' }}
             >
               <TableSortLabel
                 active={orderBy === headCell.id}
@@ -119,35 +123,28 @@ const DataTable = ({
   };
 
   const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelected = rows.map((n) => n.id);
-      setSelected(newSelected);
-      return;
-    }
-    setSelected([]);
+    return;
   };
 
-  const handleClick = (event, id) => {
-    const selectedIndex = selected.indexOf(id);
+  const handleClick = (event, id, employeeId) => {
     let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
-    }
+    newSelected = newSelected.concat(selected, id); 
     setSelected(newSelected);
+    setEmployeeId(employeeId);
+    setOpen(true);
   };
+
+  const handleCloseModal = () => {
+    setOpen(false);
+    setSelected([]);
+  }
 
   const handleChangePage = (_, newPage) => {
     setPaginationModel((prev) => ({ ...prev, page: newPage + 1 }));
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * paginationModel.pageSize - rows.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, paginationModel.pageSize - rows.length) : 0;
+  
 
   const visibleRows = React.useMemo(() => {
     let filteredRows = rows;
@@ -172,21 +169,22 @@ const DataTable = ({
   }, [filterStatus, searchText, order, orderBy, rows]);
 
   return (
-    <Box sx={{ width: '100%', maxHeight: '45vh' }}>
-      <Paper sx={{ width: '100%', maxHeight: '100%' }}>
-        <TableContainer sx={{ maxHeight: '45vh' }}>
+    <Box sx={{ width: '100%', maxHeight: '40vh', borderRadius: '24px' }}>
+      <Paper sx={{ width: '100%', maxHeight: '100%', borderRadius: '24px', boxShadow: 'none' }}>
+        <TableContainer sx={{ maxHeight: '45vh', borderRadius: '24px 24px 0px 0px' }}>
           <Table stickyHeader loading={loading} sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={'medium'}>
             <EnhancedTableHead
               numSelected={selected.length}
               order={order}
-              orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
+              orderBy={orderBy}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
             />
             <TableBody
               sx={{
                 backgroundColor: '#FFF',
+                maxHeight: '40vh',
                 loading: loading,
               }}
             >
@@ -197,7 +195,7 @@ const DataTable = ({
                 return (
                   <TableRow
                     hover
-                    onClick={(event) => handleClick(event, row.ordinalNumber)}
+                    onClick={(event) => handleClick(event, row.ordinalNumber, row.id)}
                     role="checkbox"
                     aria-checked={isItemSelected}
                     tabIndex={-1}
@@ -219,18 +217,17 @@ const DataTable = ({
                       id={labelId}
                       scope="row"
                       padding="none"
-                      width={'20%'}
                       sx={{ fontSize: '14px' }}
                     >
                       {row.ordinalNumber}
                     </TableCell>
-                    <TableCell align="left" width={'20%'} sx={{ fontSize: '14px' }} padding="none">
+                    <TableCell align="left" width={'30%'} sx={{ fontSize: '14px' }} padding="none">
                       {row.name}
                     </TableCell>
-                    <TableCell align="left" width={'20%'} sx={{ fontSize: '14px' }} padding="none">
+                    <TableCell align="left" width={'30%'} sx={{ fontSize: '14px' }} padding="none">
                       {row.position}
                     </TableCell>
-                    <TableCell align="left" width={'20%'} padding="none">
+                    <TableCell align="left" width={'30%'} padding="none">
                       <Box
                         sx={{
                           display: 'flex',
@@ -260,9 +257,6 @@ const DataTable = ({
                         </Typography>
                       </Box>
                     </TableCell>
-                    <TableCell align="left" width={'20%'} sx={{ fontSize: '14px' }} padding="none">
-                      {row.salary}
-                    </TableCell>
                   </TableRow>
                 );
               })}
@@ -280,22 +274,25 @@ const DataTable = ({
         </TableContainer>
         <TablePagination
           component="div"
-          count={rows.length}
+          count={count}
           paginationMode="server"
-          rowsPerPage={paginationModel.pageSize}
-          page={paginationModel.page - 1}
+          rowsPerPage={pageSize}
+          page={page}
           onPageChange={handleChangePage}
           labelRowsPerPage={''}
           loading={loading}
           sx={{
             backgroundColor: '#FFF',
-            borderRadius: '8px',
+            borderRadius: '0 0 24px 24px',
+            minHeight: '55px',
             '& .MuiSelect-icon': {
               display: 'none',
             },
           }}
         />
       </Paper>
+
+      <EmployeeDetailModal open={open} handleClose={handleCloseModal} employeeId={employeeId}></EmployeeDetailModal>
     </Box>
   );
 };
