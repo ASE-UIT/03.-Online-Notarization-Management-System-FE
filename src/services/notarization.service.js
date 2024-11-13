@@ -75,6 +75,34 @@ const uploadNotarizationDocument = async (document) => {
   }
 };
 
+const getAllNotarizations = async (sortBy = null, limit, page) => {
+  try {
+    const response = await axiosConfig.get(`${NOTARIZATION_ENDPOINT}/getAllNotarization`, {
+      params: {
+        sortBy,
+        limit,
+        page: page + 1,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    const status = error.response?.status;
+    const message = error.response?.data?.message;
+    return { status, message };
+  }
+};
+
+const getNotarizationByRole = async () => {
+  try {
+    const response = await axiosConfig.get(`${NOTARIZATION_ENDPOINT}/getDocumentByRole`);
+    return response.data;
+  } catch (error) {
+    const status = error.response?.status;
+    const message = error.response?.data?.message;
+    return { status, message };
+  }
+};
+
 const NotarizationService = {
   getStatusById,
   getAllNotarizationField,
@@ -82,6 +110,8 @@ const NotarizationService = {
   getHistory,
   getNotarizationServiceByFieldId,
   uploadNotarizationDocument,
+  getAllNotarizations,
+  getNotarizationByRole,
 };
 
 export default NotarizationService;

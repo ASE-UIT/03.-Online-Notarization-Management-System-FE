@@ -15,6 +15,7 @@ import Cookies from 'js-cookie';
 import PrivateRoute from './routes/PrivateRoute';
 import PublicRoute from './routes/PublicRoute';
 import { setUser } from './stores/slices/userSlice';
+import Settings from './pages/admin/Settings';
 
 const Home = lazy(() => import('./pages/home/Home'));
 const Services = lazy(() => import('./pages/services/Services'));
@@ -27,11 +28,13 @@ const HistoryNotarizationProfile = lazy(() => import('./pages/services/HistoryNo
 const CreateNotarizationSession = lazy(() => import('./pages/services/CreateNotarizationSession'));
 const UserGuide = lazy(() => import('./pages/static/UserGuide'));
 const NotFound = lazy(() => import('./pages/notfound/NotFound'));
-const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const AdminDashboard = lazy(() => import('./pages/admin/dashboard/AdminDashboard'));
 const EmployeeManagement = lazy(() => import('./pages/admin/EmployeeManagement'));
 const UserManagement = lazy(() => import('./pages/admin/UserManagement'));
-const NotaryManagement = lazy(() => import('./pages/admin/NotaryManagement'));
-const NotarySessionManagement = lazy(() => import('./pages/admin/NotarySessionManagement'));
+const NotaryManagement = lazy(() => import('./pages/admin/notary-management/NotaryManagement'));
+const NotaryDashboard = lazy(() => import('./pages/notary/NotaryDashboard'));
+const NotarizationDocuments = lazy(() => import('./pages/notary/NotarizationDocuments'));
+const NotarizationHistory = lazy(() => import('./pages/notary/NotarizationHistory'))
 
 function App() {
   const dispatch = useDispatch();
@@ -132,7 +135,7 @@ function App() {
                 <Route path="/admin/employee-management" element={<EmployeeManagement />} />
                 <Route path="/admin/user-management" element={<UserManagement />} />
                 <Route path="/admin/notary-management" element={<NotaryManagement />} />
-                <Route path="/admin/notary-session-management" element={<NotarySessionManagement />} />
+                <Route path="/admin/settings" element={<Settings />} />
               </Route>
 
               {/* Secretary Routes */}
@@ -156,6 +159,13 @@ function App() {
               {/* Profile Routes */}
               <Route element={<PrivateRoute allowedRoles={['user', 'admin', 'secretary', 'notary']} />}>
                 <Route path="/profile" element={<UserProfile />} />
+              </Route>
+
+              {/* Notary Routes */}
+              <Route element={<PrivateRoute allowedRoles={['notary']} />}>
+                <Route path="/notary/dashboard" element={<NotaryDashboard />} />
+                <Route path="/notary/notarization-documents" element={<NotarizationDocuments />} />
+                <Route path="/notary/notarization-history" element={<NotarizationHistory />} />
               </Route>
 
               <Route path="*" element={<NotFound />} />
