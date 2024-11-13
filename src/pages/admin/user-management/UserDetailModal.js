@@ -1,14 +1,75 @@
-import { ArrowBack } from '@mui/icons-material';
-import { Box, Button, IconButton, Modal, Typography, Tabs, Tab, Avatar, TextField, Grid } from '@mui/material';
-import React, { useState, useEffect } from 'react';
-import { black, gray, primary, white } from '../../../config/theme/themePrimitives';
-import { toast } from 'react-toastify';
-import { useDispatch, useSelector } from 'react-redux';
+import { Box, Modal, Typography, Tabs, Tab, Avatar, Grid } from '@mui/material';
+import React, { useState, useEffect, useCallback } from 'react';
+import { black, gray, white } from '../../../config/theme/themePrimitives';
 import 'react-toastify/dist/ReactToastify.css';
 import InfoField from './InfoField';
 import DetailModalSkeleton from './DetailModalSkeleton';
 import UserService from '../../../services/user.service';
 import NotaryDocumentCard from './NotaryDocumentCard';
+
+const documents = [
+  {
+    docType: 'Công chứng hợp đồng mua bán nhà đất',
+    documentId: '6722157ce89b01001f5ca296',
+    date: '24/09/2024',
+    status: 'Đang xử lý',
+  },
+  {
+    docType: 'Công chứng hợp đồng mua bán nhà đất',
+    documentId: '6722157ce89b01001f5ca297',
+    date: '25/09/2024',
+    status: 'Hoàn thành',
+  },
+  {
+    docType: 'Công chứng hợp đồng mua bán nhà đất',
+    documentId: '6722157ce89b01001f5ca298',
+    date: '26/09/2024',
+    status: 'Chờ xác nhận',
+  },
+  {
+    docType: 'Công chứng hợp đồng mua bán nhà đất',
+    documentId: '6722157ce89b01001f5ca299',
+    date: '27/09/2024',
+    status: 'Đang xử lý',
+  },
+  {
+    docType: 'Công chứng hợp đồng mua bán nhà đất',
+    documentId: '6722157ce89b01001f5ca300',
+    date: '28/09/2024',
+    status: 'Hoàn thành',
+  },
+  {
+    docType: 'Công chứng hợp đồng mua bán nhà đất',
+    documentId: '6722157ce89b01001f5ca301',
+    date: '29/09/2024',
+    status: 'Chờ xác nhận',
+  },
+  {
+    docType: 'Công chứng hợp đồng mua bán nhà đất',
+    documentId: '6722157ce89b01001f5ca302',
+    date: '30/09/2024',
+    status: 'Đang xử lý',
+  },
+  {
+    docType: 'Công chứng hợp đồng mua bán nhà đất',
+    documentId: '6722157ce89b01001f5ca303',
+    date: '01/10/2024',
+    status: 'Hoàn thành',
+  },
+];
+
+const TabPanel = (props) => {
+  const { children, value, index, ...other } = props;
+  return (
+    <Box role="tabpanel" hidden={value !== index} {...other}>
+      {value === index && (
+        <Box sx={{ p: 1 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </Box>
+  );
+};
 
 const EditUserProfileModal = ({ open, handleClose, userId }) => {
   const [tabValue, setTabValue] = useState(0);
@@ -31,58 +92,7 @@ const EditUserProfileModal = ({ open, handleClose, userId }) => {
     id: '',
   });
 
-  const documents = [
-    {
-      docType: 'Công chứng hợp đồng mua bán nhà đất',
-      documentId: '6722157ce89b01001f5ca296',
-      date: '24/09/2024',
-      status: 'Đang xử lý',
-    },
-    {
-      docType: 'Công chứng hợp đồng mua bán nhà đất',
-      documentId: '6722157ce89b01001f5ca297',
-      date: '25/09/2024',
-      status: 'Hoàn thành',
-    },
-    {
-      docType: 'Công chứng hợp đồng mua bán nhà đất',
-      documentId: '6722157ce89b01001f5ca298',
-      date: '26/09/2024',
-      status: 'Chờ xác nhận',
-    },
-    {
-      docType: 'Công chứng hợp đồng mua bán nhà đất',
-      documentId: '6722157ce89b01001f5ca299',
-      date: '27/09/2024',
-      status: 'Đang xử lý',
-    },
-    {
-      docType: 'Công chứng hợp đồng mua bán nhà đất',
-      documentId: '6722157ce89b01001f5ca300',
-      date: '28/09/2024',
-      status: 'Hoàn thành',
-    },
-    {
-      docType: 'Công chứng hợp đồng mua bán nhà đất',
-      documentId: '6722157ce89b01001f5ca301',
-      date: '29/09/2024',
-      status: 'Chờ xác nhận',
-    },
-    {
-      docType: 'Công chứng hợp đồng mua bán nhà đất',
-      documentId: '6722157ce89b01001f5ca302',
-      date: '30/09/2024',
-      status: 'Đang xử lý',
-    },
-    {
-      docType: 'Công chứng hợp đồng mua bán nhà đất',
-      documentId: '6722157ce89b01001f5ca303',
-      date: '01/10/2024',
-      status: 'Hoàn thành',
-    },
-  ];
-
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     setLoading(true);
     try {
       const response = await UserService.getUserById(userId);
@@ -98,29 +108,18 @@ const EditUserProfileModal = ({ open, handleClose, userId }) => {
         ward: response.address?.town || '',
         street: response.address?.street || '',
       });
+    } catch (error) {
+      console.log(error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
 
   useEffect(() => {
     if (open) {
       fetchUserData();
     }
-  }, [open]);
-
-  function TabPanel(props) {
-    const { children, value, index, ...other } = props;
-    return (
-      <div role="tabpanel" hidden={value !== index} {...other}>
-        {value === index && (
-          <Box sx={{ p: 1 }}>
-            <Typography>{children}</Typography>
-          </Box>
-        )}
-      </div>
-    );
-  }
+  }, [open, fetchUserData]);
 
   return (
     <Modal open={open} onClose={handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
@@ -130,11 +129,11 @@ const EditUserProfileModal = ({ open, handleClose, userId }) => {
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          width: '70vw',
-          bgcolor: 'background.paper',
-          p: 1,
+          width: '80vw',
+          maxHeight: '90vh',
           borderRadius: 2,
-          background: '#FFF',
+          backgroundColor: white[50],
+          p: 3,
         }}
       >
         {/* Form Fields Section */}
@@ -143,40 +142,23 @@ const EditUserProfileModal = ({ open, handleClose, userId }) => {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            alignItems: 'left',
-            gap: '10px',
-            marginTop: '20px',
-            borderRadius: '8px',
-            padding: 1,
-            columnGap: '16px',
+            borderRadius: 1,
           }}
         >
           {/* Avatar Section */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2 }}>
-            <Avatar src="/avatar.png" sx={{ width: 96, height: 96, borderRadius: '50%' }} />
-            <Box flex={1} display="flex" flexDirection="column" gap={1}>
-              <Typography variant="h5">{!loading ? userData.name : ''}</Typography>
-              <Typography variant="caption" color="textSecondary">
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, p: 3 }}>
+            <Avatar src="/avatar.png" sx={{ width: 64, height: 64, borderRadius: '50%' }} />
+            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <Typography sx={{ fontSize: 16, fontWeight: 600 }}>{!loading ? userData.name : ''}</Typography>
+              <Typography sx={{ fontSize: 14, fontWeight: 400, color: gray[500] }}>
                 {!loading ? userData.email : ''}
               </Typography>
             </Box>
           </Box>
           {/* Tab Panel */}
-          <Tabs
-            value={tabValue}
-            variant="subtitle2"
-            onChange={handleTabChange}
-            sx={{
-              flex: '1',
-              color: 'black[900]',
-              justifyContent: 'flex-start',
-              '& .MuiTabs-flexContainer': {
-                justifyContent: 'flex-start',
-              },
-            }}
-          >
-            <Tab label="Thông tin cá nhân" />
-            <Tab label="Tài liệu công chứng" />
+          <Tabs sx={{ p: 1 }} value={tabValue} onChange={handleTabChange}>
+            <Tab label="Thông tin cá nhân" sx={{ textTransform: 'none' }} />
+            <Tab label="Tài liệu công chứng" sx={{ textTransform: 'none' }} />
           </Tabs>
 
           {/* Tab Information */}
@@ -186,21 +168,20 @@ const EditUserProfileModal = ({ open, handleClose, userId }) => {
             ) : (
               <Box
                 sx={{
+                  height: '50vh',
                   display: 'flex',
                   p: 2,
                   flexDirection: 'column',
-                  justifyContent: 'center',
-                  gap: '16px',
-                  alignSelf: 'stretch',
-                  borderRadius: '8px',
-                  border: '1px solid #E0E0E0',
-                  background: '#FFF',
+                  gap: 2,
+                  borderRadius: 1,
+                  border: `1px solid ${black[50]}`,
+                  backgroundColor: white[50],
                 }}
               >
                 <Box
                   sx={{
                     display: 'flex',
-                    gap: '16px',
+                    gap: 1,
                     alignSelf: 'stretch',
                   }}
                 >
@@ -210,31 +191,31 @@ const EditUserProfileModal = ({ open, handleClose, userId }) => {
 
                 <Box
                   sx={{
+                    gap: 1,
                     display: 'flex',
-                    gap: '16px',
                     alignSelf: 'stretch',
                   }}
                 >
                   <InfoField caption={'Email'} value={userData.email}></InfoField>
                   <InfoField caption={'Số điện thoại'} value={userData.phone}></InfoField>
-                  </Box>
-                  
-                  <Box
-                  sx={{
-                    display: 'flex',
-                    gap: '16px',
-                    alignSelf: 'stretch',
-                  }}
-                >
-                    <InfoField caption={'Tỉnh/Thành phố'} value={userData.city}></InfoField>
-                    <InfoField caption={'Quận/Huyện'} value={userData.district}></InfoField>
-                    <InfoField caption={'Xã/Phường'} value={userData.ward}></InfoField>
                 </Box>
 
                 <Box
                   sx={{
                     display: 'flex',
-                    gap: '16px',
+                    gap: 1,
+                    alignSelf: 'stretch',
+                  }}
+                >
+                  <InfoField caption={'Tỉnh/Thành phố'} value={userData.city}></InfoField>
+                  <InfoField caption={'Quận/Huyện'} value={userData.district}></InfoField>
+                  <InfoField caption={'Xã/Phường'} value={userData.ward}></InfoField>
+                </Box>
+
+                <Box
+                  sx={{
+                    display: 'flex',
+                    gap: 1,
                     alignSelf: 'stretch',
                   }}
                 >
@@ -249,27 +230,20 @@ const EditUserProfileModal = ({ open, handleClose, userId }) => {
             <Box
               sx={{
                 maxWidth: '100%',
-                maxHeight: '40vh',
                 overflowY: 'auto',
                 margin: 'center',
                 justifyItems: 'center',
                 justifyContent: 'space-between',
-
-                p: 1,
-                backgroundColor: '#fff',
-                borderRadius: '8px',
+                height: '50vh',
+                p: 2,
+                backgroundColor: white[50],
+                borderRadius: 1,
+                border: `1px solid ${black[50]}`,
               }}
             >
               <Grid container spacing={3} alignItems="center">
                 {documents.map((doc, index) => (
-                  <Grid
-                    item
-                    xs={12}
-                    sm={12}
-                    md={6}
-                    key={index}
-                    onClick={() => alert(`Clicked on document ID: ${doc.documentId}`)}
-                  >
+                  <Grid item xs={12} sm={12} md={6} key={index}>
                     <NotaryDocumentCard
                       docType={doc.docType}
                       documentId={doc.documentId}

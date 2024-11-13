@@ -1,12 +1,12 @@
 import React from 'react';
-import { Box, Typography, Button, Divider, Skeleton } from '@mui/material';
-import { EditSharp } from '@mui/icons-material';
-import { black, gray, primary, white } from '../../../config/theme/themePrimitives';
+import { Box, Typography, Divider, Skeleton } from '@mui/material';
+import { gray, white } from '../../../config/theme/themePrimitives';
 
 const DetailModalSkeleton = () => {
   return (
     <Box
       sx={{
+        height: '50vh',
         gap: 2,
         display: 'flex',
         flexDirection: 'column',

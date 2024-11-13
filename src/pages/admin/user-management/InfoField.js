@@ -1,43 +1,36 @@
 import React from 'react';
 import { Box, TextField, Typography } from '@mui/material';
+import { black } from '../../../config/theme/themePrimitives';
 
 export default function InfoField({ caption, value }) {
   return (
     <Box
       sx={{
         display: 'flex',
-        gap: '10px',
-        alignSelf: 'stretch',
+        gap: 1,
         flexDirection: 'column',
-        flex: '1 0 0',
+        flex: 1,
       }}
     >
       <Typography
         sx={{
-          color: '#000',
-          fontFeatureSettings: 'liga off, clig off',
-          fontFamily: 'Be Vietnam Pro',
-          fontSize: '16px',
-          fontStyle: 'normal',
+          color: black[900],
+          fontSize: 16,
           fontWeight: 500,
-          lineHeight: 'normal',
         }}
       >
         {caption}
       </Typography>
       <TextField
+        variant="outlined"
         label={value}
         disabled={true}
         sx={{
-          color: '#5C5C5C',
-          fontFamily: 'Roboto',
-          fontSize: '16px',
-          fontStyle: 'normal',
+          color: black[400],
+          fontSize: 16,
           fontWeight: 400,
-          lineHeight: '24px',
-          letterSpacing: '0.15px',
         }}
-      ></TextField>
+      />
     </Box>
   );
 }

@@ -6,13 +6,10 @@ import Header from './Header';
 import { gray, black, white } from '../../../config/theme/themePrimitives';
 import FilterButton from './FilterButton';
 import AppsIcon from '@mui/icons-material/Apps';
-
 import SkeletonHistoryDataTable from '../../../components/services/SkeletonHistoryDataTable';
-
 import FiberNewRoundedIcon from '@mui/icons-material/FiberNewRounded';
 import AccessTimeFilledRoundedIcon from '@mui/icons-material/AccessTimeFilledRounded';
 import WaterfallChartRoundedIcon from '@mui/icons-material/WaterfallChartRounded';
-
 import SearchIcon from '@mui/icons-material/Search';
 import UserService from '../../../services/user.service';
 
@@ -58,7 +55,7 @@ const iconMap = {
   [filterList.PotentialUser]: <WaterfallChartRoundedIcon sx={{ height: '18px', width: '18px' }} />,
 };
 
-function createData(id, ordinalNumber, name, email, status, notaryCount, userType) {
+const createData = (id, ordinalNumber, name, email, status, notaryCount, userType) => {
   return {
     id,
     ordinalNumber,
@@ -68,7 +65,7 @@ function createData(id, ordinalNumber, name, email, status, notaryCount, userTyp
     notaryCount,
     userType,
   };
-}
+};
 
 const UserManagement = () => {
   const [filterOption, setFilterOption] = useState(filterList.All);
@@ -92,7 +89,7 @@ const UserManagement = () => {
 
       const rows = await Promise.all(
         users.map(async (item, index) => {
-          let status, userType, notaryCount;
+          let status;
 
           if (item.status === 'inactive') status = 'Ngoại tuyến';
           if (item.status === 'active') status = 'Trực tuyến';
@@ -130,10 +127,10 @@ const UserManagement = () => {
       }}
     >
       {/* Header Section */}
-      <Header></Header>
+      <Header />
 
       {/* User Overview Section */}
-      <UserOverview userCount={userCount}></UserOverview>
+      <UserOverview userCount={userCount} />
 
       {/* User Data Table Section */}
       <Box
@@ -154,7 +151,7 @@ const UserManagement = () => {
           <Box
             sx={{
               display: 'flex',
-              gap: '8px',
+              gap: 1,
               alignSelf: 'stretch',
               borderBottom: '1px solid #C0C0C0',
             }}
@@ -212,6 +209,7 @@ const UserManagement = () => {
               '& .MuiInputBase-input': {
                 fontSize: 14,
               },
+              backgroundColor: white[50],
             }}
             InputProps={{
               startAdornment: (
@@ -225,14 +223,14 @@ const UserManagement = () => {
         <Box
           sx={{
             border: !loadingStatus ? '1px solid var(--black-50, #E0E0E0)' : 'none',
-            borderRadius: '24px',
+            borderRadius: 2,
             background: white[50],
-            p: '8px',
-            paddingBottom: '64px',
+            p: 1,
+            paddingBottom: 8,
           }}
         >
           {loadingStatus ? (
-            <SkeletonHistoryDataTable headCells={headCells}></SkeletonHistoryDataTable>
+            <SkeletonHistoryDataTable headCells={headCells} />
           ) : (
             <UserDataTable
               filterStatus={filterOption}
@@ -244,7 +242,7 @@ const UserManagement = () => {
               paginationModel={paginationModel}
               setPaginationModel={setPaginationModel}
               loading={loadingStatus}
-            ></UserDataTable>
+            />
           )}
         </Box>
       </Box>

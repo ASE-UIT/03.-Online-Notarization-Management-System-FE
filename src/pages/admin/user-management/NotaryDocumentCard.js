@@ -1,79 +1,70 @@
 import React from 'react';
-import { Card, CardContent, Typography, Box } from '@mui/material';
-import { primary } from '../../../config/theme/themePrimitives';
+import { Typography, Box } from '@mui/material';
+import { black, primary, white } from '../../../config/theme/themePrimitives';
 
 const NotaryDocumentCard = ({ docType, documentId, date, status }) => {
   return (
-    <Card
-      variant="outlined"
+    <Box
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        padding: '8px',
-        alignSelf: 'stretch',
-        borderRadius: '8px',
-        height: '100%',
-        backgroundColor: '#FFFFFF',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-        cursor: 'pointer',
-        '&:hover': {
-          backgroundColor: '#f5f5f5',
-          boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
+        padding: 2,
+        borderRadius: 1,
+        backgroundColor: white[50],
+        boxShadow: 1,
+        ':hover': {
+          transform: 'scale(1.02)',
         },
+        transition: 'transform 0.2s',
       }}
     >
-      <CardContent>
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 2,
+        }}
+      >
+        <Typography sx={{ fontSize: 14, fontWeight: 600, color: black[900] }}>{docType}</Typography>
         <Box
           sx={{
-            display: 'flex',
-            gap: '16px',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            mb: 2,
+            backgroundColor: primary[50],
+            borderRadius: 4,
+            py: 0.5,
+            px: 1,
+            color: primary[500],
           }}
         >
-          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-            {docType}
-          </Typography>
-          <Box
-            sx={{
-              backgroundColor: primary[50],
-              borderRadius: '30px',
-              padding: '4px 8px',
-              color: primary[500],
-            }}
-          >
-            <Typography variant="body3" sx={{ color: primary[500] }}>
-              {documentId}
-            </Typography>
-          </Box>
+          <Typography sx={{ fontSize: 14, fontWeight: 500, color: primary[500] }}>{documentId}</Typography>
         </Box>
+      </Box>
 
-        <Box
-          sx={{
-            display: 'flex',
-            gap: '16px',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            mb: 1,
-          }}
-        >
-          <Typography variant="body2">Ngày công chứng:</Typography>
-          <Typography variant="body2">{date}</Typography>
-        </Box>
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 1,
+        }}
+      >
+        <Typography sx={{ fontSize: 14, fontWeight: 400, color: black[900] }}>Ngày công chứng:</Typography>
+        <Typography sx={{ fontSize: 14, fontWeight: 500, color: black[900] }}>{date}</Typography>
+      </Box>
 
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <Typography variant="body2">Tình trạng:</Typography>
-          <Typography variant="body2">{status}</Typography>
-        </Box>
-      </CardContent>
-    </Card>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <Typography sx={{ fontSize: 14, fontWeight: 400, color: black[900] }}>Tình trạng:</Typography>
+        <Typography sx={{ fontSize: 14, fontWeight: 500, color: black[900] }}>{status}</Typography>
+      </Box>
+    </Box>
   );
 };
 
