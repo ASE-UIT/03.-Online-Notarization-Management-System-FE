@@ -13,15 +13,7 @@ import UserService from '../../services/user.service';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const CustomAutocomplete = ({
-  options,
-  value,
-  onChange,
-  placeholder,
-  loading,
-  fetchOptions,
-  isSubmitting,
-}) => (
+const CustomAutocomplete = ({ options, value, onChange, placeholder, loading, fetchOptions, isSubmitting }) => (
   <Autocomplete
     loading={loading}
     options={options}
@@ -58,27 +50,14 @@ const CustomAutocomplete = ({
     value={value}
     onOpen={fetchOptions}
     disabled={isSubmitting}
-    loadingText={
-      <Typography sx={{ fontSize: '14px', fontWeight: 'regular', color: gray[600] }}>
-        Đang tải...
-      </Typography>
-    }
+    loadingText={<Typography sx={{ fontSize: '14px', fontWeight: 'regular', color: gray[600] }}>Đang tải...</Typography>}
     noOptionsText={
-      <Typography sx={{ fontSize: '14px', fontWeight: 'regular', color: gray[600] }}>
-        Không tìm thấy kết quả
-      </Typography>
+      <Typography sx={{ fontSize: '14px', fontWeight: 'regular', color: gray[600] }}>Không tìm thấy kết quả</Typography>
     }
   />
 );
 
-const DateTimePickerSection = ({
-  label,
-  startDate,
-  setStartDate,
-  startTime,
-  setStartTime,
-  isSubmitting
-}) => (
+const DateTimePickerSection = ({ label, startDate, setStartDate, startTime, setStartTime, isSubmitting }) => (
   <Box>
     <Typography variant="body2">{label}</Typography>
     <Box sx={{ display: 'flex', flexDirection: 'row', mb: 2 }}>
@@ -100,7 +79,7 @@ const DateTimePickerSection = ({
               },
             },
           }}
-          format='DD/MM/YYYY'
+          format="DD/MM/YYYY"
           disabled={isSubmitting}
         />
       </Box>
@@ -123,7 +102,7 @@ const DateTimePickerSection = ({
               },
             },
           }}
-          format='HH:mm'
+          format="HH:mm"
           disabled={isSubmitting}
         />
       </Box>
@@ -183,15 +162,9 @@ const GuestSection = ({
           </li>
         )}
         disabled={isSubmitting}
-        loadingText={
-          <Typography sx={{ fontSize: '14px', fontWeight: 'regular', color: gray[600] }}>
-            Đang tải...
-          </Typography>
-        }
+        loadingText={<Typography sx={{ fontSize: '14px', fontWeight: 'regular', color: gray[600] }}>Đang tải...</Typography>}
         noOptionsText={
-          <Typography sx={{ fontSize: '14px', fontWeight: 'regular', color: gray[600] }}>
-            Không tìm thấy kết quả
-          </Typography>
+          <Typography sx={{ fontSize: '14px', fontWeight: 'regular', color: gray[600] }}>Không tìm thấy kết quả</Typography>
         }
       />
 
@@ -209,16 +182,11 @@ const GuestSection = ({
     {/* Added Guests */}
     <Box sx={{ display: 'flex', flexWrap: 'wrap', mt: 2 }}>
       {users.map((guest, index) => (
-        <AvatarWithCloseButton
-          key={index}
-          email={guest.email}
-          onRemove={() => handleRemoveGuest(guest.email)}
-        />
+        <AvatarWithCloseButton key={index} email={guest.email} onRemove={() => handleRemoveGuest(guest.email)} />
       ))}
     </Box>
   </Box>
 );
-
 
 const CustomTextField = styled(TextField)(({ theme }) => ({
   '& fieldset': { border: 'none' },
@@ -271,7 +239,7 @@ const NotarySessionForm = ({ open, setOpen, handleSuccess }) => {
         setLoading(false);
       }
     }, 1500),
-    []
+    [],
   );
 
   const handleInputChange = (event, newValue) => {
@@ -313,7 +281,6 @@ const NotarySessionForm = ({ open, setOpen, handleSuccess }) => {
       }
     }
   };
-
 
   useEffect(() => {
     setNotarizationServices([]);
@@ -405,14 +372,10 @@ const NotarySessionForm = ({ open, setOpen, handleSuccess }) => {
     }
     resetForm();
     setOpen(false);
-  }
+  };
 
   return (
-    <Modal
-      open={open}
-      onClose={handleOnClose}
-      sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-    >
+    <Modal open={open} onClose={handleOnClose} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <Box
         sx={{
           width: { xs: '90vw', sm: '80vw', md: '70vw' },
@@ -440,7 +403,12 @@ const NotarySessionForm = ({ open, setOpen, handleSuccess }) => {
           {/* Notary Session Name */}
           <Box sx={{ flex: '1 1 30%', mr: { xs: 0, sm: 2 }, mb: 2 }}>
             <Typography variant="body2">Tên phiên công chứng</Typography>
-            <CustomTextField placeholder="Nhập tên phiên công chứng" fullWidth onChange={handleSessionNameChange} disabled={isSubmitting} />
+            <CustomTextField
+              placeholder="Nhập tên phiên công chứng"
+              fullWidth
+              onChange={handleSessionNameChange}
+              disabled={isSubmitting}
+            />
           </Box>
 
           {/* Notary Service and Field */}
@@ -471,11 +439,13 @@ const NotarySessionForm = ({ open, setOpen, handleSuccess }) => {
             </Box>
           </Box>
 
-          <Box sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            gap: 2,
-          }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              gap: 2,
+            }}
+          >
             <DateTimePickerSection
               label="Thời gian bắt đầu"
               startDate={startDate}
@@ -497,7 +467,8 @@ const NotarySessionForm = ({ open, setOpen, handleSuccess }) => {
           {/* Duration */}
           <Box sx={{ mb: 2 }}>
             <Typography variant="caption" sx={{ color: black[400] }}>
-              Sự kiện này sẽ diễn ra từ {startDate.format('DD/MM/YYYY')} - {startTime.format('HH:mm')} đến {endDate ? endDate.format('DD/MM/YYYY') : '.. / .. / ..'} - {endTime ? endTime.format('HH:mm') : '.. : ..'}
+              Sự kiện này sẽ diễn ra từ {startDate.format('DD/MM/YYYY')} - {startTime.format('HH:mm')} đến{' '}
+              {endDate ? endDate.format('DD/MM/YYYY') : '.. / .. / ..'} - {endTime ? endTime.format('HH:mm') : '.. : ..'}
             </Typography>
           </Box>
 

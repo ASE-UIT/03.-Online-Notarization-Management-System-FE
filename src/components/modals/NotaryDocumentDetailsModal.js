@@ -262,7 +262,7 @@ const NotaryDocumentDetailsModal = ({ open, handleClose, notarizationData }) => 
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <IconButton onClick={handleClose}>
+            <IconButton onClick={handleClose} aria-label="Arrow Back">
               <ArrowBack
                 sx={{
                   color: black[900],
