@@ -30,8 +30,11 @@ const UserGuide = lazy(() => import('./pages/static/UserGuide'));
 const NotFound = lazy(() => import('./pages/notfound/NotFound'));
 const AdminDashboard = lazy(() => import('./pages/admin/dashboard/AdminDashboard'));
 const EmployeeManagement = lazy(() => import('./pages/admin/EmployeeManagement'));
-const UserManagement = lazy(() => import('./pages/admin/UserManagement'));
+const UserManagement = lazy(() => import('./pages/admin/user-management/UserManagement'));
 const NotaryManagement = lazy(() => import('./pages/admin/notary-management/NotaryManagement'));
+const NotaryDashboard = lazy(() => import('./pages/notary/NotaryDashboard'));
+const NotarizationDocuments = lazy(() => import('./pages/notary/NotarizationDocuments'));
+const NotarizationHistory = lazy(() => import('./pages/notary/NotarizationHistory'))
 
 function App() {
   const dispatch = useDispatch();
@@ -156,6 +159,13 @@ function App() {
               {/* Profile Routes */}
               <Route element={<PrivateRoute allowedRoles={['user', 'admin', 'secretary', 'notary']} />}>
                 <Route path="/profile" element={<UserProfile />} />
+              </Route>
+
+              {/* Notary Routes */}
+              <Route element={<PrivateRoute allowedRoles={['notary']} />}>
+                <Route path="/notary/dashboard" element={<NotaryDashboard />} />
+                <Route path="/notary/notarization-documents" element={<NotarizationDocuments />} />
+                <Route path="/notary/notarization-history" element={<NotarizationHistory />} />
               </Route>
 
               <Route path="*" element={<NotFound />} />

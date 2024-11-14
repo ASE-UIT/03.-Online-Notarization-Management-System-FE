@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Box, Card, CardContent, IconButton, Divider, Typography, Avatar, Menu, MenuItem, CardActionArea } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Card, CardContent, Divider, Typography, Avatar, CardActionArea } from '@mui/material';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import { black, dark, green, red, white, yellow } from '../../config/theme/themePrimitives';
 import AvatarIcon from '../static/AvatarIcon';
@@ -63,8 +63,8 @@ const SessionCard = React.memo(({ session }) => {
       sx={{
         flexBasis: {
           xs: '100%',
-          sm: 'calc(50% - 24px)',
-          md: 'calc(33.33% - 24px)',
+          sm: 'calc(70% - 24px)',
+          md: 'calc(50% - 24px)',
         },
         mb: 2,
         display: 'flex',
