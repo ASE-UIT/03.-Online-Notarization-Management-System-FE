@@ -169,7 +169,7 @@ const Sidebar = () => {
             onClick={() => setOpenSideBar(!openSideBar)}
             sx={{ color: dark[500], fontSize: 20, '&:hover': { backgroundColor: primary[500], color: white[50] } }}
           >
-            {openSideBar ? <KeyboardDoubleArrowLeft fontSize="inherit" /> : <KeyboardDoubleArrowRight fontSize="inherit" />}
+            {openSideBar ? <KeyboardDoubleArrowLeft fontSize="inherit" data-testid = "keyboarddoublearrowleft" /> : <KeyboardDoubleArrowRight fontSize="inherit" data-testid ="keyboarddoublearrowright" />}
           </IconButton>
         </Box>
 

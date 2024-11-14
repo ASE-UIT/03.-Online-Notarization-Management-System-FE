@@ -66,6 +66,7 @@ export default function SignUpCard() {
   return (
     <Card variant="outlined">
       <Typography
+        data-testid =".signupH1"
         component="h1"
         variant="h4"
         sx={{
@@ -140,13 +141,13 @@ export default function SignUpCard() {
             onChange={(e) => setPasswordErrorMessage('')}
           />
         </FormControl>
-        <Button type="submit" fullWidth variant="contained">
+        <Button type="submit" fullWidth variant="contained" data-testid='.signUpBtn' >
           Đăng ký
         </Button>
         <Typography sx={{ textAlign: 'center' }}>
           Đã có tài khoản?{' '}
           <span>
-            <Link href="/signin/" variant="body2" sx={{ alignSelf: 'center' }}>
+            <Link data-testid=".signInLink" href="/signin/" variant="body2" sx={{ alignSelf: 'center' }}>
               Đăng nhập
             </Link>
           </span>
@@ -154,7 +155,7 @@ export default function SignUpCard() {
       </Box>
       <Divider>hoặc</Divider>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Button type="submit" fullWidth variant="outlined" startIcon={<GoogleIcon />}>
+        <Button data-testid=".signUpwG" type="submit" fullWidth variant="outlined" startIcon={<GoogleIcon />}>
           Đăng ký với Google
         </Button>
       </Box>
