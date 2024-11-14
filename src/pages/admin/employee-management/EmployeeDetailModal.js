@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Avatar, Box, Modal, Skeleton , Tab, Tabs, Typography } from '@mui/material';
 import InfoField from './InfoField';
 import SkeletonDetailModal from './SkeletonDetailModal';
@@ -29,18 +29,26 @@ const EmployeeDetailModal = ({ open, handleClose, employeeId, }) => {
     id: '',
     createdAt: '',
     citizenId: '',
-    address: ''
+    address: {
+      street: '',
+      town: '',
+      district: '',
+      province: '',
+    }
   });
 
-  const getEmployeeInfo = async () => {
+  const getEmployeeInfo = useCallback(async () => {
     setLoadingInfo(true);
     try {
       const response = await UserService.getUserById(employeeId);
       const date = new Date(response.createdAt);
       const startDate = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
       const citizenId = (response.citizenId) ? response.citizenId : '';
-      const address = (response.address) ? (response.address.street + ',' + response.address.town + ',' + response.address.district + ',' + response.address.province) : '';
-    
+      const street = (response.address) ? response.address.street : '';
+      const town = (response.address) ? response.address.town : '';
+      const district = (response.address) ? response.address.district : '';
+      const province = (response.address) ? response.address.province : '';
+
       let  role;
 
       if (response.role === 'notary') role = 'Công chứng viên';
@@ -54,19 +62,25 @@ const EmployeeDetailModal = ({ open, handleClose, employeeId, }) => {
         createdAt: startDate || '',
         phone: response.phoneNumber || '',
         citizenId: citizenId || '',
-        address: address || '',
+        address: {
+          street: street || '',
+          town: town || '',
+          district: district || '',
+          province: province || '',
+        },
       });
     } finally {
       setLoadingInfo(false);
     }
-  };
+  }, [employeeId]
+)
 
   useEffect(() => {
     if (open) {
       setTabValue(0); 
       getEmployeeInfo();
     }
-  }, [open]);
+  }, [open, getEmployeeInfo]);
 
   const handleTabChange = (event, newIndex) => {
     setTabValue(newIndex);
@@ -80,7 +94,8 @@ const EmployeeDetailModal = ({ open, handleClose, employeeId, }) => {
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          width: '50vw',
+          width: '80vw',
+          maxHeight: '90vh',
           bgcolor: 'background.paper',
           p: '24px',
           borderRadius: 2,
@@ -232,11 +247,32 @@ const EmployeeDetailModal = ({ open, handleClose, employeeId, }) => {
               }}
             >
               {loadingInfo ? (
-                <SkeletonDetailModal caption={'Địa chỉ liên hệ'}></SkeletonDetailModal>
+                <SkeletonDetailModal caption={'Tỉnh/Thành phố'}></SkeletonDetailModal>
               ) : (
-                <InfoField caption={'Địa chỉ liên hệ'} value={formData.address}></InfoField>
+                <InfoField caption={'Tỉnh/Thành phố'} value={formData.address.province}></InfoField>
               )}
-              
+              {loadingInfo ? (
+                <SkeletonDetailModal caption={'Quận/Huyện'}></SkeletonDetailModal>
+              ) : (
+                <InfoField caption={'Quận/Huyện'} value={formData.address.district}></InfoField>
+              )}
+              {loadingInfo ? (
+                <SkeletonDetailModal caption={'Xã/Phường'}></SkeletonDetailModal>
+              ) : (
+                <InfoField caption={'Xã/Phường'} value={formData.address.town}></InfoField>
+              )}
+            </Box>
+
+            <Box
+              sx={{
+                alignSelf: 'stretch',
+              }}
+            >
+              {loadingInfo ? (
+                <SkeletonDetailModal caption={'Số nhà, đường/phố'}></SkeletonDetailModal>
+              ) : (
+                <InfoField caption={'Số nhà, đường/phố'} value={formData.address.street}></InfoField>
+              )}
             </Box>
           </Box>
         </TabPanel>
