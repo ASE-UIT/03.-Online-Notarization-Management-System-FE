@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Button, IconButton } from '@mui/material';
+import { Box, Typography, IconButton } from '@mui/material';
 import { white, black,yellow } from '../../../config/theme/themePrimitives';
 
 import { NotificationsRounded } from '@mui/icons-material';

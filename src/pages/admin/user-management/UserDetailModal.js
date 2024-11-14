@@ -5,58 +5,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import InfoField from './InfoField';
 import DetailModalSkeleton from './DetailModalSkeleton';
 import UserService from '../../../services/user.service';
+import NotarizationService from '../../../services/notarization.service';
 import NotaryDocumentCard from './NotaryDocumentCard';
-
-const documents = [
-  {
-    docType: 'Công chứng hợp đồng mua bán nhà đất',
-    documentId: '6722157ce89b01001f5ca296',
-    date: '24/09/2024',
-    status: 'Đang xử lý',
-  },
-  {
-    docType: 'Công chứng hợp đồng mua bán nhà đất',
-    documentId: '6722157ce89b01001f5ca297',
-    date: '25/09/2024',
-    status: 'Hoàn thành',
-  },
-  {
-    docType: 'Công chứng hợp đồng mua bán nhà đất',
-    documentId: '6722157ce89b01001f5ca298',
-    date: '26/09/2024',
-    status: 'Chờ xác nhận',
-  },
-  {
-    docType: 'Công chứng hợp đồng mua bán nhà đất',
-    documentId: '6722157ce89b01001f5ca299',
-    date: '27/09/2024',
-    status: 'Đang xử lý',
-  },
-  {
-    docType: 'Công chứng hợp đồng mua bán nhà đất',
-    documentId: '6722157ce89b01001f5ca300',
-    date: '28/09/2024',
-    status: 'Hoàn thành',
-  },
-  {
-    docType: 'Công chứng hợp đồng mua bán nhà đất',
-    documentId: '6722157ce89b01001f5ca301',
-    date: '29/09/2024',
-    status: 'Chờ xác nhận',
-  },
-  {
-    docType: 'Công chứng hợp đồng mua bán nhà đất',
-    documentId: '6722157ce89b01001f5ca302',
-    date: '30/09/2024',
-    status: 'Đang xử lý',
-  },
-  {
-    docType: 'Công chứng hợp đồng mua bán nhà đất',
-    documentId: '6722157ce89b01001f5ca303',
-    date: '01/10/2024',
-    status: 'Hoàn thành',
-  },
-];
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -74,6 +24,7 @@ const TabPanel = (props) => {
 const EditUserProfileModal = ({ open, handleClose, userId }) => {
   const [tabValue, setTabValue] = useState(0);
   const [loading, setLoading] = useState(false);
+  const[documents, setDocuments] = useState([]);
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -92,22 +43,40 @@ const EditUserProfileModal = ({ open, handleClose, userId }) => {
     id: '',
   });
 
+  const statusMapping = {
+    pending: 'Chờ xử lý',
+    processing: 'Đang xử lý',
+    verification: 'Đang xác minh',
+    digitalSignature: 'Sẵn sàng ký số',
+    completed: 'Hoàn tất',
+    rejected: 'Không hợp lệ',
+  };
+
   const fetchUserData = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await UserService.getUserById(userId);
+      const userInfo = await UserService.getUserById(userId);
+      const userNotaryHistory = await NotarizationService.getHistoryByUserId(userId);
+      const transformedDocuments = userNotaryHistory.map(item => ({
+        docType: item.notarizationService?.name || '',
+        documentId: item._id,
+        date: new Date(item.createdAt).toLocaleDateString('vi-VN'),
+        status: statusMapping[item.status?.status] || 'Không xác định',
+      }));
+
       setUserData({
-        role: response?.role || '',
-        isEmailVerified: response?.isEmailVerified || false,
-        name: response?.name || '',
-        email: response?.email || '',
-        phone: response?.phoneNumber || '',
-        identification: response?.citizenId || '',
-        city: response.address?.province || '',
-        district: response.address?.district || '',
-        ward: response.address?.town || '',
-        street: response.address?.street || '',
+        role: userInfo?.role || '',
+        isEmailVerified: userInfo?.isEmailVerified || false,
+        name: userInfo?.name || '',
+        email: userInfo?.email || '',
+        phone: userInfo?.phoneNumber || '',
+        identification: userInfo?.citizenId || '',
+        city: userInfo.address?.province || '',
+        district: userInfo.address?.district || '',
+        ward: userInfo.address?.town || '',
+        street: userInfo.address?.street || '',
       });
+      setDocuments(transformedDocuments);
     } catch (error) {
       console.log(error);
     } finally {
@@ -120,6 +89,12 @@ const EditUserProfileModal = ({ open, handleClose, userId }) => {
       fetchUserData();
     }
   }, [open, fetchUserData]);
+
+  useEffect(() => {
+    if (open) {
+      setTabValue(0);
+    }
+  }, [open]);
 
   return (
     <Modal open={open} onClose={handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">

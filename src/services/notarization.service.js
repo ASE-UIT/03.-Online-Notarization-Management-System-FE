@@ -102,6 +102,17 @@ const getNotarizationByRole = async () => {
   }
 };
 
+const getHistoryByUserId = async (userId) => {
+  try {
+    const response = await axiosConfig.get(`${NOTARIZATION_ENDPOINT}/get-history-by-user-id/${userId}`);
+    return response.data;
+  } catch (error) {
+    const status = error.response?.status;
+    const message = error.response?.data?.message;
+    return { status, message };
+  }
+}
+
 const NotarizationService = {
   getStatusById,
   getAllNotarizationField,
@@ -111,6 +122,7 @@ const NotarizationService = {
   uploadNotarizationDocument,
   getAllNotarizations,
   getNotarizationByRole,
+  getHistoryByUserId,
 };
 
 export default NotarizationService;

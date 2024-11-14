@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
@@ -13,7 +13,7 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import { visuallyHidden } from '@mui/utils';
 import CircleRoundedIcon from '@mui/icons-material/CircleRounded';
-import { Avatar, Typography, Button } from '@mui/material';
+import { Avatar, Typography } from '@mui/material';
 import TablePagination from '@mui/material/TablePagination';
 import UserDetailModal from './UserDetailModal';
 
