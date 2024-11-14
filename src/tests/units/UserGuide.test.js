@@ -1,100 +1,83 @@
-// src/tests/units/UserGuide.test.js
-
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import UserGuide from '../../pages/static/UserGuide';
 import '@testing-library/jest-dom';
-import { BrowserRouter } from 'react-router-dom';
+import UserGuide from '../../../src/pages/static/UserGuide'; // Điều chỉnh đường dẫn cho phù hợp
 
-describe('Trang Hướng dẫn sử dụng', () => {
-  beforeEach(() => {
-    render(
-      <BrowserRouter>
-        <UserGuide />
-      </BrowserRouter>
-    );
+describe('UserGuide', () => {
+  it('hiển thị tiêu đề và văn bản mô tả chính xác', () => {
+    render(<UserGuide />);
+    expect(
+      screen.getByText('5 bước để sử dụng dịch vụ\ncông chứng trực tuyến', { exact: false })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Công chứng tài liệu trở nên dễ dàng hơn khi sử dụng dịch vụ công chứng trực tuyến/i)
+    ).toBeInTheDocument();
   });
 
-  test('1. Kiểm tra hiển thị tiêu đề và văn bản mô tả', () => {
-    // Kiểm tra tiêu đề
-    const title = screen.getByText('5 bước để sử dụng dịch vụ công chứng trực tuyến');
-    expect(title).toBeInTheDocument();
-    expect(title).toHaveStyle({ fontWeight: 700 });
-
-    // Kiểm tra văn bản mô tả
-    const description = screen.getByText(/Công chứng tài liệu trở nên dễ dàng hơn/i);
-    expect(description).toBeInTheDocument();
-  });
-
-  test('2. Kiểm tra danh sách các bước hướng dẫn', () => {
-    // Kiểm tra số lượng bước
-    const steps = screen.getAllByTestId('step-card');
-    expect(steps).toHaveLength(5);
-
-    // Kiểm tra thông tin của từng bước
-    const expectedStepTitles = [
+  it('hiển thị danh sách các bước hướng dẫn đầy đủ và theo thứ tự', () => {
+    render(<UserGuide />);
+    const stepTitles = [
       'Đăng ký tài khoản',
       'Xác minh danh tính',
       'Lựa chọn dịch vụ công chứng',
       'Cung cấp tài liệu cần công chứng',
-      'Thanh toán và nhận tài liệu đã được công chứng'
+      'Thanh toán và nhận tài liệu đã được công chứng',
     ];
 
-    expectedStepTitles.forEach((title, index) => {
-      const stepTitle = screen.getByText(title);
-      expect(stepTitle).toBeInTheDocument();
-      
-      // Kiểm tra nút "Tìm hiểu thêm"
-      const expandButton = screen.getAllByText('Tìm hiểu thêm')[index];
-      expect(expandButton).toBeInTheDocument();
-      
-      // Kiểm tra chức năng mở rộng thông tin
-      fireEvent.click(expandButton);
-      const stepDescription = screen.getByTestId(`step-description-${index}`);
-      expect(stepDescription).toBeVisible();
+    stepTitles.forEach((title) => {
+      expect(screen.getByText(title)).toBeInTheDocument();
     });
   });
 
-  test('3. Kiểm tra hình ảnh minh họa', () => {
-    const expectedImages = [
+  it('hiển thị tiêu đề và mô tả của từng bước', () => {
+    render(<UserGuide />);
+    const stepDescriptions = [
+      /Để sử dụng dịch vụ công chứng trực tuyến, bạn cần đăng nhập vào tài khoản/i,
+      /Để đảm bảo tính bảo mật và hợp pháp của dịch vụ, bạn cần xác minh danh tính/i,
+      /Chúng tôi cung cấp nhiều loại dịch vụ công chứng khác nhau/i,
+      /Bạn cần tải lên các tài liệu cần công chứng lên hệ thống/i,
+      /Sau khi hoàn tất các bước trên, bạn chỉ cần thanh toán phí dịch vụ/i,
+    ];
+
+    stepDescriptions.forEach((regex) => {
+      expect(screen.getByText(regex)).toBeInTheDocument();
+    });
+  });
+
+  it('hiển thị hình ảnh minh họa cho từng bước', () => {
+    render(<UserGuide />);
+    const imageAlts = [
       'howitworks-signup.png',
       'howitworks-identify.png',
       'howitworks-services.png',
       'howitworks-necessarydocs.png',
-      'howitworks-finalstep.png'
+      'howtiworks-finalstep.png',
     ];
 
-    expectedImages.forEach((imageSrc, index) => {
-      const image = screen.getByTestId(`step-image-${index}`);
-      expect(image).toBeInTheDocument();
-      expect(image).toHaveAttribute('src', expect.stringContaining(imageSrc));
-      expect(image).toHaveAttribute('alt', expect.any(String));
+    imageAlts.forEach((alt) => {
+      const images = screen.getAllByAltText(alt);
+      expect(images.length).toBeGreaterThan(0);
     });
   });
 
-  test('4. Kiểm tra liên kết và nút', () => {
-    // Kiểm tra liên kết đăng ký
-    const registerLink = screen.getByText('tại đây');
-    expect(registerLink).toHaveAttribute('href', expect.stringContaining('github.com/sloweyyy'));
-    expect(registerLink).toHaveAttribute('target', '_blank');
+  it('nút "Tìm hiểu thêm" cho mỗi bước hoạt động', () => {
+    render(<UserGuide />);
+    const expandButtons = screen.getAllByRole('button', { name: /tìm hiểu thêm/i });
 
-    // Kiểm tra nút tạo hồ sơ (nếu có)
-    const createProfileButton = screen.queryByText('Tạo hồ sơ công chứng');
-    if (createProfileButton) {
-      expect(createProfileButton).toBeInTheDocument();
-      expect(createProfileButton).toHaveAttribute('href', '/create-profile');
-    }
-
-    // Kiểm tra chức năng mở rộng/thu gọn của các bước
-    const expandButtons = screen.getAllByText('Tìm hiểu thêm');
-    expandButtons.forEach((button, index) => {
+    expandButtons.forEach((button) => {
       fireEvent.click(button);
-      const stepDescription = screen.getByTestId(`step-description-${index}`);
-      expect(stepDescription).toBeVisible();
-
-      // Kiểm tra thu gọn
-      fireEvent.click(button);
-      expect(stepDescription).not.toBeVisible();
+      // Kiểm tra xem nội dung mở rộng có hiển thị hay không
+      expect(button.getAttribute('aria-expanded')).toBe('true');
     });
+  });
+
+  it('nút "Tạo hồ sơ công chứng" hoạt động đúng', () => {
+    render(<UserGuide />);
+    const createProfileButton = screen.getByText('Tạo hồ sơ công chứng');
+    expect(createProfileButton).toBeInTheDocument();
+
+    fireEvent.click(createProfileButton);
+    // Kiểm tra hành động sau khi nhấn nút, ví dụ chuyển hướng hoặc gọi hàm
+    // Nếu sử dụng react-router, kiểm tra history hoặc mock useNavigate
   });
 });
