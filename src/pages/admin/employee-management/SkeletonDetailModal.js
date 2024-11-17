@@ -1,6 +1,5 @@
 import React from 'react';
-import { Box, Typography,  Divider, Skeleton } from '@mui/material';
-import { gray,  white } from '../../../config/theme/themePrimitives';
+import { Box, Typography, Skeleton } from '@mui/material';
 
 const DetailModalSkeleton = ({caption}) => {
   return (

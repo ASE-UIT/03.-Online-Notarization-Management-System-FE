@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Skeleton, TextField, Typography } from '@mui/material';
+import { Box, TextField, Typography } from '@mui/material';
 
 export default function InfoField({ caption, value, }) {
   return (
