@@ -89,6 +89,7 @@ const ProvinceSelector = ({ city, district, ward, onCityChange, onDistrictChange
       <LabeledTextField
         label="Tỉnh/Thành phố"
         value={inputCity || ''}
+        defaultValue={city}
         onChange={handleCityChange}
         isAutoComplete={true}
         options={cities}
@@ -96,6 +97,7 @@ const ProvinceSelector = ({ city, district, ward, onCityChange, onDistrictChange
       <LabeledTextField
         label="Quận/Huyện"
         value={city ? inputDistrict : ''}
+        defaultValue={district}
         onChange={handleDistrictChange}
         isAutoComplete={true}
         options={districts}
@@ -104,6 +106,7 @@ const ProvinceSelector = ({ city, district, ward, onCityChange, onDistrictChange
       <LabeledTextField
         label="Xã/Phường/Thị trấn"
         value={district && city ? inputWard : ''}
+        defaultValue={ward}
         onChange={handleWardChange}
         isAutoComplete={true}
         options={wards}

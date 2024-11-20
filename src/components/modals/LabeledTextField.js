@@ -2,7 +2,7 @@ import { Box, IconButton, Typography, TextField, InputAdornment, Menu, MenuItem,
 import React, { useState, useEffect } from 'react';
 import { black } from '../../config/theme/themePrimitives';
 
-const LabeledTextField = ({ label, isAutoComplete = false, value = '', onChange, options = [], disabled = false }) => {
+const LabeledTextField = ({ label, isAutoComplete = false, value = '',defaultValue ='', onChange, options = [], disabled = false }) => {
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleOpenMenu = (event) => {
@@ -45,6 +45,7 @@ const LabeledTextField = ({ label, isAutoComplete = false, value = '', onChange,
                 {...params}
                 variant="outlined"
                 size="small"
+                placeholder={defaultValue}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': {
