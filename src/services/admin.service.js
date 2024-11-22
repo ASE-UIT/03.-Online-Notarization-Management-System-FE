@@ -33,6 +33,21 @@ const getDocumentFieldByPeriod = async (period) => {
   return response.data;
 };
 
+const getEmployeesMetrics = async (sortBy = null, limit, page) => {
+  const response = await axiosConfig.get(`${ADMIN_METRICS_ENDPOINT}/employees/list`, {
+    params: {
+      sortBy,
+      limit,
+      page: page + 1,
+    }});
+  return response.data;
+}
+
+const getEmployeesCount = async () => {
+  const response = await axiosConfig.get(`${ADMIN_METRICS_ENDPOINT}/employees/count`);
+  return response.data;
+};
+
 const AdminService = {
   getDocumentMetricsByPeriod,
   getSessionMetricsByPeriod,
@@ -40,6 +55,8 @@ const AdminService = {
   getPaymentServiceByPeriod,
   getPaymentFieldByPeriod,
   getDocumentFieldByPeriod,
+  getEmployeesMetrics,
+  getEmployeesCount
 };
 
 export default AdminService;

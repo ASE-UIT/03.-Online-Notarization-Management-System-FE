@@ -6,10 +6,11 @@ import { primary, black, gray, white } from '../../config/theme/themePrimitives'
 
 const steps = [
   { label: 'Chờ xử lý' },
-  { label: 'Kiểm tra hồ sơ' },
-  { label: 'Tiếp nhận và xử lý' },
+  { label: 'Đang xử lý' },
+  { label: 'Đang xác minh' },
   { label: 'Sẵn sàng ký số' },
   { label: 'Hoàn tất' },
+  { label: 'Không hợp lệ' },
 ];
 
 const CustomConnector = styled(StepConnector)(({ lineColor }) => ({

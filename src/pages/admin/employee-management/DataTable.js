@@ -6,14 +6,16 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
-import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import { visuallyHidden } from '@mui/utils';
-import HistoryDetailModal from '../modals/HistoryDetailModal';
+import CircleRoundedIcon from '@mui/icons-material/CircleRounded';
+import { Avatar, Typography, Button } from '@mui/material';
+import TablePagination from '@mui/material/TablePagination';
+import EmployeeDetailModal from './EmployeeDetailModal';
+
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -25,19 +27,37 @@ function descendingComparator(a, b, orderBy) {
   return 0;
 }
 
+function SetStatusColor(params) {
+  let color = '';
+  if (params === 'Trực tuyến') color = '#00ff00';
+  if (params === 'Ngoại tuyến') color = '#666666';
+  if (params === 'Bị cấm') color = '#FFAA00';
+  if (params === 'Đã bị xóa') color = '#EE443F';
+  return color;
+}
+
 function getComparator(order, orderBy) {
   return order === 'desc' ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-const HistoryDataTable = ({ filterStatus, searchText, rows, headCells, statusTypes, setStatusColor, data }) => {
+const DataTable = ({
+  filterStatus,
+  searchText,
+  rows,
+  headCells,
+  filterList,
+  paginationModel,
+  setPaginationModel,
+  loading,
+  count,
+}) => {
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('profile');
   const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [page, setPage] = React.useState(paginationModel.page - 1);
+  const [pageSize, setPageSize] = React.useState(paginationModel.pageSize);
   const [open, setOpen] = React.useState(false);
-  const [notaryId, setNotaryId] = React.useState('');
-  const [loading, setLoading] = React.useState(false);
+  const [employeeId, setEmployeeId] = React.useState('');
 
   function EnhancedTableHead(props) {
     const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
@@ -50,10 +70,9 @@ const HistoryDataTable = ({ filterStatus, searchText, rows, headCells, statusTyp
         <TableRow
           sx={{
             backgroundColor: '#F9FAFB',
-            borderRadius: '8px',
           }}
         >
-          <TableCell padding="checkbox" sx={{ borderRadius: '8px' }}>
+          <TableCell padding="checkbox">
             <Checkbox
               color="primary"
               indeterminate={numSelected > 0 && numSelected < rowCount}
@@ -67,7 +86,7 @@ const HistoryDataTable = ({ filterStatus, searchText, rows, headCells, statusTyp
               align={'left'}
               padding={headCell.disablePadding ? 'none' : 'normal'}
               sortDirection={orderBy === headCell.id ? order : false}
-              sx={{ borderRadius: '8px', width: '20%' }}
+              sx={{ width: '20%', fontSize: '16px' }}
             >
               <TableSortLabel
                 active={orderBy === headCell.id}
@@ -104,90 +123,83 @@ const HistoryDataTable = ({ filterStatus, searchText, rows, headCells, statusTyp
   };
 
   const handleSelectAllClick = (event) => {
-      return;
+    return;
   };
 
-  const handleClick = (event, id, notaryId) => {
-    setLoading(true);
+  const handleClick = (event, id, employeeId) => {
     let newSelected = [];
     newSelected = newSelected.concat(selected, id); 
     setSelected(newSelected);
-    setNotaryId(notaryId);      
+    setEmployeeId(employeeId);
     setOpen(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 200)
   };
 
   const handleCloseModal = () => {
     setOpen(false);
     setSelected([]);
-    
   }
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+  const handleChangePage = (_, newPage) => {
+    setPaginationModel((prev) => ({ ...prev, page: newPage + 1 }));
   };
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, paginationModel.pageSize - rows.length) : 0;
+  
 
   const visibleRows = React.useMemo(() => {
     let filteredRows = rows;
 
-    if (filterStatus !== statusTypes.All) {
-      filteredRows = rows.filter((row) => row.status === filterStatus);
+    if (filterStatus !== filterList.All) {
+      filteredRows = rows.filter((row) => row.position === filterStatus);
     }
 
     if (searchText) {
       filteredRows = filteredRows.filter(
         (row) =>
-          row.profile.toLowerCase().includes(searchText.toLowerCase()) ||
-          row.name.toLowerCase().includes(searchText.toLowerCase()) ||
-          row.date.toLowerCase().includes(searchText.toLowerCase()) ||
-          row.status.toLowerCase().includes(searchText.toLowerCase()) ||
-          row.service.toLowerCase().includes(searchText.toLowerCase()),
+          row.ordinalNumber?.toString().toLowerCase().includes(searchText.toLowerCase()) ||
+          row.name?.toString().toLowerCase().includes(searchText.toLowerCase()) ||
+          row.position?.toString().toLowerCase().includes(searchText.toLowerCase()) ||
+          row.status?.toString().toLowerCase().includes(searchText.toLowerCase()) ||
+          row.salary?.toString().toLowerCase().includes(searchText.toLowerCase()),
       );
     }
     setSelected([]);
 
-    return filteredRows.sort(getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-  }, [filterStatus, searchText, order, orderBy, page, rowsPerPage]);
+    return filteredRows.sort(getComparator(order, orderBy));
+  }, [filterStatus, searchText, order, orderBy, rows]);
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Paper sx={{ width: '100%' }}>
-        <TableContainer>
-          <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={'medium'}>
+    <Box sx={{ width: '100%', maxHeight: '40vh', borderRadius: '24px' }}>
+      <Paper sx={{ width: '100%', maxHeight: '100%', borderRadius: '24px', boxShadow: 'none' }}>
+        <TableContainer sx={{ maxHeight: '45vh', borderRadius: '24px 24px 0px 0px' }}>
+          <Table stickyHeader loading={loading} sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={'medium'}>
             <EnhancedTableHead
               numSelected={selected.length}
               order={order}
-              orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
+              orderBy={orderBy}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
             />
             <TableBody
               sx={{
                 backgroundColor: '#FFF',
+                maxHeight: '40vh',
+                loading: loading,
               }}
             >
               {visibleRows.map((row, index) => {
-                const isItemSelected = selected.includes(row.id);
+                const isItemSelected = selected.includes(row.ordinalNumber);
                 const labelId = `enhanced-table-checkbox-${index}`;
 
                 return (
                   <TableRow
                     hover
-                    onClick={(event) => handleClick(event, row.id, row.profile)}
+                    onClick={(event) => handleClick(event, row.ordinalNumber, row.id)}
                     role="checkbox"
                     aria-checked={isItemSelected}
                     tabIndex={-1}
-                    key={row.id}
+                    key={row.ordinalNumber}
                     selected={isItemSelected}
                     sx={{ cursor: 'pointer' }}
                   >
@@ -200,38 +212,57 @@ const HistoryDataTable = ({ filterStatus, searchText, rows, headCells, statusTyp
                         }}
                       />
                     </TableCell>
-                    <TableCell component="th" id={labelId} scope="row" padding="none" width={'20%'}>
-                      {row.profile}
+                    <TableCell
+                      component="th"
+                      id={labelId}
+                      scope="row"
+                      padding="none"
+                      sx={{ fontSize: '14px' }}
+                    >
+                      {row.ordinalNumber}
                     </TableCell>
-                    <TableCell align="left" width={'20%'}>
-                      {row.date}
-                    </TableCell>
-                    <TableCell align="left" width={'20%'}>
+                    <TableCell align="left" width={'30%'} sx={{ fontSize: '14px' }} padding="none">
                       {row.name}
                     </TableCell>
-                    <TableCell align="left" width={'20%'}>
-                      <Typography
+                    <TableCell align="left" width={'30%'} sx={{ fontSize: '14px' }} padding="none">
+                      {row.position}
+                    </TableCell>
+                    <TableCell align="left" width={'30%'} padding="none">
+                      <Box
                         sx={{
-                          color: setStatusColor(row.status).color,
-                          backgroundColor: setStatusColor(row.status).backgroundColor,
-                          padding: '4px 16px',
-                          borderRadius: '30px',
-                          fontSize: '15px',
-                          width: 'fit-content',
+                          display: 'flex',
+                          alignItems: 'center',
+                          p: '10px 0px',
                         }}
                       >
-                        {row.status}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="left" width={'20%'}>
-                      {row.service}
+                        <Avatar
+                          sx={{
+                            border: 'none',
+                            backgroundColor: 'transparent',
+                          }}
+                        >
+                          <CircleRoundedIcon
+                            sx={{ width: '12px', height: '12px', fill: SetStatusColor(row.status) }}
+                          ></CircleRoundedIcon>
+                        </Avatar>
+                        <Typography
+                          sx={{
+                            color: '#324155',
+                            fontSize: '14px',
+                            width: 'fit-content',
+                            fontWeight: '500',
+                          }}
+                        >
+                          {row.status}
+                        </Typography>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 );
               })}
               {emptyRows > 0 && (
                 <TableRow
-                  style={{
+                  sx={{
                     height: 33 * emptyRows,
                   }}
                 >
@@ -242,22 +273,27 @@ const HistoryDataTable = ({ filterStatus, searchText, rows, headCells, statusTyp
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[10, 15, 20]}
           component="div"
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
+          count={count}
+          paginationMode="server"
+          rowsPerPage={pageSize}
           page={page}
           onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage={'Số dòng mỗi trang'}
+          labelRowsPerPage={''}
+          loading={loading}
           sx={{
             backgroundColor: '#FFF',
-            borderRadius: '8px',
+            borderRadius: '0 0 24px 24px',
+            minHeight: '55px',
+            '& .MuiSelect-icon': {
+              display: 'none',
+            },
           }}
         />
       </Paper>
-       {notaryId && <HistoryDetailModal open={open} handleClose={handleCloseModal} data={data} notaryId={notaryId} load={loading}></HistoryDetailModal>}
+
+      <EmployeeDetailModal open={open} handleClose={handleCloseModal} employeeId={employeeId}></EmployeeDetailModal>
     </Box>
   );
 };
-export default HistoryDataTable;
+export default DataTable;
