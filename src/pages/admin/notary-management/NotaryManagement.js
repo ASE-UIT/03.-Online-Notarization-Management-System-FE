@@ -113,6 +113,7 @@ const NotaryManagement = () => {
             paginationModel={notaryPaginationModel}
             setPaginationModel={setNotaryPaginationModel}
             loading={notaryLoading}
+            getRowId={(row) => row.id}
           />
         </DataGridSection>
 
@@ -122,6 +123,7 @@ const NotaryManagement = () => {
             paginationModel={sessionPaginationModel}
             setPaginationModel={setSessionPaginationModel}
             loading={sessionLoading}
+            getRowId={(row) => row.id}
           />
         </DataGridSection>
       </Box>
