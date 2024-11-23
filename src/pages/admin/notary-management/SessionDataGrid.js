@@ -86,7 +86,7 @@ const SessionDataGrid = ({ data, paginationModel, setPaginationModel, loading })
     const { durationText, status } = calculateDurationAndStatus(session.startDate, session.endDate);
 
     return {
-      id: session._id,
+      id: session.id,
       requesterInfo: session?.creator?.name,
       sessionName: session.sessionName,
       sessionDuration: durationText,
@@ -128,6 +128,7 @@ const SessionDataGrid = ({ data, paginationModel, setPaginationModel, loading })
         disableRowSelectionOnClick
         disableColumnMenu
         disableColumnResize
+        getRowId={(row) => row.id}
       />
     </Box>
   );
