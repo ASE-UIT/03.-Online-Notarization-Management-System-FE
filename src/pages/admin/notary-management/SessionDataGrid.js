@@ -86,7 +86,7 @@ const SessionDataGrid = ({ data, paginationModel, setPaginationModel, loading })
     const { durationText, status } = calculateDurationAndStatus(session.startDate, session.endDate);
 
     return {
-      id: session.id,
+      id: session._id,
       requesterInfo: session?.creator?.name,
       sessionName: session.sessionName,
       sessionDuration: durationText,
