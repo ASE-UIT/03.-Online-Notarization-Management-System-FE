@@ -1,10 +1,10 @@
+import React, { useEffect, useState } from 'react';
 import { ArrowBack, PictureAsPdf, Error, FiberManualRecord, CheckCircleRounded, PhotoRounded } from '@mui/icons-material';
 import { Backdrop, Box, Button, CircularProgress, IconButton, Modal, Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react';
 import { dark, red, black, white, gray, yellow, blue, green } from '../../config/theme/themePrimitives';
+import { toast } from 'react-toastify';
 import NotaryStep from './NotaryStep';
 import NotarizationService from '../../services/notarization.service';
-import { toast } from 'react-toastify';
 
 const InfoRow = ({ label, value }) => (
   <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
