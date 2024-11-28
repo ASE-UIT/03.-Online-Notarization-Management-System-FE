@@ -1,16 +1,10 @@
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
-import { black, green, primary, gray } from '../../config/theme/themePrimitives';
+import { black, green, primary, gray } from '../../../config/theme/themePrimitives';
 import { TaskAltRounded, CloseRounded, OpenInNewRounded } from '@mui/icons-material';
+import { VALID_FORMATS } from '../../../utils/constants';
 
-const FileUploadSection = ({
-  uploadedFiles,
-  handleFileChange,
-  handleRemoveFile,
-  title,
-  acceptedFormats = '.pdf,.docx,.png,.jpg',
-  confirmed = false,
-}) => {
+const FileUploadSection = ({ uploadedFiles, handleFileChange, handleRemoveFile, title, confirmed = false }) => {
   return (
     <Box sx={{ display: 'flex', gap: 1, flexDirection: 'column' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -41,7 +35,7 @@ const FileUploadSection = ({
               <Typography sx={{ fontSize: 12, fontWeight: 600, textTransform: 'capitalize', color: primary[500] }}>
                 Chọn tài liệu
               </Typography>
-              <input type="file" hidden multiple onChange={handleFileChange} accept={acceptedFormats} />
+              <input type="file" hidden multiple onChange={handleFileChange} accept={VALID_FORMATS} />
             </Button>
             <Typography sx={{ fontSize: 12, textTransform: 'capitalize', color: black[900] }}>
               ({uploadedFiles.length} files đã đăng tải)
@@ -72,6 +66,7 @@ const FileUploadSection = ({
                 textDecoration: 'underline',
               },
             }}
+            onClick={() => window.open(file.file.url || URL.createObjectURL(file.file), '_blank')}
           >
             <Typography sx={{ display: 'list-item', ml: '1rem', fontSize: 14, color: black[500] }}>
               {file.file.name}

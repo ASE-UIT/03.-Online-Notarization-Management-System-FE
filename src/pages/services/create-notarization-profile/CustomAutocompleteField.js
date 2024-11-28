@@ -1,6 +1,6 @@
 import React from 'react';
 import { Autocomplete, Box, TextField, Typography } from '@mui/material';
-import { black, white } from '../../config/theme/themePrimitives';
+import { black, white } from '../../../config/theme/themePrimitives';
 
 const CustomAutocompleteField = ({ title, options, selectedOption, setSelectedOption, fetchOptions, loadingOptions }) => {
   return (

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, TextField, Typography } from '@mui/material';
-import { black, red, white } from '../../config/theme/themePrimitives';
+import { black, red, white } from '../../../config/theme/themePrimitives';
 
 const CustomTextField = ({ label, name, value, placeholder, onChange, required }) => {
   return (
