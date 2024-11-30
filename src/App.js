@@ -33,8 +33,9 @@ const AdminDashboard = lazy(() => import('./pages/admin/dashboard/AdminDashboard
 const UserManagement = lazy(() => import('./pages/admin/user-management/UserManagement'));
 const NotaryManagement = lazy(() => import('./pages/admin/notary-management/NotaryManagement'));
 const NotaryDashboard = lazy(() => import('./pages/notary/NotaryDashboard'));
-const NotarizationDocuments = lazy(() => import('./pages/notary/NotarizationDocuments'));
-const NotarizationHistory = lazy(() => import('./pages/notary/NotarizationHistory'))
+const PendingNotarizationDocuments = lazy(() => import('./pages/notary/PendingNotarizationDocuments'));
+const NotarizationHistory = lazy(() => import('./pages/notary/NotarizedHistory'))
+const AwaitingSignatureDocuments = lazy(() => import('./pages/notary/AwaitingSignatureDocuments'));
 
 function App() {
   const dispatch = useDispatch();
@@ -164,8 +165,9 @@ function App() {
               {/* Notary Routes */}
               <Route element={<PrivateRoute allowedRoles={['notary']} />}>
                 <Route path="/notary/dashboard" element={<NotaryDashboard />} />
-                <Route path="/notary/notarization-documents" element={<NotarizationDocuments />} />
+                <Route path="/notary/pending-notarization-documents" element={<PendingNotarizationDocuments />} />
                 <Route path="/notary/notarization-history" element={<NotarizationHistory />} />
+                <Route path="/notary/awaiting-signature-documents" element={<AwaitingSignatureDocuments />} />
               </Route>
 
               <Route path="*" element={<NotFound />} />
