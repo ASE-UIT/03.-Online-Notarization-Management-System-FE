@@ -33,7 +33,12 @@ const HistoryCard = ({ document }) => {
     };
 
     return (
-        <Box sx={{ flex: 1, minWidth: 300 }}>
+        <Box
+            sx={{
+                flex: 1,
+                minWidth: 300,
+            }}
+        >
             <Card variant="outlined" sx={{ borderRadius: 1, bgcolor: white[50], border: `1px solid ${gray[300]}` }}>
                 <CardContent>
                     <Box display="flex" justifyContent="space-between" alignItems="flex-start">

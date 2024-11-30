@@ -201,10 +201,12 @@ const NotarizedHistory = () => {
 
                 {/* Cards */}
                 <Box
-                    display="flex"
-                    flexWrap="wrap"
-                    gap={2}
-                    sx={{ justifyContent: "flex-start", alignItems: "center" }}
+                    sx={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+                        gap: 2,
+                        justifyContent: "center",
+                    }}
                 >
                     {data.map((document, index) => (
                         <HistoryCard key={index} document={document} />

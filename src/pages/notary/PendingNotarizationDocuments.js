@@ -5,6 +5,33 @@ import TodayPendingNotarizationDocuments from '../../components/notary/TodayPend
 import OnWeekPendingNotarizationDocuments from '../../components/notary/OnWeekPendingNotarizationDocuments'
 
 const PendingNotarizationDocuments = () => {
+    const documents = [
+        {
+            id: 1,
+            username: 'Nguyễn Văn A',
+            timeRanges: '13:00 - 14:00',
+            date: '2021-10-15',
+            note: 'Chưa có thông báo',
+            status: 'pending'
+        },
+        {
+            id: 2,
+            username: 'Nguyễn Văn B',
+            timeRanges: '13:00 - 14:00',
+            date: '2021-10-15',
+            note: 'Chưa có thông báo',
+            status: 'pending'
+        },
+        {
+            id: 3,
+            username: 'Nguyễn Văn C',
+            timeRanges: '13:00 - 14:00',
+            date: '2021-10-15',
+            note: 'Chưa có thông báo',
+            status: 'pending'
+        }
+    ];
+
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', padding: 4, gap: 3 }}>
             <Paper
@@ -59,8 +86,8 @@ const PendingNotarizationDocuments = () => {
                         width: '100%'
                     }}
                 >
-                    <TodayPendingNotarizationDocuments />
-                    <OnWeekPendingNotarizationDocuments />
+                    <TodayPendingNotarizationDocuments documents={documents} />
+                    <OnWeekPendingNotarizationDocuments documents={documents} />
                 </Box>
             </Paper>
         </Box>

@@ -168,7 +168,7 @@ const NotaryDocumentCard = ({ document }) => {
             >
                 Xem chi tiết
             </Button>
-            {document.status === 'awaiting_signature' ? (
+            {document.status === 'pending' ? (
                 <DetailPendingDocumentModal open={open} onClose={handleClose} document={document} />
             ) : (
                 <DetailAwaitingSignatureDocumentModal open={open} onClose={handleClose} document={document} />

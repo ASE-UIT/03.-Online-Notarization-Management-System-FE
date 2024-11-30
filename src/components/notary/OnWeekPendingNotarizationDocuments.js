@@ -3,34 +3,7 @@ import { black } from '../../config/theme/themePrimitives'
 import { Box, Typography } from '@mui/material';
 import NotaryDocumentCard from './NotaryDocumentCard';
 
-const OnWeekPendingNotarizationDocuments = () => {
-    const data = [
-        {
-            id: 1,
-            username: 'Nguyễn Văn A',
-            timeRanges: '13:00 - 14:00',
-            date: '2021-10-15',
-            note: 'Chưa có thông báo',
-            status: 'pending'
-        },
-        {
-            id: 2,
-            username: 'Nguyễn Văn B',
-            timeRanges: '13:00 - 14:00',
-            date: '2021-10-15',
-            note: 'Chưa có thông báo',
-            status: 'pending'
-        },
-        {
-            id: 3,
-            username: 'Nguyễn Văn C',
-            timeRanges: '13:00 - 14:00',
-            date: '2021-10-15',
-            note: 'Chưa có thông báo',
-            status: 'digitalSignature'
-        }
-    ];
-
+const OnWeekPendingNotarizationDocuments = ({ documents }) => {
     return (
         <Box
             sx={{
@@ -58,7 +31,7 @@ const OnWeekPendingNotarizationDocuments = () => {
                     width: '100%'
                 }}
             >
-                {data.map((document, index) =>
+                {documents.map((document, index) =>
                     <NotaryDocumentCard key={index} document={document} />
                 )}
             </Box>
