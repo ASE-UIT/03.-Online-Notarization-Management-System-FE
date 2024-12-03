@@ -22,7 +22,9 @@ const Services = lazy(() => import('./pages/services/Services'));
 const SignIn = lazy(() => import('./pages/signin/SignIn'));
 const SignUp = lazy(() => import('./pages/signup/SignUp'));
 const UserProfile = lazy(() => import('./pages/profile/UserProfile'));
-const CreateNotarizationProfile = lazy(() => import('./pages/services/CreateNotarizationProfile'));
+const CreateNotarizationProfile = lazy(
+  () => import('./pages/services/create-notarization-profile/CreateNotarizationProfile'),
+);
 const LookupNotarizationProfile = lazy(() => import('./pages/services/LookupNotarizationProfile'));
 const HistoryNotarizationProfile = lazy(() => import('./pages/services/HistoryNotarizationProfile'));
 const CreateNotarizationSession = lazy(() => import('./pages/services/CreateNotarizationSession'));
@@ -34,7 +36,7 @@ const UserManagement = lazy(() => import('./pages/admin/user-management/UserMana
 const NotaryManagement = lazy(() => import('./pages/admin/notary-management/NotaryManagement'));
 const NotaryDashboard = lazy(() => import('./pages/notary/NotaryDashboard'));
 const NotarizationDocuments = lazy(() => import('./pages/notary/NotarizationDocuments'));
-const NotarizationHistory = lazy(() => import('./pages/notary/NotarizationHistory'))
+const NotarizationHistory = lazy(() => import('./pages/notary/NotarizationHistory'));
 
 function App() {
   const dispatch = useDispatch();
@@ -173,7 +175,7 @@ function App() {
             {!isAuthenticated && <Footer />}
           </Box>
         </Box>
-        <ToastContainer position="bottom-left" autoClose={5000} newestOnTop rtl={false} pauseOnFocusLoss pauseOnHover />
+        <ToastContainer position="bottom-right" autoClose={2500} newestOnTop rtl={false} pauseOnFocusLoss pauseOnHover />
       </ThemeProvider>
     </Suspense>
   );
