@@ -1,51 +1,23 @@
-import { Autocomplete, Box, Button, IconButton, Modal, TextField, Typography } from '@mui/material'
+import { Box, Button, IconButton, Modal, TextField, Typography } from '@mui/material'
 import React from 'react'
 import { ArrowBack, Cancel, CheckCircle } from '@mui/icons-material'
-import { blue, green, red, yellow, black, white, gray } from '../../config/theme/themePrimitives'
-import { purple } from '@mui/material/colors'
+import { blue, red, yellow, black, white, gray } from '../../config/theme/themePrimitives'
 import InformationField from './InformationField'
 import FileField from './FileField'
-import ImplementDocumentField from './ImplementDocumentField'
 
-const DetailAwaitingSignatureDocumentModal = ({ open, onClose, document }) => {
-    const data = {
-        id: 1,
-        user: {
-            name: 'Nguyễn Văn A',
-            identify: '123456789',
-            phone: '0123456789',
-            email: 'nguyenvana@gmail.com',
-        },
-        notarizationField: 'Công chứng hợp đồng mua bán đất',
-        notarizationService: 'Công chứng hợp đồng mua bán đất',
-        status: 'digitalSignature',
-    }
-
-    const lackDocument = [
-        'CCCD/CMND',
-        'Hộ khẩu',
-        'Giấy khai sinh',
-        'Hộ chiếu',
-    ];
-
+const DetailDocumentModal = ({ open, onClose, document }) => {
     const setStyleBaseOnStatus = (status) => {
         switch (status) {
-            case 'pending': return { color: yellow[500], backgroundColor: yellow[50] };
-            case 'processing': return { color: purple[500], backgroundColor: purple[50] };
+            case 'processing': return { color: yellow[500], backgroundColor: yellow[50] };
             case 'digitalSignature': return { color: blue[500], backgroundColor: blue[50] };
-            case 'completed': return { color: green[500], backgroundColor: green[50] };
-            case 'rejected': return { color: red[500], backgroundColor: red[50] };
             default: return { color: black[500], backgroundColor: black[50] };
         }
     };
 
     const setTextBaseOnStatus = (status) => {
         switch (status) {
-            case 'pending': return 'Đang xử lý';
-            case 'processing': return 'Đang xác minh';
+            case 'processing': return 'Đang xử lý';
             case 'digitalSignature': return 'Sẵn sàng ký số';
-            case 'completed': return 'Hoàn thành';
-            case 'rejected': return 'Không hợp lệ';
             default: return 'Không xác định';
         }
     };
@@ -85,7 +57,7 @@ const DetailAwaitingSignatureDocumentModal = ({ open, onClose, document }) => {
                         width: '100%',
                     }}
                 >
-                    <IconButton sx={{ padding: 0, margin: 0, color: black[900] }}>
+                    <IconButton sx={{ padding: 0, margin: 0, color: black[900] }} onClick={onClose}>
                         <ArrowBack sx={{ height: 24, width: 24 }} />
                     </IconButton>
 
@@ -97,11 +69,11 @@ const DetailAwaitingSignatureDocumentModal = ({ open, onClose, document }) => {
                             color: black[900]
                         }}
                     >
-                        Chi tiết hồ sơ công chứng - Mã số: 6722157ce89b01001f5ca296
+                        Chi tiết hồ sơ công chứng - Mã số: {document?.documentId?.id}
                     </Typography>
 
-                    <Box sx={{ borderRadius: 100, fontSize: 12, fontWeight: 500, padding: '4px 8px', ...setStyleBaseOnStatus(data.status) }}>
-                        {setTextBaseOnStatus(data.status)}
+                    <Box sx={{ borderRadius: 100, fontSize: 12, fontWeight: 500, padding: '4px 8px', ...setStyleBaseOnStatus(document?.status) }}>
+                        {setTextBaseOnStatus(document?.status)}
                     </Box>
                 </Box>
 
@@ -144,10 +116,10 @@ const DetailAwaitingSignatureDocumentModal = ({ open, onClose, document }) => {
                                 Thông tin khách hàng
                             </Typography>
 
-                            <InformationField title="Họ và tên" value={data.user.name} />
-                            <InformationField title="Số CMND" value={data.user.identify} />
-                            <InformationField title="Số điện thoại" value={data.user.phone} />
-                            <InformationField title="Email" value={data.user.email} />
+                            <InformationField title="Họ và tên" value={document?.documentId?.requesterInfo?.fullName} />
+                            <InformationField title="Số CMND" value={document?.documentId?.requesterInfo?.citizenId} />
+                            <InformationField title="Số điện thoại" value={document?.documentId?.requesterInfo?.phoneNumber} />
+                            <InformationField title="Email" value={document?.documentId?.requesterInfo?.email} />
                         </Box>
 
                         {/* Notarization Document Information */}
@@ -179,8 +151,8 @@ const DetailAwaitingSignatureDocumentModal = ({ open, onClose, document }) => {
                                     width: '100%',
                                 }}
                             >
-                                <InformationField title="Lĩnh vực công chứng" value={data.notarizationField} />
-                                <InformationField title="Dịch vụ công chứng" value={data.notarizationService} />
+                                <InformationField title="Lĩnh vực công chứng" value={document?.documentId?.notarizationField?.name} />
+                                <InformationField title="Dịch vụ công chứng" value={document?.documentId?.notarizationService?.name} />
                             </Box>
                         </Box>
 
@@ -324,4 +296,4 @@ const DetailAwaitingSignatureDocumentModal = ({ open, onClose, document }) => {
     )
 }
 
-export default DetailAwaitingSignatureDocumentModal
+export default DetailDocumentModal

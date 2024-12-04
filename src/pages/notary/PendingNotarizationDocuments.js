@@ -1,36 +1,52 @@
 import { Box, Paper, Typography } from '@mui/material'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { black, gray, white } from '../../config/theme/themePrimitives'
-import TodayPendingNotarizationDocuments from '../../components/notary/TodayPendingNotarizationDocuments'
-import OnWeekPendingNotarizationDocuments from '../../components/notary/OnWeekPendingNotarizationDocuments'
+import TodayNotarizationDocuments from '../../components/notary/TodayNotarizationDocuments'
+import OnWeekNotarizationDocuments from '../../components/notary/OnWeekNotarizationDocuments'
+import NotarizationService from '../../services/notarization.service'
 
 const PendingNotarizationDocuments = () => {
-    const documents = [
-        {
-            id: 1,
-            username: 'Nguyễn Văn A',
-            timeRanges: '13:00 - 14:00',
-            date: '2021-10-15',
-            note: 'Chưa có thông báo',
-            status: 'pending'
-        },
-        {
-            id: 2,
-            username: 'Nguyễn Văn B',
-            timeRanges: '13:00 - 14:00',
-            date: '2021-10-15',
-            note: 'Chưa có thông báo',
-            status: 'pending'
-        },
-        {
-            id: 3,
-            username: 'Nguyễn Văn C',
-            timeRanges: '13:00 - 14:00',
-            date: '2021-10-15',
-            note: 'Chưa có thông báo',
-            status: 'pending'
+    const [documents, setDocuments] = useState([]);
+    const [todayDocuments, setTodayDocuments] = useState([]);
+    const [onWeekDocuments, setOnWeekDocuments] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const fetchProcessingDocuments = async () => {
+            setLoading(true);
+            const response = await NotarizationService.getNotarizationByRole(
+                {
+                    status: 'processing',
+                    page: 1,
+                    limit: 10
+                }
+            );
+            setDocuments(response.documents);
+            setLoading(false);
         }
-    ];
+
+        fetchProcessingDocuments();
+    }, []);
+
+    useEffect(() => {
+        const today = new Date().getDate();
+        const onWeek = new Date().getDate() + 7;
+
+        const todayDocuments = documents.filter(document => {
+            const date = new Date(document?.documentId?.createdAt).getDate();
+            return date === today;
+        });
+
+        const onWeekDocuments = documents.filter(document => {
+            const date = new Date(document?.documentId?.createdAt).getDate();
+            return date > today && date <= onWeek;
+        });
+
+        setTodayDocuments(todayDocuments);
+        setOnWeekDocuments(onWeekDocuments);
+    }, [documents]);
+
+    console.log('documents', documents);
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', padding: 4, gap: 3 }}>
@@ -83,11 +99,11 @@ const PendingNotarizationDocuments = () => {
                         display: 'flex',
                         flexDirection: 'column',
                         gap: 2,
-                        width: '100%'
+                        width: '100%',
                     }}
                 >
-                    <TodayPendingNotarizationDocuments documents={documents} />
-                    <OnWeekPendingNotarizationDocuments documents={documents} />
+                    <TodayNotarizationDocuments documents={todayDocuments} isLoading={loading} />
+                    <OnWeekNotarizationDocuments documents={onWeekDocuments} isLoading={loading} />
                 </Box>
             </Paper>
         </Box>

@@ -1,36 +1,50 @@
-import { Box, Paper, Typography } from '@mui/material'
-import React from 'react'
+import { Box, Paper, Skeleton, Typography } from '@mui/material'
+import React, { useState, useEffect } from 'react'
 import { black, gray, white } from '../../config/theme/themePrimitives'
-import TodayPendingNotarizationDocuments from '../../components/notary/TodayPendingNotarizationDocuments'
-import OnWeekPendingNotarizationDocuments from '../../components/notary/OnWeekPendingNotarizationDocuments'
+import TodayNotarizationDocuments from '../../components/notary/TodayNotarizationDocuments'
+import OnWeekNotarizationDocuments from '../../components/notary/OnWeekNotarizationDocuments'
+import NotarizationService from '../../services/notarization.service'
 
 const AwaitingSignatureDocuments = () => {
-    const documents = [
-        {
-            id: 1,
-            username: 'Nguyễn Văn A',
-            timeRanges: '13:00 - 14:00',
-            date: '2021-10-15',
-            note: 'Chưa có thông báo',
-            status: 'digitalSignature'
-        },
-        {
-            id: 2,
-            username: 'Nguyễn Văn B',
-            timeRanges: '13:00 - 14:00',
-            date: '2021-10-15',
-            note: 'Chưa có thông báo',
-            status: 'digitalSignature'
-        },
-        {
-            id: 3,
-            username: 'Nguyễn Văn C',
-            timeRanges: '13:00 - 14:00',
-            date: '2021-10-15',
-            note: 'Chưa có thông báo',
-            status: 'digitalSignature'
+    const [documents, setDocuments] = useState([]);
+    const [todayDocuments, setTodayDocuments] = useState([]);
+    const [onWeekDocuments, setOnWeekDocuments] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const fetchProcessingDocuments = async () => {
+            setLoading(true);
+            const response = await NotarizationService.getNotarizationByRole(
+                {
+                    status: 'readyToSign',
+                    page: 1,
+                    limit: 10
+                }
+            );
+            setDocuments(response.documents);
+            setLoading(false);
         }
-    ];
+
+        fetchProcessingDocuments();
+    }, []);
+
+    useEffect(() => {
+        const today = new Date().getDate();
+        const onWeek = new Date().getDate() + 7;
+
+        const todayDocuments = documents.filter(document => {
+            const date = new Date(document?.documentId?.createdAt).getDate();
+            return date === today;
+        });
+
+        const onWeekDocuments = documents.filter(document => {
+            const date = new Date(document?.documentId?.createdAt).getDate();
+            return date > today && date <= onWeek;
+        });
+
+        setTodayDocuments(todayDocuments);
+        setOnWeekDocuments(onWeekDocuments);
+    }, [documents]);
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', padding: 4, gap: 3 }}>
@@ -77,7 +91,6 @@ const AwaitingSignatureDocuments = () => {
                         Các yêu cầu chờ ký số sẽ hiển thị ở đây
                     </Typography>
                 </Box>
-
                 <Box
                     sx={{
                         display: 'flex',
@@ -86,8 +99,8 @@ const AwaitingSignatureDocuments = () => {
                         width: '100%'
                     }}
                 >
-                    <TodayPendingNotarizationDocuments documents={documents} />
-                    <OnWeekPendingNotarizationDocuments documents={documents} />
+                    <TodayNotarizationDocuments documents={todayDocuments} isLoading={loading} />
+                    <OnWeekNotarizationDocuments documents={onWeekDocuments} isLoading={loading} />
                 </Box>
             </Paper>
         </Box>

@@ -1,13 +1,11 @@
 import { Box, Typography } from '@mui/material';
 import React from 'react';
 import { black, blue, green, red, yellow } from '../../config/theme/themePrimitives';
-import { purple } from '@mui/material/colors';
 
-const NotaryDocumentItem = ({ item }) => {
+const NotaryDocumentItem = ({ document }) => {
     const setStyleBaseOnStatus = (status) => {
         switch (status) {
-            case 'pending': return { color: yellow[500], backgroundColor: yellow[50] };
-            case 'processing': return { color: purple[500], backgroundColor: purple[50] };
+            case 'processing': return { color: yellow[500], backgroundColor: yellow[50] };
             case 'digitalSignature': return { color: blue[500], backgroundColor: blue[50] };
             case 'completed': return { color: green[500], backgroundColor: green[50] };
             case 'rejected': return { color: red[500], backgroundColor: red[50] };
@@ -17,8 +15,7 @@ const NotaryDocumentItem = ({ item }) => {
 
     const setTextBaseOnStatus = (status) => {
         switch (status) {
-            case 'pending': return 'Đang xử lý';
-            case 'processing': return 'Đang xác minh';
+            case 'processing': return 'Đang xử lý';
             case 'digitalSignature': return 'Sẵn sàng ký số';
             case 'completed': return 'Hoàn thành';
             case 'rejected': return 'Không hợp lệ';
@@ -29,11 +26,11 @@ const NotaryDocumentItem = ({ item }) => {
     return (
         <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', gap: 2 }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <Typography sx={{ fontSize: 14, fontWeight: 500, color: black[900] }}>{item.name}</Typography>
-                <Typography sx={{ fontSize: 14, fontWeight: 400, color: black[400] }}>{item.notarizationField}</Typography>
+                <Typography sx={{ fontSize: 14, fontWeight: 500, color: black[900] }}>{document.requesterName}</Typography>
+                <Typography sx={{ fontSize: 14, fontWeight: 400, color: black[400] }}>{document.notarizationFieldName}</Typography>
             </Box>
-            <Box sx={{ borderRadius: 100, fontSize: 12, fontWeight: 500, padding: '4px 8px', ...setStyleBaseOnStatus(item.status) }}>
-                {setTextBaseOnStatus(item.status)}
+            <Box sx={{ borderRadius: 100, fontSize: 12, fontWeight: 500, padding: '4px 8px', ...setStyleBaseOnStatus(document.beforeStatus) }}>
+                {setTextBaseOnStatus(document.beforeStatus)}
             </Box>
         </Box>
     );

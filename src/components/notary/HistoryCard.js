@@ -1,7 +1,7 @@
-import React from 'react'
-import { Box, Card, CardContent, Typography } from '@mui/material'
+import React, { useState } from 'react'
+import { Box, Card, CardActionArea, CardContent, Typography } from '@mui/material'
 import { blue, green, red, yellow, black, gray, white } from '../../config/theme/themePrimitives'
-import { purple } from '@mui/material/colors'
+import DetailHistoryDocumentModal from './DetailHistoryDocumentModal'
 
 const customStyle = {
     fontSize: 12,
@@ -10,10 +10,10 @@ const customStyle = {
 };
 
 const HistoryCard = ({ document }) => {
+    const [open, setOpen] = useState(false);
     const setStyleBaseOnStatus = (status) => {
         switch (status) {
-            case 'pending': return { color: yellow[500], backgroundColor: yellow[50] };
-            case 'processing': return { color: purple[500], backgroundColor: purple[50] };
+            case 'processing': return { color: yellow[500], backgroundColor: yellow[50] };
             case 'digitalSignature': return { color: blue[500], backgroundColor: blue[50] };
             case 'completed': return { color: green[500], backgroundColor: green[50] };
             case 'rejected': return { color: red[500], backgroundColor: red[50] };
@@ -23,8 +23,7 @@ const HistoryCard = ({ document }) => {
 
     const setTextBaseOnStatus = (status) => {
         switch (status) {
-            case 'pending': return 'Đang xử lý';
-            case 'processing': return 'Đang xác minh';
+            case 'processing': return 'Đang xử lý';
             case 'digitalSignature': return 'Sẵn sàng ký số';
             case 'completed': return 'Hoàn thành';
             case 'rejected': return 'Không hợp lệ';
@@ -32,81 +31,99 @@ const HistoryCard = ({ document }) => {
         }
     };
 
+    const handleOpen = () => {
+        setOpen(true);
+    }
+
+    const handleClose = () => {
+        setOpen(false);
+    }
+
     return (
-        <Box
-            sx={{
-                flex: 1,
-                minWidth: 300,
-            }}
-        >
-            <Card variant="outlined" sx={{ borderRadius: 1, bgcolor: white[50], border: `1px solid ${gray[300]}` }}>
-                <CardContent>
-                    <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+        <>
+            <CardActionArea disableRipple sx={{ flex: 1, minWidth: 300, minHeight: 180 }} onClick={handleOpen}>
+                <Card
+                    variant="outlined"
+                    sx={{
+                        borderRadius: 1,
+                        bgcolor: white[50],
+                        border: `1px solid ${gray[300]}`,
+                        height: '100%',
+                        ":hover": {
+                            boxShadow: '0px 4px 8px rgba(19, 25, 39, 0.08)',
+                            border: `1px solid ${gray[900]}`,
+                        }
+                    }}
+                >
+                    <CardContent>
+                        <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+                            <Box
+                                sx={{
+                                    flex: 1,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: 1,
+                                }}
+                            >
+                                <Typography
+                                    sx={{
+                                        color: gray[900],
+                                        fontSize: 14,
+                                        fontWeight: 600,
+                                        textTransform: 'none'
+                                    }}
+                                >
+                                    {document.requesterName}
+                                </Typography>
+                                <Typography
+                                    sx={{
+                                        fontSize: 14,
+                                        fontWeight: 400,
+                                        color: black[400]
+                                    }}
+                                >
+                                    {document.notarizationFieldName}
+                                </Typography>
+                            </Box>
+                            <Box sx={{ borderRadius: 100, fontSize: 12, fontWeight: 500, padding: '4px 8px', ...setStyleBaseOnStatus(document.beforeStatus) }}>
+                                {setTextBaseOnStatus(document.beforeStatus)}
+                            </Box>
+                        </Box>
                         <Box
                             sx={{
-                                flex: 1,
                                 display: 'flex',
-                                flexDirection: 'column',
-                                gap: 1,
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                gap: 2,
+                                mt: 2
                             }}
                         >
-                            <Typography
-                                sx={{
-                                    color: gray[900],
-                                    fontSize: 14,
-                                    fontWeight: 600,
-                                    textTransform: 'none'
-                                }}
-                            >
-                                {document.name}
+                            <Typography sx={customStyle}>
+                                Mã số:
                             </Typography>
-                            <Typography
-                                sx={{
-                                    fontSize: 14,
-                                    fontWeight: 400,
-                                    color: black[400]
-                                }}
-                            >
-                                {document.description}
+                            <Typography sx={customStyle}>{document._id}</Typography>
+                        </Box>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                gap: 2,
+                                mt: 2
+                            }}
+                        >
+                            <Typography sx={customStyle}>
+                                Ngày công chứng:
                             </Typography>
+                            <Typography sx={customStyle}>{new Date(document.createdDate).toLocaleDateString('vi-VN')}</Typography>
                         </Box>
-                        <Box sx={{ borderRadius: 100, fontSize: 12, fontWeight: 500, padding: '4px 8px', ...setStyleBaseOnStatus(document.status) }}>
-                            {setTextBaseOnStatus(document.status)}
-                        </Box>
-                    </Box>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            gap: 2,
-                            mt: 2
-                        }}
-                    >
-                        <Typography sx={customStyle}>
-                            Mã số:
-                        </Typography>
-                        <Typography sx={customStyle}>{document.id}</Typography>
-                    </Box>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            gap: 2,
-                            mt: 2
-                        }}
-                    >
-                        <Typography sx={customStyle}>
-                            Ngày công chứng:
-                        </Typography>
-                        <Typography sx={customStyle}>{document.date}</Typography>
-                    </Box>
-                </CardContent>
-            </Card>
-        </Box>
+                    </CardContent>
+                </Card>
+            </CardActionArea>
+            <DetailHistoryDocumentModal open={open} onClose={handleClose} document={document} />
+        </>
     )
 }
 

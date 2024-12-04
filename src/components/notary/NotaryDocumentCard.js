@@ -2,19 +2,21 @@ import { Avatar, Box, Button, Divider, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import { black, gray, white } from '../../config/theme/themePrimitives'
 import { CalendarToday, Info, Schedule } from '@mui/icons-material'
-import DetailPendingDocumentModal from './DetailPendingDocumentModal'
-import DetailAwaitingSignatureDocumentModal from './DetailAwaitingSignatureDocumentModal'
+import DetailDocumentModal from './DetailDocumentModal'
 
 const NotaryDocumentCard = ({ document }) => {
     const [open, setOpen] = useState(false);
 
-    const handleClose = () => {
-        setOpen(false);
-    };
-
     const handleOpen = () => {
         setOpen(true);
     }
+
+    const handleClose = () => {
+        setOpen(false);
+    }
+
+    const time = new Date(document?.documentId?.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    const date = new Date(document?.documentId?.createdAt).toLocaleDateString('vi-VN');
 
     return (
         <Box
@@ -35,7 +37,8 @@ const NotaryDocumentCard = ({ document }) => {
                     gap: 1,
                     alignItems: 'center',
                     justifyContent: 'center',
-                    padding: '0px 16px'
+                    padding: '0px 16px',
+                    minWidth: 120
                 }}
             >
                 <Avatar sx={{ height: 40, width: 40 }} />
@@ -47,7 +50,7 @@ const NotaryDocumentCard = ({ document }) => {
                         textTransform: 'capitalize'
                     }}
                 >
-                    {document.username}
+                    {document?.documentId?.requesterInfo?.fullName}
                 </Typography>
             </Box>
 
@@ -80,7 +83,7 @@ const NotaryDocumentCard = ({ document }) => {
                             textTransform: 'capitalize'
                         }}
                     >
-                        {document.timeRanges}
+                        {time}
                     </Typography>
                 </Box>
 
@@ -101,7 +104,7 @@ const NotaryDocumentCard = ({ document }) => {
                             textTransform: 'capitalize'
                         }}
                     >
-                        {document.date}
+                        {date}
                     </Typography>
                 </Box>
             </Box>
@@ -141,7 +144,9 @@ const NotaryDocumentCard = ({ document }) => {
                         fontWeight: 500,
                     }}
                 >
-                    {document.note}
+                    {document?.documentId?.notarizationField.name}
+                    <br />
+                    {document?.documentId?.notarizationService.name}
                 </Typography>
             </Box>
 
@@ -168,11 +173,7 @@ const NotaryDocumentCard = ({ document }) => {
             >
                 Xem chi tiết
             </Button>
-            {document.status === 'pending' ? (
-                <DetailPendingDocumentModal open={open} onClose={handleClose} document={document} />
-            ) : (
-                <DetailAwaitingSignatureDocumentModal open={open} onClose={handleClose} document={document} />
-            )}
+            <DetailDocumentModal open={open} onClose={handleClose} document={document} />
         </Box>
     )
 }
