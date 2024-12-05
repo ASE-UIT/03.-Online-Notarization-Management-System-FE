@@ -128,6 +128,7 @@ const SessionDataGrid = ({ data, paginationModel, setPaginationModel, loading })
         disableRowSelectionOnClick
         disableColumnMenu
         disableColumnResize
+        getRowId={(row) => row.id}
       />
     </Box>
   );
