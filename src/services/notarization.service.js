@@ -113,6 +113,17 @@ const getApproveHistory = async () => {
   }
 }
 
+const getDocumentById = async (documentId) => {
+  try {
+    const response = await axiosConfig.get(`${NOTARIZATION_ENDPOINT}/document/${documentId}`);
+    return response.data;
+  } catch (error) {
+    const status = error.response?.status;
+    const message = error.response?.data?.message;
+    return { status, message };
+  }
+}
+
 const NotarizationService = {
   getStatusById,
   getAllNotarizationField,
@@ -123,6 +134,7 @@ const NotarizationService = {
   getAllNotarizations,
   getNotarizationByRole,
   getApproveHistory,
+  getDocumentById,
 };
 
 export default NotarizationService;

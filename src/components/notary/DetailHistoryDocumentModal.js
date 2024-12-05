@@ -69,11 +69,11 @@ const DetailHistoryDocumentModal = ({ open, onClose, document }) => {
                             color: black[900]
                         }}
                     >
-                        Chi tiết hồ sơ công chứng - Mã số: {document?.documentId?.id}
+                        Chi tiết hồ sơ công chứng - Mã số: {document?._id}
                     </Typography>
 
-                    <Box sx={{ borderRadius: 100, fontSize: 12, fontWeight: 500, padding: '4px 8px', ...setStyleBaseOnStatus(document?.status) }}>
-                        {setTextBaseOnStatus(document?.status)}
+                    <Box sx={{ borderRadius: 100, fontSize: 12, fontWeight: 500, padding: '4px 8px', ...setStyleBaseOnStatus(document?.status?.status) }}>
+                        {setTextBaseOnStatus(document?.status?.status)}
                     </Box>
                 </Box>
 
@@ -116,10 +116,10 @@ const DetailHistoryDocumentModal = ({ open, onClose, document }) => {
                                 Thông tin khách hàng
                             </Typography>
 
-                            <InformationField title="Họ và tên" value={document?.documentId?.requesterInfo?.fullName} />
-                            <InformationField title="Số CMND" value={document?.documentId?.requesterInfo?.citizenId} />
-                            <InformationField title="Số điện thoại" value={document?.documentId?.requesterInfo?.phoneNumber} />
-                            <InformationField title="Email" value={document?.documentId?.requesterInfo?.email} />
+                            <InformationField title="Họ và tên" value={document?.requesterInfo?.fullName} />
+                            <InformationField title="Số CMND" value={document?.requesterInfo?.citizenId} />
+                            <InformationField title="Số điện thoại" value={document?.requesterInfo?.phoneNumber} />
+                            <InformationField title="Email" value={document?.requesterInfo?.email} />
                         </Box>
 
                         {/* Notarization Document Information */}
@@ -151,8 +151,8 @@ const DetailHistoryDocumentModal = ({ open, onClose, document }) => {
                                     width: '100%',
                                 }}
                             >
-                                <InformationField title="Lĩnh vực công chứng" value={document?.documentId?.notarizationField?.name} />
-                                <InformationField title="Dịch vụ công chứng" value={document?.documentId?.notarizationService?.name} />
+                                <InformationField title="Lĩnh vực công chứng" value={document?.notarizationField?.name} />
+                                <InformationField title="Dịch vụ công chứng" value={document?.notarizationService?.name} />
                             </Box>
                         </Box>
 

@@ -31,7 +31,8 @@ const NotarizedHistory = () => {
         const fetchDocuments = async () => {
             try {
                 const response = await NotarizationService.getApproveHistory();
-                setDocuments(response);
+                if (Array.isArray(response))
+                    setDocuments(response);
             } catch (error) {
 
                 console.error(error);

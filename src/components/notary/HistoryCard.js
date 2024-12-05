@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Box, Card, CardActionArea, CardContent, Typography } from '@mui/material'
 import { blue, green, red, yellow, black, gray, white } from '../../config/theme/themePrimitives'
 import DetailHistoryDocumentModal from './DetailHistoryDocumentModal'
+import NotarizationService from '../../services/notarization.service'
 
 const customStyle = {
     fontSize: 12,
@@ -11,6 +12,7 @@ const customStyle = {
 
 const HistoryCard = ({ document }) => {
     const [open, setOpen] = useState(false);
+    const [documentSelected, setDocumentSelected] = useState(document);
     const setStyleBaseOnStatus = (status) => {
         switch (status) {
             case 'processing': return { color: yellow[500], backgroundColor: yellow[50] };
@@ -38,6 +40,21 @@ const HistoryCard = ({ document }) => {
     const handleClose = () => {
         setOpen(false);
     }
+
+    useEffect(() => {
+        const fetchDocument = async () => {
+            try {
+                const response = await NotarizationService.getDocumentById(document.documentId);
+                setDocumentSelected(response);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchDocument();
+    }, [document.documentId]);
+
+    console.log(documentSelected);
 
     return (
         <>
@@ -102,7 +119,7 @@ const HistoryCard = ({ document }) => {
                             <Typography sx={customStyle}>
                                 Mã số:
                             </Typography>
-                            <Typography sx={customStyle}>{document._id}</Typography>
+                            <Typography sx={customStyle}>{document.documentId}</Typography>
                         </Box>
                         <Box
                             sx={{
@@ -122,7 +139,7 @@ const HistoryCard = ({ document }) => {
                     </CardContent>
                 </Card>
             </CardActionArea>
-            <DetailHistoryDocumentModal open={open} onClose={handleClose} document={document} />
+            <DetailHistoryDocumentModal open={open} onClose={handleClose} document={documentSelected} />
         </>
     )
 }
