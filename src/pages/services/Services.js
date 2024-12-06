@@ -10,6 +10,7 @@ import {
 	Autocomplete,
 	Skeleton,
 	CircularProgress,
+	Button,
 } from "@mui/material";
 import { dark, gray, primary } from "../../config/theme/themePrimitives";
 import Guide from "../../components/services/Guide";
@@ -20,6 +21,7 @@ const Services = () => {
 	const [filteredData, setFilteredData] = useState([]);
 	const [loading, setLoading] = useState(true); 
 	const [searchLoading, setSearchLoading] = useState(false); 
+	const [visibleCount, setVisibleCount] = useState(9);
 	
 	const fetchServiceList = async () => {
 		setLoading(true);
@@ -45,6 +47,10 @@ const Services = () => {
 		);
 		setFilteredData(filtered);
 		setSearchLoading(false);
+	};
+
+	const loadMore = () => {
+		setVisibleCount(prevCount => prevCount + 9); 
 	};
 
 	useEffect(() => {
@@ -164,7 +170,7 @@ const Services = () => {
 						<CircularProgress size={"4rem"} />
 					</Box>
 				) : (
-					filteredData.map((service, index) => (
+					filteredData.slice(0, visibleCount).map((service, index) => (
 						<Box
 							key={index}
 							sx={{
@@ -243,6 +249,21 @@ const Services = () => {
 							</Card>
 						</Box>
 					))
+				)}
+				{/* Load More Button */}
+				{filteredData.length > visibleCount && (
+					<Box
+						sx={{
+							display: 'flex', 
+							justifyContent: 'center', 
+							mt: 4, 
+							width: '100%'
+						}}
+					>
+						<Button  color="primary" onClick={loadMore}>
+							Xem thêm
+						</Button>
+					</Box>
 				)}
 			</Box>
 
