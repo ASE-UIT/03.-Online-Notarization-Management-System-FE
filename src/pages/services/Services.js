@@ -13,28 +13,42 @@ import {
 } from "@mui/material";
 import { dark, gray, primary } from "../../config/theme/themePrimitives";
 import Guide from "../../components/services/Guide";
-import { services } from "../../utils/fakeData";
+import NotarizationService from "../../services/notarization.service";
 
 const Services = () => {
-	const [filteredData, setFilteredData] = useState(services);
-	const [loading, setLoading] = useState(true); // simutale loading when fetching data from server side (API)
-	const [searchLoading, setSearchLoading] = useState(false); // simulate loading when querying data from server side (API)
+	const [services, setServices] = useState([]);
+	const [filteredData, setFilteredData] = useState([]);
+	const [loading, setLoading] = useState(true); 
+	const [searchLoading, setSearchLoading] = useState(false); 
+	
+	const fetchServiceList = async () => {
+		setLoading(true);
+		try {
+			const response = await NotarizationService.getAllNotarizationService();
+			const data = response.map(item => ({
+				title: item.name,
+      			description: item.description,
+			}))
+			setFilteredData(data);
+			setServices(data);
+		} catch (error) {
+			console.error('Error fetching service list:', error);
+		} finally {
+			setLoading(false);
+		}
+	}
 
 	const handleSearch = (text) => {
 		setSearchLoading(true);
-		setTimeout(() => {
-			const filtered = services.filter((item) =>
-				item.title.toLowerCase().includes(text.toLowerCase())
-			);
-			setFilteredData(filtered);
-			setSearchLoading(false);
-		}, 2000);
+		const filtered = services.filter((item) =>
+			item.title.toLowerCase().includes(text.toLowerCase())
+		);
+		setFilteredData(filtered);
+		setSearchLoading(false);
 	};
 
 	useEffect(() => {
-		setTimeout(() => {
-			setLoading(false);
-		}, 2000);
+		fetchServiceList();
 	}, []);
 
 	return (
@@ -179,13 +193,18 @@ const Services = () => {
 										{service.title}
 									</Typography>
 									<Typography variant="body2" color="textSecondary">
-										{service.description}
+										{service.description.split("\n").map((line, index) => (
+    										<React.Fragment key={index}>
+      											{line}
+      											<br />
+    										</React.Fragment>
+  										))}
 									</Typography>
 								</CardContent>
 								<CardActions>
 									<Link
 										underline="none"
-										href={service.href}
+										href="/signin"
 										sx={{
 											height: "100%",
 											display: "flex",
