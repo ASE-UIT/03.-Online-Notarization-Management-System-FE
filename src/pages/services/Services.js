@@ -10,51 +10,31 @@ import {
 	Autocomplete,
 	Skeleton,
 	CircularProgress,
-	Button,
 } from "@mui/material";
 import { dark, gray, primary } from "../../config/theme/themePrimitives";
 import Guide from "../../components/services/Guide";
-import NotarizationService from "../../services/notarization.service";
+import { services } from "../../utils/fakeData";
 
 const Services = () => {
-	const [services, setServices] = useState([]);
-	const [filteredData, setFilteredData] = useState([]);
-	const [loading, setLoading] = useState(true); 
-	const [searchLoading, setSearchLoading] = useState(false); 
-	const [visibleCount, setVisibleCount] = useState(9);
-	
-	const fetchServiceList = async () => {
-		setLoading(true);
-		try {
-			const response = await NotarizationService.getAllNotarizationService();
-			const data = response.map(item => ({
-				title: item.name,
-      			description: item.description,
-			}))
-			setFilteredData(data);
-			setServices(data);
-		} catch (error) {
-			console.error('Error fetching service list:', error);
-		} finally {
-			setLoading(false);
-		}
-	}
+	const [filteredData, setFilteredData] = useState(services);
+	const [loading, setLoading] = useState(true); // simutale loading when fetching data from server side (API)
+	const [searchLoading, setSearchLoading] = useState(false); // simulate loading when querying data from server side (API)
 
 	const handleSearch = (text) => {
 		setSearchLoading(true);
-		const filtered = services.filter((item) =>
-			item.title.toLowerCase().includes(text.toLowerCase())
-		);
-		setFilteredData(filtered);
-		setSearchLoading(false);
-	};
-
-	const loadMore = () => {
-		setVisibleCount(prevCount => prevCount + 9); 
+		setTimeout(() => {
+			const filtered = services.filter((item) =>
+				item.title.toLowerCase().includes(text.toLowerCase())
+			);
+			setFilteredData(filtered);
+			setSearchLoading(false);
+		}, 2000);
 	};
 
 	useEffect(() => {
-		fetchServiceList();
+		setTimeout(() => {
+			setLoading(false);
+		}, 2000);
 	}, []);
 
 	return (
@@ -170,7 +150,7 @@ const Services = () => {
 						<CircularProgress size={"4rem"} />
 					</Box>
 				) : (
-					filteredData.slice(0, visibleCount).map((service, index) => (
+					filteredData.map((service, index) => (
 						<Box
 							key={index}
 							sx={{
@@ -199,18 +179,13 @@ const Services = () => {
 										{service.title}
 									</Typography>
 									<Typography variant="body2" color="textSecondary">
-										{service.description.split("\n").map((line, index) => (
-    										<React.Fragment key={index}>
-      											{line}
-      											<br />
-    										</React.Fragment>
-  										))}
+										{service.description}
 									</Typography>
 								</CardContent>
 								<CardActions>
 									<Link
 										underline="none"
-										href="/signin"
+										href={service.href}
 										sx={{
 											height: "100%",
 											display: "flex",
@@ -249,21 +224,6 @@ const Services = () => {
 							</Card>
 						</Box>
 					))
-				)}
-				{/* Load More Button */}
-				{filteredData.length > visibleCount && (
-					<Box
-						sx={{
-							display: 'flex', 
-							justifyContent: 'center', 
-							mt: 4, 
-							width: '100%'
-						}}
-					>
-						<Button  color="primary" onClick={loadMore}>
-							Xem thêm
-						</Button>
-					</Box>
 				)}
 			</Box>
 
