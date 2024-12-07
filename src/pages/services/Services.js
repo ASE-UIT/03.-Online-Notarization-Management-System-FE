@@ -12,7 +12,7 @@ import {
 	CircularProgress,
 	Button,
 } from "@mui/material";
-import { dark, gray, primary } from "../../config/theme/themePrimitives";
+import { dark, gray, primary, white } from "../../config/theme/themePrimitives";
 import Guide from "../../components/services/Guide";
 import NotarizationService from "../../services/notarization.service";
 
@@ -136,7 +136,7 @@ const Services = () => {
 				}}
 			>
 				{loading ? (
-					Array.from(new Array(services.length)).map((_, index) => (
+					Array.from(new Array(services.length || 6)).map((_, index) => (
 						<Box
 							key={index}
 							sx={{
@@ -190,7 +190,7 @@ const Services = () => {
 									flexDirection: "column",
 									justifyContent: "space-between",
 									flexGrow: 1,
-
+									backgroundColor:white[50],
 									py: 1,
 								}}
 							>
