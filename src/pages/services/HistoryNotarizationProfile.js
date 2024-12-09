@@ -91,7 +91,7 @@ const HistoryNotarizationProfile = () => {
       setLoadingStatus(true);
       const response = await NotarizationService.getHistory();
       setFullData(response);
-
+      
       const data = await Promise.all(
         response.map(async (item, index) => {          
           const date = new Date(item.createdAt);
