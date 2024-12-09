@@ -1,8 +1,14 @@
-import { ArrowBack, PictureAsPdf, Error, FiberManualRecord, CheckCircleRounded, PhotoRounded } from '@mui/icons-material';
-import { Backdrop, Box, Button, CircularProgress, IconButton, Modal, Typography } from '@mui/material';
+import {
+  ArrowBack,
+  PictureAsPdf,
+  PhotoRounded,
+} from '@mui/icons-material';
+import { Backdrop, Box, CircularProgress, IconButton, Modal, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { dark, red, black, white, gray, yellow, blue, green } from '../../config/theme/themePrimitives';
 import NotaryStep from './NotaryStep';
+import { getDocumentNameByCode } from '../../utils/constants';
+import NotaryFeedback from '../services/NotaryFeedback.js';
 
 const InfoRow = ({ label, value }) => (
   <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -27,14 +33,17 @@ const Section = ({ title, children }) => (
   </Box>
 );
 
-const HistoryDetailModal = ({ open, handleClose, data, notaryId, load}) => {
+const HistoryDetailModal = ({ open, handleClose, data, notaryId, load }) => {
   let notarizationData;
+
   data.forEach((element) => {
     if (element._id === notaryId) notarizationData = element;
   });
-  const [currentStep, setCurrentStep] = useState(0);
-  const [loading, setLoading] = useState(false);
 
+  const [currentStep, setCurrentStep] = useState(0);
+  const loading = false;
+  const [feedback, setFeedback] = useState();
+  const [missingFiles, setMissingFiles] = useState('');
   const [documentFiles, setDocumentFiles] = useState([]);
   const [imageFiles, setImageFiles] = useState([]);
 
@@ -46,7 +55,6 @@ const HistoryDetailModal = ({ open, handleClose, data, notaryId, load}) => {
       verification: { text: 'Đang xác minh', backgroundColor: '#f3ebfa', color: '#7007C1' },
       digitalSignature: { text: 'Sẵn sàng ký số', backgroundColor: blue[50], color: blue[500] },
       completed: { text: 'Hoàn tất', backgroundColor: green[50], color: green[500] },
-      invalid: { text: 'Không hợp lệ', backgroundColor: red[50], color: red[500] },
     };
 
     const { text, backgroundColor, color } = statusConfig[status] || statusConfig.default;
@@ -78,7 +86,7 @@ const HistoryDetailModal = ({ open, handleClose, data, notaryId, load}) => {
           boxShadow: 1,
           border: `1px solid ${black[50]}`,
           alignItems: 'center',
-          width:'fit-content'
+          width: 'fit-content',
         }}
       >
         <Box
@@ -103,6 +111,7 @@ const HistoryDetailModal = ({ open, handleClose, data, notaryId, load}) => {
           }}
         >
           <Typography
+            onClick={() => window.open(file.firebaseUrl)}
             sx={{
               flex: 1,
               fontSize: 12,
@@ -132,7 +141,7 @@ const HistoryDetailModal = ({ open, handleClose, data, notaryId, load}) => {
           boxShadow: 1,
           border: `1px solid ${black[50]}`,
           alignItems: 'center',
-          width:'fit-content'
+          width: 'fit-content',
         }}
       >
         <Box
@@ -187,18 +196,40 @@ const HistoryDetailModal = ({ open, handleClose, data, notaryId, load}) => {
         },
         [[], []],
       );
-      console.log(notarizationData.files);
-      
       setDocumentFiles(docs);
-      setImageFiles(images);      
+      setImageFiles(images);
     }
-    
+
+    let notaryFeedback = '',
+      missingList = '';
+    if (notarizationData?.status.feedback) {
+      notaryFeedback = notarizationData.status.feedback;
+      notaryFeedback.trim();
+      if (notaryFeedback.startsWith('Missing documents')) {
+        setFeedback('Hồ sơ cần bổ sung thêm giấy tờ');
+
+        missingList = notaryFeedback
+          .slice(19, notaryFeedback.length - 1)
+          .split(',')
+          .map((element) => {
+            let code = element.trim();
+            return getDocumentNameByCode(code);
+          });
+        setMissingFiles(missingList);
+      } else {
+        setFeedback(notaryFeedback);
+        setMissingFiles(missingList);
+      }
+    } else {
+      setFeedback(notaryFeedback);
+      setMissingFiles(missingList);
+    }
+
     if (notarizationData.status.status === 'pending') setCurrentStep(0);
     if (notarizationData.status.status === 'processing') setCurrentStep(1);
     if (notarizationData.status.status === 'verification') setCurrentStep(2);
     if (notarizationData.status.status === 'digitalSignature') setCurrentStep(3);
     if (notarizationData.status.status === 'completed') setCurrentStep(4);
-    if (notarizationData.status.status === 'rejected') setCurrentStep(5);
   }, [notarizationData]);
 
   return (
@@ -206,26 +237,26 @@ const HistoryDetailModal = ({ open, handleClose, data, notaryId, load}) => {
       <Box>
         {load ? (
           <Box
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '100vh',
-            height: '90vh',
-            backgroundColor: white[50],
-            borderRadius: 2,
-            overflowY: 'scroll',
-            display: 'flex',
-            boxShadow: 1,
-            p: 2,
-            gap: 1,
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          <CircularProgress ></CircularProgress>
-        </Box>
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '100vh',
+              height: '90vh',
+              backgroundColor: white[50],
+              borderRadius: 2,
+              overflowY: 'scroll',
+              display: 'flex',
+              boxShadow: 1,
+              p: 2,
+              gap: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <CircularProgress></CircularProgress>
+          </Box>
         ) : (
           <Box>
             <Box
@@ -328,61 +359,7 @@ const HistoryDetailModal = ({ open, handleClose, data, notaryId, load}) => {
                     }}
                   >
                     <NotaryStep currentStep={currentStep} />
-                    <Box
-                      sx={{
-                        flex: 1,
-                        backgroundColor: white[50],
-                        boxShadow: 1,
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        p: 2,
-                        height: 'fit-content',
-                        borderRadius: 1,
-                        border: `1px solid ${black[50]}`,
-                      }}
-                    >
-                      <Typography sx={{ fontSize: 14, fontWeight: 600, textAlign: 'left' }}>Ghi chú</Typography>
-                      <Box
-                        sx={{
-                          p: 1,
-                          display: 'flex',
-                          flexDirection: 'row',
-                          gap: 1,
-                          borderRadius: 1,
-                          backgroundColor: red[50],
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          width: 'fit-content',
-                          my: 2,
-                        }}
-                      >
-                        <Error fontSize={'small'} sx={{ color: red[400] }} />
-                        <Typography sx={{ color: black[900], fontSize: 12, fontWeight: 500 }}>
-                          Hồ sơ cần bổ sung thêm giấy tờ
-                        </Typography>
-                      </Box>
-
-                      <Typography sx={{ fontSize: 14, fontWeight: 600, mb: 1, textAlign: 'left' }}>
-                        Tài liệu cần bổ sung
-                      </Typography>
-
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          gap: 1,
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          width: 'fit-content',
-                          p: 1,
-                        }}
-                      >
-                        <FiberManualRecord sx={{ color: black[900], width: '8px', height: '8px' }} />
-                        <Typography sx={{ color: black[900], fontSize: 12, fontWeight: 400 }}>
-                          Giấy tờ chứng minh nhân dân
-                        </Typography>
-                      </Box>
-                    </Box>
+                    <NotaryFeedback feedback={feedback} missingFiles={missingFiles}></NotaryFeedback>
                   </Box>
                   {/* Contact Section */}
                   <Box

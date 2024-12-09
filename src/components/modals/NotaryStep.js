@@ -10,7 +10,6 @@ const steps = [
   { label: 'Đang xác minh' },
   { label: 'Sẵn sàng ký số' },
   { label: 'Hoàn tất' },
-  { label: 'Không hợp lệ' },
 ];
 
 const CustomConnector = styled(StepConnector)(({ lineColor }) => ({
