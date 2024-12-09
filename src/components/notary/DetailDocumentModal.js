@@ -1,15 +1,31 @@
-import { Box, Button, IconButton, Modal, TextField, Typography } from '@mui/material'
-import React from 'react'
-import { ArrowBack, Cancel, CheckCircle } from '@mui/icons-material'
-import { blue, red, yellow, black, white, gray } from '../../config/theme/themePrimitives'
+import { Avatar, Box, Button, IconButton, Modal, TextField, Typography } from '@mui/material'
+import React, { useState } from 'react'
+import { ArrowBack, Cancel, CheckCircle, DriveFolderUploadRounded } from '@mui/icons-material'
+import { blue, red, yellow, black, white, gray, green } from '../../config/theme/themePrimitives'
 import InformationField from './InformationField'
 import FileField from './FileField'
+import NotarizationService from '../../services/notarization.service'
+
+const responseDocument = [
+    'Hợp đồng mua bán đất.pdf',
+    'Hợp đồng mua.img',
+    'Hợp đồng.pdf',
+    'Hợp đồng mua.img',
+    'Hợp đồng mua bán đất.pdf',
+    'Hợp đồng.img',
+];
 
 const DetailDocumentModal = ({ open, onClose, document }) => {
+    const [feedback, setFeedback] = useState('');
+    const [isSending, setIsSending] = useState(false);
+
     const setStyleBaseOnStatus = (status) => {
         switch (status) {
             case 'processing': return { color: yellow[500], backgroundColor: yellow[50] };
             case 'digitalSignature': return { color: blue[500], backgroundColor: blue[50] };
+            case 'readyToSign': return { color: blue[500], backgroundColor: blue[50] };
+            case 'completed': return { color: green[500], backgroundColor: green[50] };
+            case 'rejected': return { color: red[500], backgroundColor: red[50] };
             default: return { color: black[500], backgroundColor: black[50] };
         }
     };
@@ -18,9 +34,24 @@ const DetailDocumentModal = ({ open, onClose, document }) => {
         switch (status) {
             case 'processing': return 'Đang xử lý';
             case 'digitalSignature': return 'Sẵn sàng ký số';
+            case 'readyToSign': return 'Sẵn sàng ký số';
+            case 'completed': return 'Hoàn thành';
+            case 'rejected': return 'Không hợp lệ';
             default: return 'Không xác định';
         }
     };
+
+    const handleAccept = () => {
+        setIsSending(true);
+        NotarizationService.forwardDocumentStatus(document.documentId.id, 'accept', feedback);
+        setIsSending(false);
+    }
+
+    const handleReject = () => {
+        setIsSending(true);
+        NotarizationService.forwardDocumentStatus(document.documentId.id, 'reject', feedback);
+        setIsSending(false);
+    }
 
     return (
         <Modal
@@ -208,7 +239,7 @@ const DetailDocumentModal = ({ open, onClose, document }) => {
                     {/* Note Section */}
                     <Box
                         sx={{
-                            flex: '1 0 0',
+                            flex: 1,
                             display: 'flex',
                             flexDirection: 'column',
                             gap: 2,
@@ -219,19 +250,19 @@ const DetailDocumentModal = ({ open, onClose, document }) => {
                                 fontSize: 14,
                                 fontWeight: 600,
                                 color: black[900],
-                                textTransform: 'uppercase'
+                                textTransform: 'uppercase',
                             }}
                         >
                             Ghi chú
                         </Typography>
-
                         <TextField
                             multiline
-                            rows={25}
                             fullWidth
+                            rows={12}
                             placeholder="Nhập nội dung ghi chú"
                             variant="outlined"
                             sx={{
+                                flex: 1,
                                 '& .MuiInputBase-root': {
                                     fontSize: 14,
                                     color: black[900],
@@ -248,7 +279,140 @@ const DetailDocumentModal = ({ open, onClose, document }) => {
                                     },
                                 },
                             }}
+                            value={feedback}
+                            onChange={(e) => setFeedback(e.target.value)}
                         />
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                width: '100%',
+                                height: '100%',
+                            }}
+                        >
+                            {/* Tiêu đề Tài liệu phản hồi */}
+                            <Typography
+                                sx={{
+                                    fontSize: 14,
+                                    fontWeight: 600,
+                                    color: black[900],
+                                    textTransform: 'uppercase',
+                                }}
+                            >
+                                Tài liệu phản hồi
+                            </Typography>
+
+                            {/* Phần còn lại gồm nút upload và danh sách tài liệu */}
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    flexGrow: 1,
+                                    justifyContent: 'space-between',
+                                }}
+                            >
+                                {/* Nút Upload */}
+                                <Button
+                                    disableTouchRipple
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'flex-start',
+                                        gap: 2,
+                                        padding: 1,
+                                        borderRadius: 2,
+                                        border: `1px solid ${black[50]}`,
+                                        marginTop: 2,
+                                    }}
+                                >
+                                    <Avatar
+                                        sx={{
+                                            borderRadius: 100,
+                                            border: `1px dashed ${black[900]}`,
+                                            bgcolor: 'transparent',
+                                            color: black[900],
+                                        }}
+                                    >
+                                        <DriveFolderUploadRounded fontSize='small' />
+                                    </Avatar>
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: 1,
+                                        }}
+                                    >
+                                        <Typography
+                                            sx={{
+                                                fontSize: 12,
+                                                fontWeight: 400,
+                                                color: black[500],
+                                                textTransform: 'none',
+                                            }}
+                                        >
+                                            Kéo và thả hoặc chọn tệp
+                                        </Typography>
+                                        <Typography
+                                            sx={{
+                                                fontSize: 10,
+                                                fontWeight: 400,
+                                                color: black[300],
+                                                textTransform: 'none',
+                                            }}
+                                        >
+                                            Định dạng: pdf, doc, docx
+                                        </Typography>
+                                    </Box>
+                                </Button>
+
+                                {/* Danh sách tài liệu */}
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        columnGap: 2,
+                                        rowGap: 1,
+                                        flexWrap: 'wrap',
+                                        paddingY: 2,
+                                    }}
+                                >
+                                    {responseDocument.map((doc, index) => (
+                                        <Box
+                                            key={index}
+                                            sx={{
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                padding: '4px 12px',
+                                                borderRadius: '16px',
+                                                backgroundColor: black[50],
+                                            }}
+                                        >
+                                            <Typography
+                                                sx={{
+                                                    fontSize: 12,
+                                                    fontWeight: 400,
+                                                    color: black[300],
+                                                    marginRight: 1,
+                                                    userSelect: 'none',
+                                                }}
+                                            >
+                                                {doc}
+                                            </Typography>
+                                            <IconButton sx={{ padding: 0, margin: 0 }}>
+                                                <Cancel
+                                                    sx={{
+                                                        color: black[300],
+                                                        fontSize: 16,
+                                                        ":hover": { color: black[900] },
+                                                    }}
+                                                />
+                                            </IconButton>
+                                        </Box>
+                                    ))}
+                                </Box>
+                            </Box>
+                        </Box>
+
                     </Box>
                 </Box>
                 {/* Bottom Content */}
@@ -270,8 +434,14 @@ const DetailDocumentModal = ({ open, onClose, document }) => {
                             '&:hover': { bgcolor: red[600] },
                             textTransform: 'none',
                             padding: '8px 32px',
+                            '&:disabled': {
+                                bgcolor: black[200],
+                                color: black[400],
+                            }
                         }}
                         endIcon={<Cancel />}
+                        onClick={handleReject}
+                        disabled={isSending}
                     >
                         Từ chối
                     </Button>
@@ -285,8 +455,14 @@ const DetailDocumentModal = ({ open, onClose, document }) => {
                             '&:hover': { bgcolor: black[800] },
                             textTransform: 'none',
                             padding: '8px 32px',
+                            '&:disabled': {
+                                bgcolor: black[200],
+                                color: black[400],
+                            }
                         }}
                         endIcon={<CheckCircle />}
+                        onClick={handleAccept}
+                        disabled={isSending}
                     >
                         Chấp nhận
                     </Button>

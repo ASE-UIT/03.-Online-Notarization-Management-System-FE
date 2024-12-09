@@ -124,6 +124,17 @@ const getDocumentById = async (documentId) => {
   }
 }
 
+const forwardDocumentStatus = async (documentId, action, feedback) => {
+  try {
+    const response = await axiosConfig.post(`${NOTARIZATION_ENDPOINT}/forwardDocumentStatus/${documentId}`, { action, feedback });
+    return response.data;
+  } catch (error) {
+    const status = error.response?.status;
+    const message = error.response?.data?.message;
+    return { status, message };
+  }
+}
+
 const NotarizationService = {
   getStatusById,
   getAllNotarizationField,
@@ -135,6 +146,7 @@ const NotarizationService = {
   getNotarizationByRole,
   getApproveHistory,
   getDocumentById,
+  forwardDocumentStatus,
 };
 
 export default NotarizationService;

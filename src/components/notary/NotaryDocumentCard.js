@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { black, gray, white } from '../../config/theme/themePrimitives'
 import { CalendarToday, Info, Schedule } from '@mui/icons-material'
 import DetailDocumentModal from './DetailDocumentModal'
+import DetailHistoryDocumentModal from './DetailHistoryDocumentModal'
 
 const NotaryDocumentCard = ({ document }) => {
     const [open, setOpen] = useState(false);
@@ -173,7 +174,11 @@ const NotaryDocumentCard = ({ document }) => {
             >
                 Xem chi tiết
             </Button>
-            <DetailDocumentModal open={open} onClose={handleClose} document={document} />
+            {document?.status === "processing" ? (
+                <DetailDocumentModal open={open} onClose={handleClose} document={document} />
+            ) : (
+                <DetailHistoryDocumentModal open={open} onClose={handleClose} document={document} />
+            )}
         </Box>
     )
 }

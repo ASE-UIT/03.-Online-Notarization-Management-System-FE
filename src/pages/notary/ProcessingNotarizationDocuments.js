@@ -1,10 +1,10 @@
-import { Box, Paper, IconButton, Typography } from '@mui/material';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Box, IconButton, Paper, Typography } from '@mui/material';
 import { black, gray, white } from '../../config/theme/themePrimitives';
-import NotarizationService from '../../services/notarization.service';
-import NotaryDocumentCardSkeleton from '../../components/notary/NotaryDocumentCardSkeleton';
-import NotaryDocumentCard from '../../components/notary/NotaryDocumentCard';
 import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
+import NotarizationService from '../../services/notarization.service';
+import NotaryDocumentCard from '../../components/notary/NotaryDocumentCard';
+import NotaryDocumentCardSkeleton from '../../components/notary/NotaryDocumentCardSkeleton';
 
 const IconStyle = {
     fontSize: 20,
@@ -25,15 +25,15 @@ const IconButtonStyle = {
     borderRadius: 1
 };
 
-const AwaitingSignatureDocuments = () => {
+const ProcessingNotarizationDocuments = () => {
     const [documents, setDocuments] = useState([]);
     const [loading, setLoading] = useState(false);
     const [pageIndex, setPageIndex] = useState(1);
 
-    const fetchDigitalSignatureDocuments = async (page) => {
+    const fetchProcessingDocuments = async (page) => {
         setLoading(true);
         const response = await NotarizationService.getNotarizationByRole({
-            status: 'readyToSign',
+            status: 'processing',
             page,
             limit: 5
         });
@@ -42,7 +42,7 @@ const AwaitingSignatureDocuments = () => {
     };
 
     useEffect(() => {
-        fetchDigitalSignatureDocuments(pageIndex);
+        fetchProcessingDocuments(pageIndex);
     }, [pageIndex]);
 
     const handleNextPage = () => {
@@ -95,7 +95,7 @@ const AwaitingSignatureDocuments = () => {
                             textTransform: 'capitalize'
                         }}
                     >
-                        Danh sách chờ Ký số
+                        Danh sách chờ phê duyệt
                     </Typography>
 
                     <Typography
@@ -105,9 +105,10 @@ const AwaitingSignatureDocuments = () => {
                             fontWeight: 500,
                         }}
                     >
-                        Các yêu cầu chờ ký số sẽ hiển thị ở đây
+                        Các yêu cầu chờ phê duyệt sẽ hiển thị ở đây
                     </Typography>
                 </Box>
+
                 <Box
                     sx={{
                         flex: 1,
@@ -126,7 +127,6 @@ const AwaitingSignatureDocuments = () => {
                         ))}
                 </Box>
             </Paper>
-
             <Box
                 sx={{
                     display: 'flex',
@@ -155,4 +155,4 @@ const AwaitingSignatureDocuments = () => {
     );
 };
 
-export default AwaitingSignatureDocuments;
+export default ProcessingNotarizationDocuments;
