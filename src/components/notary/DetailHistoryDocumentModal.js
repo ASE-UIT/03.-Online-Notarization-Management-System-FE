@@ -1,23 +1,141 @@
 import { Box, Button, IconButton, Modal, TextField, Typography } from '@mui/material'
 import React, { useState, useEffect } from 'react'
-import { ArrowBack, Cancel, CheckCircle, OpenInNew } from '@mui/icons-material'
+import { ArrowBack, Cancel, CheckCircle, OpenInNew, PhotoRounded, PictureAsPdf } from '@mui/icons-material'
 import { blue, red, yellow, black, white, gray, green } from '../../config/theme/themePrimitives'
 import InformationField from './InformationField'
 import FileField from './FileField'
 import NotarizationService from '../../services/notarization.service'
 
-const responseDocument = [
-    'Document 1',
-    'Document 2',
-    'Document 3',
-    'Document 4',
-    'Document 5',
-];
+const renderDocumentFiles = (file) => {
+    return (
+        <Box
+            sx={{
+                p: 1,
+                display: 'flex',
+                flexDirection: 'row',
+                gap: 2,
+                borderRadius: 1,
+                border: `1px solid ${gray[200]}`,
+                alignItems: 'center',
+                width: 'fit-content'
+            }}
+        >
+            <Box
+                sx={{
+                    borderRadius: 100,
+                    backgroundColor: red[50],
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    display: 'flex',
+                    p: 1,
+                }}
+            >
+                <PictureAsPdf sx={{ fontSize: 14, color: red[500] }} />
+            </Box>
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    minWidth: '100px',
+                    overflow: 'clip',
+                    textOverflow: 'ellipsis',
+                }}
+            >
+                <Typography
+                    sx={{
+                        flex: 1,
+                        fontSize: 12,
+                        fontWeight: 500,
+                        cursor: 'pointer',
+                        ':hover': {
+                            textDecoration: 'underline',
+                        },
+                    }}
+                    onClick={() => window.open(file.firebaseUrl)}
+                >
+                    {file.filename}
+                </Typography>
+            </Box>
+        </Box>
+    );
+};
+
+const renderImageFiles = (file) => {
+    return (
+        <Box
+            sx={{
+                p: 1,
+                display: 'flex',
+                flexDirection: 'row',
+                gap: 2,
+                borderRadius: 1,
+                border: `1px solid ${gray[200]}`,
+                alignItems: 'center',
+                width: 'fit-content'
+            }}
+        >
+            <Box
+                sx={{
+                    borderRadius: 100,
+                    backgroundColor: yellow[50],
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    display: 'flex',
+                    p: 1,
+                }}
+            >
+                <PhotoRounded sx={{ fontSize: 14, color: yellow[500] }} />
+            </Box>
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    minWidth: '100px',
+                    overflow: 'clip',
+                    textOverflow: 'ellipsis',
+                }}
+            >
+                <Typography
+                    sx={{
+                        flex: 1,
+                        fontSize: 12,
+                        fontWeight: 500,
+                        cursor: 'pointer',
+                        ':hover': {
+                            textDecoration: 'underline',
+                        },
+                    }}
+                    onClick={() => window.open(file.firebaseUrl)}
+                >
+                    {file.filename}
+                </Typography>
+            </Box>
+        </Box>
+    );
+};
+
+const Section = ({ title, children }) => (
+    <Box
+        sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            p: 2,
+            backgroundColor: gray[50],
+            borderRadius: 1,
+        }}
+    >
+        <Typography sx={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', color: black[900] }}>{title}</Typography>
+        {children}
+    </Box>
+);
 
 const DetailHistoryDocumentModal = ({ open, onClose, document }) => {
     const [feedback, setFeedback] = useState('');
     const [isSending, setIsSending] = useState(false);
     const isDisabled = document?.status === 'completed' || document?.status === 'rejected';
+    const [documentFiles, setDocumentFiles] = useState([]);
+    const [imageFiles, setImageFiles] = useState([]);
 
     const setStyleBaseOnStatus = (status) => {
         switch (status) {
@@ -41,19 +159,36 @@ const DetailHistoryDocumentModal = ({ open, onClose, document }) => {
         }
     };
 
-    const handleAccept = () => {
+    const handleAccept = async () => {
         setIsSending(true);
-        NotarizationService.forwardDocumentStatus(document.documentId.id, 'accept', feedback);
+        NotarizationService.approveSignatureByNotary(document.documentId.id)
         setIsSending(false);
     }
 
     const handleReject = () => {
         setIsSending(true);
-        NotarizationService.forwardDocumentStatus(document.documentId.id, 'reject', feedback);
+        NotarizationService.approveSignatureByNotary(document.documentId.id);
         setIsSending(false);
     }
 
-    console.log('document', document);
+    useEffect(() => {
+        if (document?.documentId?.files) {
+            const [docs, images] = document?.documentId?.files.reduce(
+                ([docAcc, imgAcc], file) => {
+                    if (['.pdf', '.docx'].some((ext) => file.filename?.toString().toLowerCase().endsWith(ext))) {
+                        docAcc.push(file);
+                    } else if (['.png', '.jpg', '.jpeg'].some((ext) => file.filename?.toString().toLowerCase().endsWith(ext))) {
+                        imgAcc.push(file);
+                    }
+                    return [docAcc, imgAcc];
+                },
+                [[], []],
+            );
+
+            setDocumentFiles(docs);
+            setImageFiles(images);
+        }
+    }, [document]);
 
     return (
         <Modal
@@ -189,53 +324,38 @@ const DetailHistoryDocumentModal = ({ open, onClose, document }) => {
                             </Box>
                         </Box>
 
-                        {/* File Section */}
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: 2,
-                                padding: 2,
-                                width: '100%',
-                            }}
-                        >
-                            <Typography
-                                sx={{
-                                    fontSize: 14,
-                                    fontWeight: 600,
-                                    color: black[900],
-                                    textTransform: 'uppercase'
-                                }}
-                            >
-                                Tệp
-                            </Typography>
-
-                            <FileField type="pdf" name="Hợp đồng mua bán đất.pdf" size="1.2 MB" />
-                        </Box>
+                        {documentFiles.length > 0 && (
+                            <Section title={'Tệp'}>
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        justifyContent: 'space-between',
+                                        gap: 1,
+                                        flex: 1,
+                                    }}
+                                >
+                                    {documentFiles.map((file) => renderDocumentFiles(file))}
+                                </Box>
+                            </Section>
+                        )}
 
                         {/* Image Section */}
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: 2,
-                                padding: 2,
-                                width: '100%',
-                            }}
-                        >
-                            <Typography
-                                sx={{
-                                    fontSize: 14,
-                                    fontWeight: 600,
-                                    color: black[900],
-                                    textTransform: 'uppercase'
-                                }}
-                            >
-                                Ảnh
-                            </Typography>
-
-                            <FileField type="img" name="Hợp đồng mua bán đất.img" size="1.2 MB" />
-                        </Box>
+                        {imageFiles.length > 0 && (
+                            <Section title={'Ảnh'}>
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        justifyContent: 'space-between',
+                                        gap: 1,
+                                        flex: 1,
+                                    }}
+                                >
+                                    {imageFiles.map((file) => renderImageFiles(file))}
+                                </Box>
+                            </Section>
+                        )}
                     </Box>
 
                     {/* Note Section */}
@@ -314,7 +434,7 @@ const DetailHistoryDocumentModal = ({ open, onClose, document }) => {
                                     paddingY: 2,
                                 }}
                             >
-                                {responseDocument.map((doc, index) => (
+                                {document?.documentId?.output?.map((output, index) => (
                                     <Box
                                         key={index}
                                         sx={{
@@ -336,9 +456,14 @@ const DetailHistoryDocumentModal = ({ open, onClose, document }) => {
                                                 color: black[500],
                                                 marginRight: 1,
                                                 userSelect: 'none',
+                                                underlinecursor: 'pointer',
+                                                ':hover': {
+                                                    textDecoration: 'underline',
+                                                },
                                             }}
+                                            onClick={() => window.open(output.firebaseUrl)}
                                         >
-                                            {doc}
+                                            {output?.filename}
                                         </Typography>
                                         <OpenInNew sx={{ color: black[500], fontSize: 16 }} />
                                     </Box>

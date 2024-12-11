@@ -124,14 +124,32 @@ const getDocumentById = async (documentId) => {
   }
 }
 
-const forwardDocumentStatus = async (documentId, action, feedback) => {
+const forwardDocumentStatus = async (documentId, formData) => {
   try {
-    const response = await axiosConfig.post(`${NOTARIZATION_ENDPOINT}/forwardDocumentStatus/${documentId}`, { action, feedback });
+    const response = await axiosConfig.patch(`${NOTARIZATION_ENDPOINT}/forwardDocumentStatus/${documentId}`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     const status = error.response?.status;
     const message = error.response?.data?.message;
     return { status, message };
+  }
+}
+
+const approveSignatureByNotary = async (documentId) => {
+  try {
+    const response = await axiosConfig.post(`${NOTARIZATION_ENDPOINT}/approve-signature-by-notary`, { documentId });
+    return response.data;
+  } catch (error) {
+    const status = error.response?.status;
+    const message = error.response?.data?.message;
+    return { status, message }
   }
 }
 
@@ -147,6 +165,7 @@ const NotarizationService = {
   getApproveHistory,
   getDocumentById,
   forwardDocumentStatus,
+  approveSignatureByNotary,
 };
 
 export default NotarizationService;

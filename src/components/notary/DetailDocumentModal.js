@@ -1,23 +1,142 @@
 import { Avatar, Box, Button, IconButton, Modal, TextField, Typography } from '@mui/material'
-import React, { useState } from 'react'
-import { ArrowBack, Cancel, CheckCircle, DriveFolderUploadRounded } from '@mui/icons-material'
+import React, { useState, useRef, useEffect } from 'react'
+import { ArrowBack, Cancel, CheckCircle, DriveFolderUploadRounded, PictureAsPdf, PhotoRounded } from '@mui/icons-material'
 import { blue, red, yellow, black, white, gray, green } from '../../config/theme/themePrimitives'
 import InformationField from './InformationField'
-import FileField from './FileField'
 import NotarizationService from '../../services/notarization.service'
 
-const responseDocument = [
-    'Hợp đồng mua bán đất.pdf',
-    'Hợp đồng mua.img',
-    'Hợp đồng.pdf',
-    'Hợp đồng mua.img',
-    'Hợp đồng mua bán đất.pdf',
-    'Hợp đồng.img',
-];
+const renderDocumentFiles = (file) => {
+    return (
+        <Box
+            sx={{
+                p: 1,
+                display: 'flex',
+                flexDirection: 'row',
+                gap: 2,
+                borderRadius: 1,
+                border: `1px solid ${gray[200]}`,
+                alignItems: 'center',
+                width: 'fit-content'
+            }}
+        >
+            <Box
+                sx={{
+                    borderRadius: 100,
+                    backgroundColor: red[50],
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    display: 'flex',
+                    p: 1,
+                }}
+            >
+                <PictureAsPdf sx={{ fontSize: 14, color: red[500] }} />
+            </Box>
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    minWidth: '100px',
+                    overflow: 'clip',
+                    textOverflow: 'ellipsis',
+                }}
+            >
+                <Typography
+                    sx={{
+                        flex: 1,
+                        fontSize: 12,
+                        fontWeight: 500,
+                        cursor: 'pointer',
+                        ':hover': {
+                            textDecoration: 'underline',
+                        },
+                    }}
+                    onClick={() => window.open(file.firebaseUrl)}
+                >
+                    {file.filename}
+                </Typography>
+            </Box>
+        </Box>
+    );
+};
+
+const renderImageFiles = (file) => {
+    return (
+        <Box
+            sx={{
+                p: 1,
+                display: 'flex',
+                flexDirection: 'row',
+                gap: 2,
+                borderRadius: 1,
+                border: `1px solid ${gray[200]}`,
+                alignItems: 'center',
+                width: 'fit-content'
+            }}
+        >
+            <Box
+                sx={{
+                    borderRadius: 100,
+                    backgroundColor: yellow[50],
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    display: 'flex',
+                    p: 1,
+                }}
+            >
+                <PhotoRounded sx={{ fontSize: 14, color: yellow[500] }} />
+            </Box>
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    minWidth: '100px',
+                    overflow: 'clip',
+                    textOverflow: 'ellipsis',
+                }}
+            >
+                <Typography
+                    sx={{
+                        flex: 1,
+                        fontSize: 12,
+                        fontWeight: 500,
+                        cursor: 'pointer',
+                        ':hover': {
+                            textDecoration: 'underline',
+                        },
+                    }}
+                    onClick={() => window.open(file.firebaseUrl)}
+                >
+                    {file.filename}
+                </Typography>
+            </Box>
+        </Box>
+    );
+};
+
+const Section = ({ title, children }) => (
+    <Box
+        sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            p: 2,
+            backgroundColor: gray[50],
+            borderRadius: 1,
+        }}
+    >
+        <Typography sx={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', color: black[900] }}>{title}</Typography>
+        {children}
+    </Box>
+);
 
 const DetailDocumentModal = ({ open, onClose, document }) => {
     const [feedback, setFeedback] = useState('');
-    const [isSending, setIsSending] = useState(false);
+    const [sending, setSending] = useState(false);
+    const [files, setFiles] = useState([]);
+    const fileInputRef = useRef(null);
+    const isDisabled = sending || files.length === 0 || feedback === '';
+    const [documentFiles, setDocumentFiles] = useState([]);
+    const [imageFiles, setImageFiles] = useState([]);
 
     const setStyleBaseOnStatus = (status) => {
         switch (status) {
@@ -41,17 +160,81 @@ const DetailDocumentModal = ({ open, onClose, document }) => {
         }
     };
 
-    const handleAccept = () => {
-        setIsSending(true);
-        NotarizationService.forwardDocumentStatus(document.documentId.id, 'accept', feedback);
-        setIsSending(false);
-    }
+    const prepareFormData = (action, feedback, files) => {
+        const formData = new FormData();
+        formData.append('action', action);
+        formData.append('feedback', feedback);
 
-    const handleReject = () => {
-        setIsSending(true);
-        NotarizationService.forwardDocumentStatus(document.documentId.id, 'reject', feedback);
-        setIsSending(false);
-    }
+        files.forEach((file) => {
+            formData.append(`files`, file);
+        });
+
+        return formData;
+    };
+
+    const handleAccept = async () => {
+        setSending(true);
+        const formData = prepareFormData('accept', feedback, files);
+
+        try {
+            await NotarizationService.forwardDocumentStatus(document.documentId.id, formData);
+            setSending(false);
+            onClose();
+        } catch (error) {
+            console.error('Error during accepting document:', error);
+            setSending(false);
+        }
+    };
+
+    const handleReject = async () => {
+        setSending(true);
+        const formData = prepareFormData('reject', feedback, files);
+
+        try {
+            await NotarizationService.forwardDocumentStatus(document.documentId.id, formData);
+            setSending(false);
+            onClose();
+        } catch (error) {
+            console.error('Error during rejecting document:', error);
+            setSending(false);
+        }
+    };
+
+
+    const handleUploadClick = () => {
+        fileInputRef.current.click();
+    };
+
+    const handleFileChange = (event) => {
+        const selectedFiles = Array.from(event.target.files);
+        const validFiles = selectedFiles.filter(file =>
+            ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(file.type)
+        );
+
+        if (validFiles) {
+            setFiles((prevFiles) => [...prevFiles, ...validFiles]);
+        }
+        fileInputRef.current.value = null;
+    };
+
+    useEffect(() => {
+        if (document?.documentId?.files) {
+            const [docs, images] = document?.documentId?.files.reduce(
+                ([docAcc, imgAcc], file) => {
+                    if (['.pdf', '.docx'].some((ext) => file.filename?.toString().toLowerCase().endsWith(ext))) {
+                        docAcc.push(file);
+                    } else if (['.png', '.jpg', '.jpeg'].some((ext) => file.filename?.toString().toLowerCase().endsWith(ext))) {
+                        imgAcc.push(file);
+                    }
+                    return [docAcc, imgAcc];
+                },
+                [[], []],
+            );
+
+            setDocumentFiles(docs);
+            setImageFiles(images);
+        }
+    }, [document]);
 
     return (
         <Modal
@@ -188,52 +371,38 @@ const DetailDocumentModal = ({ open, onClose, document }) => {
                         </Box>
 
                         {/* File Section */}
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: 2,
-                                padding: 2,
-                                width: '100%',
-                            }}
-                        >
-                            <Typography
-                                sx={{
-                                    fontSize: 14,
-                                    fontWeight: 600,
-                                    color: black[900],
-                                    textTransform: 'uppercase'
-                                }}
-                            >
-                                Tệp
-                            </Typography>
-
-                            <FileField type="pdf" name="Hợp đồng mua bán đất.pdf" size="1.2 MB" />
-                        </Box>
+                        {documentFiles.length > 0 && (
+                            <Section title={'Tệp'}>
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        justifyContent: 'space-between',
+                                        gap: 1,
+                                        flex: 1,
+                                    }}
+                                >
+                                    {documentFiles.map((file) => renderDocumentFiles(file))}
+                                </Box>
+                            </Section>
+                        )}
 
                         {/* Image Section */}
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: 2,
-                                padding: 2,
-                                width: '100%',
-                            }}
-                        >
-                            <Typography
-                                sx={{
-                                    fontSize: 14,
-                                    fontWeight: 600,
-                                    color: black[900],
-                                    textTransform: 'uppercase'
-                                }}
-                            >
-                                Ảnh
-                            </Typography>
-
-                            <FileField type="img" name="Hợp đồng mua bán đất.img" size="1.2 MB" />
-                        </Box>
+                        {imageFiles.length > 0 && (
+                            <Section title={'Ảnh'}>
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        justifyContent: 'space-between',
+                                        gap: 1,
+                                        flex: 1,
+                                    }}
+                                >
+                                    {imageFiles.map((file) => renderImageFiles(file))}
+                                </Box>
+                            </Section>
+                        )}
                     </Box>
 
                     {/* Note Section */}
@@ -314,6 +483,7 @@ const DetailDocumentModal = ({ open, onClose, document }) => {
                                 {/* Nút Upload */}
                                 <Button
                                     disableTouchRipple
+                                    onClick={handleUploadClick}
                                     sx={{
                                         display: 'flex',
                                         alignItems: 'center',
@@ -363,6 +533,14 @@ const DetailDocumentModal = ({ open, onClose, document }) => {
                                             Định dạng: pdf, doc, docx
                                         </Typography>
                                     </Box>
+
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        style={{ display: 'none' }}
+                                        onChange={handleFileChange}
+                                        accept=".pdf,.doc,.docx"
+                                    />
                                 </Button>
 
                                 {/* Danh sách tài liệu */}
@@ -376,7 +554,7 @@ const DetailDocumentModal = ({ open, onClose, document }) => {
                                         paddingY: 2,
                                     }}
                                 >
-                                    {responseDocument.map((doc, index) => (
+                                    {files.map((file, index) => (
                                         <Box
                                             key={index}
                                             sx={{
@@ -396,7 +574,7 @@ const DetailDocumentModal = ({ open, onClose, document }) => {
                                                     userSelect: 'none',
                                                 }}
                                             >
-                                                {doc}
+                                                {file.name}
                                             </Typography>
                                             <IconButton sx={{ padding: 0, margin: 0 }}>
                                                 <Cancel
@@ -441,7 +619,7 @@ const DetailDocumentModal = ({ open, onClose, document }) => {
                         }}
                         endIcon={<Cancel />}
                         onClick={handleReject}
-                        disabled={isSending}
+                        disabled={isDisabled}
                     >
                         Từ chối
                     </Button>
@@ -462,7 +640,7 @@ const DetailDocumentModal = ({ open, onClose, document }) => {
                         }}
                         endIcon={<CheckCircle />}
                         onClick={handleAccept}
-                        disabled={isSending}
+                        disabled={isDisabled}
                     >
                         Chấp nhận
                     </Button>
