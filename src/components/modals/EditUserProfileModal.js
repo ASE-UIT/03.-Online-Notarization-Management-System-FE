@@ -62,10 +62,21 @@ const EditUserProfileModal = ({ open, handleClose }) => {
   }, [open, user]);
 
   const handleInputChange = (field, value) => {
-    setTempForm((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setTempForm((prev) => {
+      const updatedForm = { ...prev, [field]: value };
+  
+      if (field === 'province') {
+        updatedForm.district = '';
+        updatedForm.town = '';
+      }
+      if (field === 'district') {
+        updatedForm.town = '';
+        console.log(tempForm.town);
+      }
+  
+      return updatedForm;
+    });
+    console.log(field);
   };
 
   const isFormDataValid = ({ name, citizenId, email, phoneNumber, province, district, town, street }) => {
@@ -122,13 +133,12 @@ const EditUserProfileModal = ({ open, handleClose }) => {
         updateBody.address = address;
       }
 
-      console.log(updateBody);
-
       dispatch(updateUser({ id: user.id, updatedUserInfo: updateBody }))
         .unwrap()
         .then(() => {
           setFormData(tempForm);
           toast.success('Cập nhật thông tin thành công');
+          handleClose();
         })
         .catch(() => {
           toast.error('Cập nhật thông tin thất bại');
