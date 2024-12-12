@@ -13,7 +13,7 @@ import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import ForgotPassword from './ForgotPassword';
+import ForgotPasswordModal from './ForgotPasswordModal';
 import { GoogleIcon } from './CustomIcons';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -74,7 +74,7 @@ export default function SignInCard() {
   };
 
   const handleClickOpen = () => {
-    setOpen(true);
+    window.location.href = '/forgot-password';
   };
 
   const handleClose = () => {
@@ -198,7 +198,7 @@ export default function SignInCard() {
             Quên mật khẩu?
           </Link>
         </Box>
-        <ForgotPassword open={open} handleClose={handleClose} />
+        <ForgotPasswordModal open={open} handleClose={handleClose} />
         <Button
           type="submit"
           fullWidth

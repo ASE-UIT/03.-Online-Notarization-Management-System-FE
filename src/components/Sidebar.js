@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Box, Divider, Drawer, IconButton, List, Typography } from '@mui/material';
-import { HistoryEdu, KeyboardDoubleArrowLeft, KeyboardDoubleArrowRight, Logout } from '@mui/icons-material';
+import { Article, HistoryEdu, KeyboardDoubleArrowLeft, KeyboardDoubleArrowRight, Logout } from '@mui/icons-material';
 import { dark, primary, white, red } from '../config/theme/themePrimitives';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -115,10 +115,16 @@ const Sidebar = () => {
           href: '/notary/dashboard',
         },
         {
-          type: 'notarization-documents',
+          type: 'pending-notarization-documents',
+          icon: <Article />,
+          title: 'Tài liệu chờ xác nhận',
+          href: '/notary/pending-notarization-documents',
+        },
+        {
+          type: 'awaiting-signature-documents',
           icon: <HistoryEdu />,
-          title: 'Tài liệu công chứng',
-          href: '/notary/notarization-documents',
+          title: 'Tài liệu chờ ký số',
+          href: '/notary/awaiting-signature-documents',
         },
         {
           type: 'notarization-history',
