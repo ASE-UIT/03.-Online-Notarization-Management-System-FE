@@ -236,6 +236,10 @@ const DetailDocumentModal = ({ open, onClose, document }) => {
         }
     }, [document]);
 
+    const handleDeleteDocument = (index) => {
+        setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    };
+
     return (
         <Modal
             open={open}
@@ -576,7 +580,7 @@ const DetailDocumentModal = ({ open, onClose, document }) => {
                                             >
                                                 {file.name}
                                             </Typography>
-                                            <IconButton sx={{ padding: 0, margin: 0 }}>
+                                            <IconButton sx={{ padding: 0, margin: 0 }} onClick={() => handleDeleteDocument(index)}>
                                                 <Cancel
                                                     sx={{
                                                         color: black[300],
