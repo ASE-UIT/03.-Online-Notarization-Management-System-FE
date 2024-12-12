@@ -38,6 +38,8 @@ const NotaryDashboard = lazy(() => import('./pages/notary/NotaryDashboard'));
 const ProcessingNotarizationDocuments = lazy(() => import('./pages/notary/ProcessingNotarizationDocuments'));
 const NotarizationHistory = lazy(() => import('./pages/notary/NotarizedHistory'))
 const AwaitingSignatureDocuments = lazy(() => import('./pages/notary/AwaitingSignatureDocuments'));
+const ForgotPassword = lazy(() => import('./pages/signin/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/signin/ResetPassword'));
 
 function App() {
   const dispatch = useDispatch();
@@ -120,10 +122,28 @@ function App() {
                   </PublicRoute>
                 }
               />
+              <Route
+                path="/forgot-password"
+                element={
+                  <PublicRoute>
+                    <ForgotPassword />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/reset-password"
+                element={
+                  <PublicRoute>
+                    <ResetPassword />
+                  </PublicRoute>
+                }
+              />
 
               {/* Auth Routes */}
               <Route path="/signin" element={<PublicRoute element={<SignIn />} />} />
               <Route path="/signup" element={<PublicRoute element={<SignUp />} />} />
+              <Route path="/forgot-password" element={<PublicRoute element={<ForgotPassword />} />} />
+              <Route path="/reset-password" element={<PublicRoute element={<ResetPassword />} />} />
 
               {/* User Routes */}
               <Route element={<PrivateRoute allowedRoles={['user']} />}>
