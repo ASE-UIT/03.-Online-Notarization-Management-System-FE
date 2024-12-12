@@ -1,12 +1,37 @@
-import React from 'react'
-import { Box, Typography, TextField, Button, Card } from '@mui/material'
-import { dark, gray, primary, white } from '../../config/theme/themePrimitives'
+import React, { useState } from 'react'
+import { Box, Typography, TextField, Button, Card, CircularProgress } from '@mui/material'
+import { dark, primary, white } from '../../config/theme/themePrimitives'
+import AuthService from '../../services/auth.service'
+import { toast } from 'react-toastify'
 
 const ForgotPassword = () => {
-    const handleForgotPassword = () => {
-        console.log('Forgot password')
-        window.location.href = '/reset-password'
-    }
+    const [email, setEmail] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const handleForgotPassword = async () => {
+        if (email === '') {
+            toast.error('Vui lòng nhập email của bạn');
+            return;
+        } else if (!email.includes('@')) {
+            toast.error('Email không hợp lệ');
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            await AuthService.forgotPassword(email);
+            toast.success('Vui lòng kiểm tra email của bạn để cài đặt lại mật khẩu');
+
+            setLoading(false);
+            setTimeout(() => {
+                window.location.href = '/signin';
+            }, 2000);
+        } catch (error) {
+            toast.error('Email không tồn tại');
+        }
+    };
+
     return (
         <Box
             display="flex"
@@ -87,6 +112,8 @@ const ForgotPassword = () => {
                             fullWidth
                             variant="outlined"
                             placeholder="Nhập địa chỉ email của bạn"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
                     </Box>
                 </Box>
@@ -106,7 +133,15 @@ const ForgotPassword = () => {
                     }}
                     onClick={handleForgotPassword}
                 >
-                    Đặt lại mật khẩu
+                    {loading ?
+                        <CircularProgress
+                            size={30}
+                            thickness={4}
+                            color="inherit"
+                        />
+                        :
+                        'Gửi yêu cầu'
+                    }
                 </Button>
             </Card>
         </Box>

@@ -46,6 +46,7 @@ function App() {
   const theme = createTheme(getDesignTokens());
   const { isAuthenticated } = useSelector((state) => state.auth);
   const { token, refreshToken } = TokenService.getAccessTokenFromURL(window.location.search);
+  const resetPasswordToken = TokenService.getResetPasswordTokenFromURL(window.location.search);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -64,6 +65,13 @@ function App() {
 
     fetchUser();
   }, [token, refreshToken, dispatch]);
+
+  useEffect(() => {
+    if (resetPasswordToken) {
+      Cookies.set('resetPasswordToken', resetPasswordToken);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
 
   return (
     <Suspense fallback={<div>Loading...</div>}>

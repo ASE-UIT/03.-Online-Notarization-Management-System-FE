@@ -1,9 +1,42 @@
-import React from 'react'
-import { Box, Typography, TextField, Button, Card } from '@mui/material'
+import React, { useState } from 'react'
+import { Box, Typography, TextField, Button, Card, CircularProgress } from '@mui/material'
 import { dark, gray, primary, white } from '../../config/theme/themePrimitives'
 import { FiberManualRecord } from '@mui/icons-material'
+import AuthService from '../../services/auth.service'
+import { toast } from 'react-toastify'
+import Cookies from 'js-cookie'
 
 const ResetPassword = () => {
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const token = Cookies.get('resetPasswordToken');
+    const [loading, setLoading] = useState(false);
+
+    const handleResetPassword = async () => {
+        if (password === '') {
+            alert('Vui lòng nhập mật khẩu mới');
+            return;
+        } else if (password.length < 8) {
+            alert('Mật khẩu phải chứa ít nhất 8 ký tự');
+            return;
+        } else if (password !== confirmPassword) {
+            alert('Mật khẩu không khớp');
+            return;
+        }
+
+        try {
+            setLoading(true);
+            await AuthService.resetPassword(token, password);
+            toast.success('Mật khẩu đã được cập nhật');
+            setLoading(false);
+            setTimeout(() => {
+                window.location.href = '/signin';
+            }, 2000);
+        } catch (error) {
+            toast.error('Có lỗi xảy ra');
+        }
+    }
+
     return (
         <Box
             display="flex"
@@ -84,6 +117,8 @@ const ResetPassword = () => {
                             fullWidth
                             variant="outlined"
                             placeholder="Nhập mật khẩu mới"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                         />
                     </Box>
 
@@ -99,6 +134,8 @@ const ResetPassword = () => {
                             fullWidth
                             variant="outlined"
                             placeholder="Nhập lại mật khẩu mới"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
                         />
                     </Box>
                 </Box>
@@ -177,8 +214,18 @@ const ResetPassword = () => {
                             backgroundColor: primary[600]
                         }
                     }}
+                    onClick={handleResetPassword}
+                    disabled={password === '' || confirmPassword === ''}
                 >
-                    Xác nhận
+                    {loading ?
+                        <CircularProgress
+                            size={30}
+                            thickness={4}
+                            color="inherit"
+                        />
+                        :
+                        'Đặt lại mật khẩu'
+                    }
                 </Button>
             </Card>
         </Box>
