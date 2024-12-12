@@ -37,6 +37,7 @@ const NotaryManagement = lazy(() => import('./pages/admin/notary-management/Nota
 const NotaryDashboard = lazy(() => import('./pages/notary/NotaryDashboard'));
 const NotarizationDocuments = lazy(() => import('./pages/notary/NotarizationDocuments'));
 const NotarizationHistory = lazy(() => import('./pages/notary/NotarizationHistory'));
+const DocumentWallet = lazy(() => import('./pages/services/DocumentWallet'));
 
 function App() {
   const dispatch = useDispatch();
@@ -129,6 +130,7 @@ function App() {
                 <Route path="/user/create-notarization-profile" element={<CreateNotarizationProfile />} />
                 <Route path="/user/history" element={<HistoryNotarizationProfile />} />
                 <Route path="/user/create-notarization-session" element={<CreateNotarizationSession />} />
+                <Route path="/user/document-wallet" element={<DocumentWallet />} />
               </Route>
 
               {/* Admin Routes */}

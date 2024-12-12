@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Box, Divider, Drawer, IconButton, List, Typography } from '@mui/material';
-import { HistoryEdu, KeyboardDoubleArrowLeft, KeyboardDoubleArrowRight, Logout } from '@mui/icons-material';
+import { HistoryEdu, KeyboardDoubleArrowLeft, KeyboardDoubleArrowRight, Logout, Wallet } from '@mui/icons-material';
 import { dark, primary, white, red } from '../config/theme/themePrimitives';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -70,7 +70,13 @@ const Sidebar = () => {
           title: 'Tạo phiên công chứng',
           href: '/user/create-notarization-session',
         },
-        { type: 'settings', icon: <Settings />, title: 'Cài đặt', href: '/user/settings' },
+        {
+          type:
+            'document-wallet',
+          icon: <Wallet />,
+          title: 'Ví tài liệu',
+          href: '/user/document-wallet'
+        },
       );
     } else if (role === 'admin') {
       items.push(
