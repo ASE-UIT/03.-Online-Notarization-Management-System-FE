@@ -13,20 +13,6 @@ const EditUserProfileModal = ({ open, handleClose }) => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
 
-  const [formData, setFormData] = useState({
-    role: '',
-    citizenId: '',
-    phoneNumber: '',
-    province: '',
-    district: '',
-    town: '',
-    street: '',
-    isEmailVerified: false,
-    name: '',
-    email: '',
-    id: '',
-  });
-
   const [tempForm, setTempForm] = useState({
     role: '',
     citizenId: '',
@@ -55,8 +41,6 @@ const EditUserProfileModal = ({ open, handleClose }) => {
         town: user.address?.town || '',
         street: user.address?.street || '',
       };
-
-      setFormData(updatedFormData);
       setTempForm(updatedFormData);
     }
   }, [open, user]);
@@ -64,19 +48,17 @@ const EditUserProfileModal = ({ open, handleClose }) => {
   const handleInputChange = (field, value) => {
     setTempForm((prev) => {
       const updatedForm = { ...prev, [field]: value };
-  
+
       if (field === 'province') {
         updatedForm.district = '';
         updatedForm.town = '';
       }
       if (field === 'district') {
         updatedForm.town = '';
-        console.log(tempForm.town);
       }
-  
+
       return updatedForm;
     });
-    console.log(field);
   };
 
   const isFormDataValid = ({ name, citizenId, email, phoneNumber, province, district, town, street }) => {
@@ -136,7 +118,6 @@ const EditUserProfileModal = ({ open, handleClose }) => {
       dispatch(updateUser({ id: user.id, updatedUserInfo: updateBody }))
         .unwrap()
         .then(() => {
-          setFormData(tempForm);
           toast.success('Cập nhật thông tin thành công');
           handleClose();
         })
