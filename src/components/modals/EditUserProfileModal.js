@@ -212,7 +212,7 @@ const EditUserProfileModal = ({ open, handleClose }) => {
               label="Email"
               value={tempForm.email}
               onChange={(value) => handleInputChange('email', value)}
-              disabled={!(tempForm.isEmailVerified)}
+              disabled={tempForm.isEmailVerified}
             />
             <LabeledTextField
               label="Số điện thoại"
