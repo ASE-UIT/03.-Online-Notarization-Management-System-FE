@@ -1,9 +1,12 @@
 import React from 'react'
 import { Box, Button, Divider, Typography } from '@mui/material'
-import { black, gray, white } from '../../config/theme/themePrimitives'
+import { black, gray, red, white, yellow } from '../../config/theme/themePrimitives'
 import { Info } from '@mui/icons-material';
+import { PictureAsPdf, Image } from '@mui/icons-material';
 
 const HorizontalCard = ({ document }) => {
+    const isPDF = document.filename.split('.').pop() === 'pdf';
+
     return (
         <Box
             sx={{
@@ -26,10 +29,26 @@ const HorizontalCard = ({ document }) => {
                     width: 50,
                     height: 50,
                     borderRadius: 1,
-                    backgroundColor: gray[900],
+                    backgroundColor: isPDF ? red[50] : yellow[50],
                     marginX: 2
                 }}
-            />
+            >
+                {isPDF ? (
+                    <PictureAsPdf
+                        sx={{
+                            fontSize: 30,
+                            color: isPDF ? red[500] : yellow[500],
+                        }}
+                    />
+                ) : (
+                    <Image
+                        sx={{
+                            fontSize: 30,
+                            color: isPDF ? red[500] : yellow[500],
+                        }}
+                    />
+                )}
+            </Box>
             {/* Vertical Divider */}
             <Divider orientation="vertical" flexItem />
             {/* Document Name Section */}
@@ -38,7 +57,7 @@ const HorizontalCard = ({ document }) => {
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',
-                    flex: 1,
+                    flex: 2,
                     alignItems: 'flex-start',
                     marginX: 2,
                     gap: 1
@@ -60,7 +79,7 @@ const HorizontalCard = ({ document }) => {
                         color: black[500],
                     }}
                 >
-                    {document.name}
+                    {document.filename}
                 </Typography>
             </Box>
             <Divider orientation="vertical" flexItem />
@@ -93,7 +112,7 @@ const HorizontalCard = ({ document }) => {
                         }}
                         component={'span'}
                     >
-                        {document.receiveDate}
+                        {new Date(document.mintedAt).toLocaleDateString()}
                     </Typography>
                 </Typography>
                 <Typography
@@ -113,7 +132,8 @@ const HorizontalCard = ({ document }) => {
                         }}
                         component={'span'}
                     >
-                        {document.expireDate}
+                        {/* TODO */}
+                        {new Date(document.mintedAt).toLocaleDateString()}
                     </Typography>
                 </Typography>
             </Box>
@@ -165,6 +185,7 @@ const HorizontalCard = ({ document }) => {
                     marginX: 2
                 }}
                 endIcon={<Info />}
+                onClick={() => { window.open(document.tokenURI) }}
             >
                 Chi tiết tài liệu
             </Button>

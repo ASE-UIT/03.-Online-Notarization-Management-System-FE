@@ -1,30 +1,29 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import HorizontalCard from '../../components/services/HorizontalCard';
 import BoxCard from '../../components/services/BoxCard';
-
-const documentWalletData = [
-    {
-        name: 'Hồ sơ 1',
-        receiveDate: '01/01/2021',
-        expireDate: '01/01/2022',
-        amount: 10,
-    },
-    {
-        name: 'Hồ sơ 2',
-        receiveDate: '02/02/2022',
-        expireDate: '02/02/2023',
-        amount: 5,
-    },
-    {
-        name: 'Hồ sơ 3',
-        receiveDate: '03/03/2023',
-        expireDate: '03/03/2024',
-        amount: 15,
-    },
-];
+import UserWalletService from '../../services/userwallet.service';
 
 const DocumentWallet = () => {
+    const [documentWallet, setDocumentWallet] = useState([]);
+
+    useEffect(() => {
+        const fetchDocumentWallet = async () => {
+            try {
+                const response = await UserWalletService.getUserWallet();
+                if (response.status === 200) {
+                    setDocumentWallet(response.data.nftItems);
+                } else {
+                    console.log(response);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        fetchDocumentWallet();
+    }, []);
+
     return (
         <Box sx={{ display: 'flex', width: '100%', height: '100vh', flexDirection: 'column', gap: 1 }}>
             <Box padding={3}>
@@ -41,7 +40,7 @@ const DocumentWallet = () => {
                     padding: 3,
                 }}
             >
-                {documentWalletData.map((document, index) => (
+                {documentWallet.map((document, index) => (
                     <HorizontalCard key={index} document={document} />
                 ))}
             </Box>
@@ -54,7 +53,7 @@ const DocumentWallet = () => {
                     padding: 3,
                 }}
             >
-                {documentWalletData.map((document, index) => (
+                {documentWallet.map((document, index) => (
                     <BoxCard key={index} document={document} />
                 ))}
             </Box>

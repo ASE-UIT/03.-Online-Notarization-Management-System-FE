@@ -2,8 +2,12 @@ import React from 'react'
 import { Box, Button, Divider, Typography } from '@mui/material'
 import { black, gray, white } from '../../config/theme/themePrimitives'
 import { Info } from '@mui/icons-material';
+import { PictureAsPdf, Image } from '@mui/icons-material';
+import { red, yellow } from '@mui/material/colors';
 
 const BoxCard = ({ document }) => {
+    const isPDF = document.filename.split('.').pop() === 'pdf';
+
     return (
         <Box
             sx={{
@@ -26,6 +30,7 @@ const BoxCard = ({ document }) => {
                     width: "100%"
                 }}
             >
+                {/* Image Section */}
                 <Box
                     sx={{
                         display: 'flex',
@@ -34,9 +39,26 @@ const BoxCard = ({ document }) => {
                         width: 50,
                         height: 50,
                         borderRadius: 1,
-                        backgroundColor: gray[900],
+                        backgroundColor: isPDF ? red[50] : yellow[50],
+                        marginX: 2
                     }}
-                />
+                >
+                    {isPDF ? (
+                        <PictureAsPdf
+                            sx={{
+                                fontSize: 30,
+                                color: isPDF ? red[500] : yellow[500],
+                            }}
+                        />
+                    ) : (
+                        <Image
+                            sx={{
+                                fontSize: 30,
+                                color: isPDF ? red[500] : yellow[500],
+                            }}
+                        />
+                    )}
+                </Box>
                 <Box
                     sx={{
                         display: 'flex',
@@ -69,7 +91,7 @@ const BoxCard = ({ document }) => {
                     marginTop: 1
                 }}
             >
-                {document.name}
+                {document.filename}
             </Typography>
             {/* Date Section */}
             <Box
@@ -98,7 +120,7 @@ const BoxCard = ({ document }) => {
                         }}
                         component={'span'}
                     >
-                        {document.receiveDate}
+                        {new Date(document.mintedAt).toLocaleDateString()}
                     </Typography>
                 </Typography>
                 <Typography
@@ -118,7 +140,7 @@ const BoxCard = ({ document }) => {
                         }}
                         component={'span'}
                     >
-                        {document.expireDate}
+                        {new Date(document.mintedAt).toLocaleDateString()}
                     </Typography>
                 </Typography>
             </Box>
@@ -140,6 +162,7 @@ const BoxCard = ({ document }) => {
                     },
                 }}
                 endIcon={<Info />}
+                onClick={() => { window.open(document.tokenURI) }}
             >
                 Chi tiết tài liệu
             </Button>
