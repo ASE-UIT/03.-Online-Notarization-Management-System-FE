@@ -10,11 +10,14 @@ import {
     Card,
     CardContent,
     Skeleton,
+    IconButton,
+    Tooltip,
 } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { black, gray, white } from "../../config/theme/themePrimitives";
 import HistoryCard from "../../components/notary/HistoryCard";
 import NotarizationService from "../../services/notarization.service";
+import { FilterList } from "@mui/icons-material";
 
 const NotarizedHistory = () => {
     const [documents, setDocuments] = useState([]);
@@ -26,6 +29,7 @@ const NotarizedHistory = () => {
         field: "",
         status: "",
     });
+    const [sortOrder, setSortOrder] = useState("asc");
 
     useEffect(() => {
         const fetchDocuments = async () => {
@@ -45,32 +49,37 @@ const NotarizedHistory = () => {
     }, []);
 
     useEffect(() => {
-        const fields = Array.from(new Set(documents.map(doc => doc.notarizationFieldName)));
-        const statuses = Array.from(new Set(documents.map(doc => doc.beforeStatus)));
+        const fields = Array.from(new Set(documents.map(doc => doc.documentId?.notarizationField?.name)));
+        const statuses = Array.from(new Set(documents.map(doc => doc.status)));
 
         setField(fields);
         setStatus(statuses);
     }, [documents]);
 
     const applyFilter = () => {
-        return documents.filter((document) => {
-            // Kiểm tra tiêu chí "search"
-            const matchesSearch = filter.search
-                ? document.requesterName.toLowerCase().includes(filter.search.toLowerCase())
-                : true;
+        return documents
+            .filter((document) => {
+                const matchesSearch = filter.search
+                    ? document.documentId.requesterInfo.fullName
+                        .toLowerCase()
+                        .includes(filter.search.toLowerCase())
+                    : true;
 
-            // Kiểm tra tiêu chí "field"
-            const matchesField = filter.field
-                ? document.notarizationFieldName === filter.field
-                : true;
+                const matchesField = filter.field
+                    ? document.documentId.notarizationField.name === filter.field
+                    : true;
 
-            // Kiểm tra tiêu chí "status"
-            const matchesStatus = filter.status
-                ? document.beforeStatus === filter.status
-                : true;
+                const matchesStatus = filter.status
+                    ? document.status === filter.status
+                    : true;
 
-            return matchesSearch && matchesField && matchesStatus;
-        });
+                return matchesSearch && matchesField && matchesStatus;
+            })
+            .sort((a, b) => {
+                const dateA = new Date(a.documentId.createdAt);
+                const dateB = new Date(b.documentId.createdAt);
+                return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+            });
     };
 
     const setTextBaseOnStatus = (status) => {
@@ -116,6 +125,34 @@ const NotarizedHistory = () => {
                     >
                         Tất Cả Yêu Cầu Công Chứng
                     </Typography>
+
+                    <Tooltip
+                        title={
+                            sortOrder === "asc" ?
+                                <Typography sx={{ fontSize: "12px", fontWeight: 400 }}>
+                                    Sắp xếp tăng dần
+                                </Typography> :
+                                <Typography sx={{ fontSize: "12px", fontWeight: 400 }}>
+                                    Sắp xếp giảm dần
+                                </Typography>
+                        }
+                        placement="left"
+                    >
+                        <IconButton
+                            size="small"
+                            onClick={() => setSortOrder((prevOrder) => (prevOrder === "asc" ? "desc" : "asc"))}
+                            sx={{
+                                bgcolor: white[50],
+                                border: `1px solid ${gray[200]}`,
+                                "&:hover": {
+                                    bgcolor: gray[500],
+                                    color: white[50],
+                                },
+                            }}
+                        >
+                            <FilterList />
+                        </IconButton>
+                    </Tooltip>
                 </Box>
 
                 {/* Filters */}
@@ -185,14 +222,14 @@ const NotarizedHistory = () => {
                             },
                         }}
                     >
-                        <InputLabel>Chọn dịch vụ</InputLabel>
+                        <InputLabel>Chọn lĩnh vực</InputLabel>
                         <Select
                             value={filter.field}
                             onChange={(e) => setFilter({ ...filter, field: e.target.value })}
-                            label="Chọn dịch vụ"
+                            label="Chọn lĩnh vực"
                             IconComponent={ArrowDropDownIcon}
                         >
-                            <MenuItem value="">Tất cả dịch vụ</MenuItem>
+                            <MenuItem value="">Tất cả lĩnh vực</MenuItem>
                             {field.map((fieldName, index) => (
                                 <MenuItem key={index} value={fieldName}>
                                     {fieldName}
@@ -259,7 +296,7 @@ const NotarizedHistory = () => {
                     }}
                 >
                     {isLoading
-                        ? Array.from({ length: 4 }).map((_, index) => (
+                        ? Array.from({ length: 6 }).map((_, index) => (
                             <Box key={index} sx={{ flex: 1, minWidth: 300, minHeight: 180 }}>
                                 <Card
                                     variant="outlined"

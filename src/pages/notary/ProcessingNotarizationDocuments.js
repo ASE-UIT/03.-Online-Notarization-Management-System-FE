@@ -1,29 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Box, IconButton, Paper, Typography } from '@mui/material';
+import { Box, Paper, Typography, Pagination } from '@mui/material';
 import { black, gray, white } from '../../config/theme/themePrimitives';
-import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
 import NotarizationService from '../../services/notarization.service';
 import NotaryDocumentCard from '../../components/notary/NotaryDocumentCard';
 import NotaryDocumentCardSkeleton from '../../components/notary/NotaryDocumentCardSkeleton';
-
-const IconStyle = {
-    fontSize: 20,
-    padding: 1,
-    margin: 0
-};
-
-const IconButtonStyle = {
-    padding: '2px',
-    margin: 0,
-    color: black[900],
-    bgcolor: white[50],
-    '&:hover': {
-        bgcolor: black[900],
-        color: white[50]
-    },
-    border: `1px solid ${gray[200]}`,
-    borderRadius: 1
-};
 
 const ProcessingNotarizationDocuments = () => {
     const [documents, setDocuments] = useState([]);
@@ -45,14 +25,8 @@ const ProcessingNotarizationDocuments = () => {
         fetchProcessingDocuments(pageIndex);
     }, [pageIndex]);
 
-    const handleNextPage = () => {
-        setPageIndex((prev) => prev + 1);
-    };
-
-    const handlePreviousPage = () => {
-        if (pageIndex > 1) {
-            setPageIndex((prev) => prev - 1);
-        }
+    const handlePageChange = (event, value) => {
+        setPageIndex(value);
     };
 
     return (
@@ -127,29 +101,21 @@ const ProcessingNotarizationDocuments = () => {
                         ))}
                 </Box>
             </Paper>
+
             <Box
                 sx={{
                     display: 'flex',
                     justifyContent: 'flex-end',
-                    gap: 2,
-                    marginTop: 2
+                    marginTop: 3
                 }}
             >
-                <IconButton
-                    disableRipple
-                    sx={IconButtonStyle}
-                    onClick={handlePreviousPage}
-                    disabled={pageIndex === 1}
-                >
-                    <ArrowBackIos sx={IconStyle} />
-                </IconButton>
-                <IconButton
-                    disableRipple
-                    sx={IconButtonStyle}
-                    onClick={handleNextPage}
-                >
-                    <ArrowForwardIos sx={IconStyle} />
-                </IconButton>
+                <Pagination
+                    count={10}
+                    page={pageIndex}
+                    onChange={handlePageChange}
+                    color="primary"
+                    shape="rounded"
+                />
             </Box>
         </Box>
     );

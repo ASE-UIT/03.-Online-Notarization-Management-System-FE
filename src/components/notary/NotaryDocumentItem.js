@@ -1,8 +1,11 @@
 import { Box, Typography } from '@mui/material';
 import React from 'react';
 import { black, blue, green, red, yellow } from '../../config/theme/themePrimitives';
+import DetailHistoryDocumentModal from './DetailHistoryDocumentModal';
 
 const NotaryDocumentItem = ({ document }) => {
+    const [open, setOpen] = React.useState(false);
+
     const setStyleBaseOnStatus = (status) => {
         switch (status) {
             case 'processing': return { color: yellow[500], backgroundColor: yellow[50] };
@@ -26,15 +29,22 @@ const NotaryDocumentItem = ({ document }) => {
     };
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', gap: 2 }}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <Typography sx={{ fontSize: 14, fontWeight: 500, color: black[900] }}>{document?.documentId?.requesterInfo?.fullName}</Typography>
-                <Typography sx={{ fontSize: 14, fontWeight: 400, color: black[400] }}>{document?.documentId?.notarizationField?.name}</Typography>
+        <>
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', gap: 2, cursor: 'pointer' }} onClick={() => setOpen(true)}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <Typography sx={{ fontSize: 14, fontWeight: 500, color: black[900] }}>{document?.documentId?.requesterInfo?.fullName}</Typography>
+                    <Typography sx={{ fontSize: 14, fontWeight: 400, color: black[400] }}>{document?.documentId?.notarizationField?.name}</Typography>
+                </Box>
+                <Box sx={{ borderRadius: 100, fontSize: 12, fontWeight: 500, padding: '4px 8px', ...setStyleBaseOnStatus(document.status) }}>
+                    {setTextBaseOnStatus(document.status)}
+                </Box>
             </Box>
-            <Box sx={{ borderRadius: 100, fontSize: 12, fontWeight: 500, padding: '4px 8px', ...setStyleBaseOnStatus(document.status) }}>
-                {setTextBaseOnStatus(document.status)}
-            </Box>
-        </Box>
+            <DetailHistoryDocumentModal
+                open={open}
+                onClose={() => setOpen(false)}
+                document={document}
+            />
+        </>
     );
 };
 

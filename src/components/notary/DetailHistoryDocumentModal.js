@@ -1,10 +1,10 @@
-import { Box, Button, IconButton, Modal, TextField, Typography } from '@mui/material'
+import { Box, Button, IconButton, Modal, Typography } from '@mui/material'
 import React, { useState, useEffect } from 'react'
-import { ArrowBack, Cancel, CheckCircle, OpenInNew, PhotoRounded, PictureAsPdf } from '@mui/icons-material'
+import { ArrowBack, CheckCircle, OpenInNew, PhotoRounded, PictureAsPdf } from '@mui/icons-material'
 import { blue, red, yellow, black, white, gray, green } from '../../config/theme/themePrimitives'
 import InformationField from './InformationField'
-import FileField from './FileField'
 import NotarizationService from '../../services/notarization.service'
+import { toast } from 'react-toastify'
 
 const renderDocumentFiles = (file) => {
     return (
@@ -161,15 +161,19 @@ const DetailHistoryDocumentModal = ({ open, onClose, document }) => {
 
     const handleAccept = async () => {
         setIsSending(true);
-        NotarizationService.approveSignatureByNotary(document.documentId.id)
-        setIsSending(false);
-    }
+        try {
+            const response = await NotarizationService.approveSignatureByNotary(document.documentId.id);
+            if (response.status === 200) {
+                toast.success('Chấp nhận thành công!');
+                onClose();
+            }
+        } catch (error) {
+            toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
+        } finally {
+            setIsSending(false);
+        }
+    };
 
-    const handleReject = () => {
-        setIsSending(true);
-        NotarizationService.approveSignatureByNotary(document.documentId.id);
-        setIsSending(false);
-    }
 
     useEffect(() => {
         if (document?.documentId?.files) {
@@ -358,13 +362,13 @@ const DetailHistoryDocumentModal = ({ open, onClose, document }) => {
                         )}
                     </Box>
 
-                    {/* Note Section */}
                     <Box
                         sx={{
                             flex: 1,
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: 2,
+                            width: '100%',
+                            justifyContent: 'flex-start',
                         }}
                     >
                         <Typography
@@ -373,102 +377,55 @@ const DetailHistoryDocumentModal = ({ open, onClose, document }) => {
                                 fontWeight: 600,
                                 color: black[900],
                                 textTransform: 'uppercase',
+                                marginTop: 2,
                             }}
                         >
-                            Ghi chú
+                            Tài liệu phản hồi
                         </Typography>
-
-                        <TextField
-                            multiline
-                            fullWidth
-                            rows={15}
-                            placeholder="Nhập nội dung ghi chú"
-                            variant="outlined"
-                            sx={{
-                                flex: 1,
-                                '& .MuiInputBase-root': {
-                                    fontSize: 14,
-                                    color: black[900],
-                                    padding: '8px 12px',
-                                    '& fieldset': {
-                                        borderColor: gray[200],
-                                    },
-                                    '&:hover fieldset': {
-                                        borderColor: black[900],
-                                    },
-                                    '&.Mui-focused fieldset': {
-                                        borderColor: black[900],
-                                        borderWidth: 1,
-                                    },
-                                },
-                            }}
-                            value={feedback}
-                            onChange={(e) => setFeedback(e.target.value)}
-                        />
-
                         <Box
                             sx={{
                                 display: 'flex',
-                                flexDirection: 'column',
-                                width: '100%',
-                                justifyContent: 'flex-end',
+                                flexDirection: 'row',
+                                columnGap: 2,
+                                rowGap: 1,
+                                flexWrap: 'wrap',
+                                paddingY: 2,
                             }}
                         >
-                            <Typography
-                                sx={{
-                                    fontSize: 14,
-                                    fontWeight: 600,
-                                    color: black[900],
-                                    textTransform: 'uppercase'
-                                }}
-                            >
-                                Tài liệu phản hồi
-                            </Typography>
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    flexDirection: 'row',
-                                    columnGap: 2,
-                                    rowGap: 1,
-                                    flexWrap: 'wrap',
-                                    paddingY: 2,
-                                }}
-                            >
-                                {document?.documentId?.output?.map((output, index) => (
-                                    <Box
-                                        key={index}
+                            {document?.documentId?.output?.map((output, index) => (
+                                <Box
+                                    key={index}
+                                    sx={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        padding: '4px 12px',
+                                        borderRadius: '16px',
+                                        backgroundColor: black[50],
+                                        cursor: 'pointer',
+                                        '&:hover': {
+                                            backgroundColor: black[100],
+                                        },
+                                    }}
+                                >
+                                    <Typography
                                         sx={{
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            padding: '4px 12px',
-                                            borderRadius: '16px',
-                                            backgroundColor: black[50],
-                                            cursor: 'pointer',
-                                            '&:hover': {
-                                                backgroundColor: black[100],
+                                            fontSize: 12,
+                                            fontWeight: 500,
+                                            color: black[500],
+                                            marginRight: 1,
+                                            userSelect: 'none',
+                                            underlinecursor: 'pointer',
+                                            ':hover': {
+                                                textDecoration: 'underline',
                                             },
                                         }}
+                                        onClick={() => window.open(output.firebaseUrl)}
                                     >
-                                        <Typography
-                                            sx={{
-                                                fontSize: 12,
-                                                fontWeight: 500,
-                                                color: black[500],
-                                                marginRight: 1,
-                                                userSelect: 'none',
-                                                underlinecursor: 'pointer',
-                                                ':hover': {
-                                                    textDecoration: 'underline',
-                                                },
-                                            }}
-                                            onClick={() => window.open(output.firebaseUrl)}
-                                        >
-                                            {output?.filename}
-                                        </Typography>
-                                        <OpenInNew sx={{ color: black[500], fontSize: 16 }} />
-                                    </Box>
-                                ))}
-                            </Box>
+                                        {output?.filename}
+                                    </Typography>
+                                    <OpenInNew sx={{ color: black[500], fontSize: 16 }} />
+                                </Box>
+                            ))}
                         </Box>
                     </Box>
                 </Box>
@@ -482,27 +439,6 @@ const DetailHistoryDocumentModal = ({ open, onClose, document }) => {
                         justifyContent: 'flex-end',
                     }}
                 >
-                    <Button
-                        sx={{
-                            fontSize: 14,
-                            fontWeight: 600,
-                            color: white[50],
-                            bgcolor: red[500],
-                            '&:hover': { bgcolor: red[600] },
-                            textTransform: 'none',
-                            padding: '8px 32px',
-                            '&:disabled': {
-                                bgcolor: black[200],
-                                color: black[400],
-                            }
-                        }}
-                        endIcon={<Cancel />}
-                        onClick={handleReject}
-                        disabled={isSending || isDisabled}
-                    >
-                        Từ chối
-                    </Button>
-
                     <Button
                         sx={{
                             fontSize: 14,
