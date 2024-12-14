@@ -132,8 +132,7 @@ const HorizontalCard = ({ document }) => {
                         }}
                         component={'span'}
                     >
-                        {/* TODO */}
-                        {new Date(document.mintedAt).toLocaleDateString()}
+                        {new Date(new Date(document.mintedAt).setMonth(new Date(document.mintedAt).getMonth() + 6)).toLocaleDateString()}
                     </Typography>
                 </Typography>
             </Box>

@@ -140,7 +140,7 @@ const BoxCard = ({ document }) => {
                         }}
                         component={'span'}
                     >
-                        {new Date(document.mintedAt).toLocaleDateString()}
+                        {new Date(new Date(document.mintedAt).setMonth(new Date(document.mintedAt).getMonth() + 6)).toLocaleDateString()}
                     </Typography>
                 </Typography>
             </Box>
