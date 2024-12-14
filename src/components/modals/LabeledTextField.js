@@ -67,7 +67,8 @@ const LabeledTextField = ({ label, isAutoComplete = false, value = '',defaultVal
       ) : (
         <TextField
           variant="outlined"
-          size="small"
+            size="small"
+            disabled={disabled}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           sx={{
