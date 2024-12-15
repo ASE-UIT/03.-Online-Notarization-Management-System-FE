@@ -89,15 +89,6 @@ const ForgotPassword = () => {
                         >
                             Quên mật khẩu?
                         </Typography>
-                        <Typography
-                            sx={{
-                                fontSize: 14,
-                                fontWeight: 400,
-                                color: dark[600]
-                            }}
-                        >
-                            Chúng tôi sẽ hỗ trợ bạn cài đặt lại mật khẩu.
-                        </Typography>
                     </Box>
 
                     <Box
