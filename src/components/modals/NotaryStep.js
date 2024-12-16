@@ -37,7 +37,7 @@ const NotaryStep = ({ currentStep }) => {
   };
 
   return (
-    <Box>
+    <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
       <Stepper activeStep={currentStep} orientation="vertical" connector={<CustomConnector />}>
         {steps.map((step, index) => (
           <Step key={step.label}>

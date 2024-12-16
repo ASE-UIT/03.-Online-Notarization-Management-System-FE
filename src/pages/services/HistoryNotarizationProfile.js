@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Button, TextField, InputAdornment } from '@mui/material';
+import { Box, Typography, Button, TextField, InputAdornment, Grid } from '@mui/material';
 import 'react-toastify/dist/ReactToastify.css';
 import FindInPageIcon from '@mui/icons-material/FindInPage';
 import SearchIcon from '@mui/icons-material/Search';
@@ -17,6 +17,7 @@ import EditNoteIcon from '@mui/icons-material/EditNote';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import VerifiedIcon from '@mui/icons-material/Verified';
+import NotaryDocumentCard from '../admin/user-management/NotaryDocumentCard';
 
 const HistoryNotarizationProfile = () => {
   const statusTypes = {
@@ -34,11 +35,11 @@ const HistoryNotarizationProfile = () => {
     [statusTypes.Pending]: <HourglassTopIcon sx={{ height: '18px', width: '18px' }} />,
     [statusTypes.Processing]: <LoopIcon sx={{ height: '18px', width: '18px' }} />,
     [statusTypes.DigitalSignature]: <EditNoteIcon sx={{ height: '18px', width: '18px' }} />,
-    [statusTypes.Verification]: <VerifiedIcon sx={{ height: '18px', width: '18px'}}/>,
+    [statusTypes.Verification]: <VerifiedIcon sx={{ height: '18px', width: '18px' }} />,
     [statusTypes.Completed]: <CheckCircleIcon sx={{ height: '18px', width: '18px' }} />,
     [statusTypes.Rejected]: <ErrorIcon sx={{ height: '18px', width: '18px' }} />,
   };
-  
+
   const headCells = [
     {
       id: 'profile',
@@ -66,7 +67,7 @@ const HistoryNotarizationProfile = () => {
       label: 'Loại dịch vụ',
     },
   ];
-  
+
   function createData(id, profile, date, name, status, service) {
     return {
       id,
@@ -91,12 +92,12 @@ const HistoryNotarizationProfile = () => {
       setLoadingStatus(true);
       const response = await NotarizationService.getHistory();
       setFullData(response);
-      
+
       const data = await Promise.all(
-        response.map(async (item, index) => {          
+        response.map(async (item, index) => {
           const date = new Date(item.createdAt);
           const notaryDate = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
-          let status;          
+          let status;
 
           if (item.status.status === 'pending') status = 'Chờ xử lý';
           if (item.status.status === 'processing') status = 'Đang xử lý';
@@ -104,10 +105,18 @@ const HistoryNotarizationProfile = () => {
           if (item.status.status === 'digitalSignature') status = 'Sẵn sàng ký số';
           if (item.status.status === 'completed') status = 'Hoàn tất';
           if (item.status.status === 'rejected') status = 'Không hợp lệ';
-          return createData(index + 1, item._id, notaryDate, item.requesterInfo.fullName, status, item.notarizationService.name);
+          return createData(
+            index + 1,
+            item._id,
+            notaryDate,
+            item.requesterInfo.fullName,
+            status,
+            item.notarizationService.name,
+          );
         }),
       );
       setRows(data);
+      console.log(data);
       setLoadingStatus(false);
     } catch (error) {
       if (error.response && error.response.status === 401) {
@@ -143,7 +152,7 @@ const HistoryNotarizationProfile = () => {
 
   useEffect(() => {
     getHistoryFromDB();
-  }, []);
+  });
 
   const handleClick = () => {
     navigate('/lookup');
@@ -158,6 +167,7 @@ const HistoryNotarizationProfile = () => {
           p: 3,
           gap: '8px',
           backgroundColor: white[50],
+          flexDirection: { xs: 'column', sm: 'row' },
         }}
       >
         <Box sx={{ flex: 1, gap: 2 }}>
@@ -217,7 +227,7 @@ const HistoryNotarizationProfile = () => {
         >
           <Box
             sx={{
-              display: 'flex',
+              display: { xs: 'none', sm: 'none', md: 'flex', lg: 'flex', xl: 'flex' },
               gap: '8px',
               alignSelf: 'stretch',
               borderBottom: '1px solid #C0C0C0',
@@ -289,7 +299,7 @@ const HistoryNotarizationProfile = () => {
             />
           </Box>
 
-          <Box flex={1}></Box>
+          <Box sx={{ flex: 1, display: { xs: 'none', sm: 'none', md: 'flex' } }}></Box>
 
           <TextField
             variant="outlined"
@@ -299,7 +309,7 @@ const HistoryNotarizationProfile = () => {
             onChange={(e) => setSearchText(e.target.value)}
             sx={{
               borderRadius: 1,
-              width: '20%',
+              width: { xs: '100%', sm: '100%', md: '20%' },
               minWidth: '150px',
               '& .MuiInputBase-input': {
                 fontSize: 14,
@@ -316,6 +326,7 @@ const HistoryNotarizationProfile = () => {
         </Box>
         <Box
           sx={{
+            display: { xs: 'none', sm: 'none', md: 'flex', lg: 'flex', xl: 'flex' },
             border: !loadingStatus ? '1px solid var(--black-50, #E0E0E0)' : 'none',
             borderRadius: '8px',
             background: white[50],
@@ -334,6 +345,23 @@ const HistoryNotarizationProfile = () => {
               data={fullData}
             ></HistoryDataTable>
           )}
+        </Box>
+        <Box sx={{ display: { xs: 'grid', sm: 'grid', md: 'none', lg: 'none', xl: 'none' }, gap: 2 }}>
+          {rows.map((doc, index) => (
+            <Grid item xs={12} sm={12} md={6} key={index}>
+              <NotaryDocumentCard
+                docType={doc.service}
+                documentId={doc.profile}
+                date={doc.date}
+                status={doc.status}
+                onClick={() =>
+                  toast.info('Vui lòng truy cập trên máy tính để xem chi tiết', {
+                    position: 'top-center',
+                  })
+                }
+              />
+            </Grid>
+          ))}
         </Box>
       </Box>
     </Box>

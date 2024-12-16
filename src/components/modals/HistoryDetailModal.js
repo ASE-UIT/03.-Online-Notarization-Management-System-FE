@@ -1,14 +1,10 @@
-import {
-  ArrowBack,
-  PictureAsPdf,
-  PhotoRounded,
-} from '@mui/icons-material';
+import { ArrowBack, PictureAsPdf, PhotoRounded } from '@mui/icons-material';
 import { Backdrop, Box, CircularProgress, IconButton, Modal, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { dark, red, black, white, gray, yellow, blue, green } from '../../config/theme/themePrimitives';
 import NotaryStep from './NotaryStep';
-import { getDocumentNameByCode } from '../../utils/constants';
 import NotaryFeedback from '../services/NotaryFeedback.js';
+import useWindowSize from '../../hooks/useWindowSize';
 
 const InfoRow = ({ label, value }) => (
   <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -42,10 +38,9 @@ const HistoryDetailModal = ({ open, handleClose, data, notaryId, load }) => {
 
   const [currentStep, setCurrentStep] = useState(0);
   const loading = false;
-  const [feedback, setFeedback] = useState();
-  const [missingFiles, setMissingFiles] = useState('');
   const [documentFiles, setDocumentFiles] = useState([]);
   const [imageFiles, setImageFiles] = useState([]);
+  const { width, height } = useWindowSize();
 
   const renderStatusBox = (status) => {
     const statusConfig = {
@@ -200,31 +195,6 @@ const HistoryDetailModal = ({ open, handleClose, data, notaryId, load }) => {
       setImageFiles(images);
     }
 
-    let notaryFeedback = '',
-      missingList = '';
-    if (notarizationData?.status.feedback) {
-      notaryFeedback = notarizationData.status.feedback;
-      notaryFeedback.trim();
-      if (notaryFeedback.startsWith('Missing documents')) {
-        setFeedback('Hồ sơ cần bổ sung thêm giấy tờ');
-
-        missingList = notaryFeedback
-          .slice(19, notaryFeedback.length - 1)
-          .split(',')
-          .map((element) => {
-            let code = element.trim();
-            return getDocumentNameByCode(code);
-          });
-        setMissingFiles(missingList);
-      } else {
-        setFeedback(notaryFeedback);
-        setMissingFiles(missingList);
-      }
-    } else {
-      setFeedback(notaryFeedback);
-      setMissingFiles(missingList);
-    }
-
     if (notarizationData.status.status === 'pending') setCurrentStep(0);
     if (notarizationData.status.status === 'processing') setCurrentStep(1);
     if (notarizationData.status.status === 'verification') setCurrentStep(2);
@@ -242,8 +212,8 @@ const HistoryDetailModal = ({ open, handleClose, data, notaryId, load }) => {
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: '100vh',
-              height: '90vh',
+              width: `${width}px - 20%`,
+              height: `${height}px - 50%`,
               backgroundColor: white[50],
               borderRadius: 2,
               overflowY: 'scroll',
@@ -265,8 +235,8 @@ const HistoryDetailModal = ({ open, handleClose, data, notaryId, load }) => {
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                width: '100vh',
-                height: '90vh',
+                width: `calc(${width}px - 20%)`,
+                height: `calc(${height}px - 20%)`,
                 backgroundColor: white[50],
                 borderRadius: 2,
                 overflowY: 'scroll',
@@ -275,6 +245,7 @@ const HistoryDetailModal = ({ open, handleClose, data, notaryId, load }) => {
                 boxShadow: 1,
                 p: 2,
                 gap: 1,
+                scrollbarWidth: { xs: 'none', sm: 'auto' },
               }}
             >
               {/* Header Section */}
@@ -282,10 +253,12 @@ const HistoryDetailModal = ({ open, handleClose, data, notaryId, load }) => {
                 sx={{
                   display: 'flex',
                   justifyContent: 'space-between',
-                  alignItems: 'center',
+                  alignItems: { xs: 'flex-start', sm: 'center' },
+                  flexDirection: { xs: 'column', sm: 'row' },
+                  gap: 1,
                 }}
               >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
                   <IconButton onClick={handleClose}>
                     <ArrowBack
                       sx={{
@@ -294,11 +267,22 @@ const HistoryDetailModal = ({ open, handleClose, data, notaryId, load }) => {
                       fontSize="small"
                     />
                   </IconButton>
-                  <Typography sx={{ fontSize: 16, fontWeight: 600, color: black[900] }}>
-                    Chi tiết hồ sơ công chứng {notarizationData._id && `- Mã số: #${notarizationData._id}`}
-                  </Typography>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: { xs: 'flex-start', sm: 'center' },
+                      flexDirection: { xs: 'column', sm: 'row' },
+                      gap: 1,
+                      width: '100%',
+                    }}
+                  >
+                    <Typography sx={{ fontSize: 'clamp(14px, 2vw, 16px)', fontWeight: 600, color: black[900] }}>
+                      Chi tiết hồ sơ công chứng {notarizationData._id && `- Mã số: #${notarizationData._id}`}
+                    </Typography>
+                    {renderStatusBox(notarizationData.status.status)}
+                  </Box>
                 </Box>
-                {renderStatusBox(notarizationData.status.status)}
               </Box>
               {/* User Information Section */}
               <Section title="Thông tin khách hàng">
@@ -354,31 +338,12 @@ const HistoryDetailModal = ({ open, handleClose, data, notaryId, load }) => {
                     sx={{
                       display: 'flex',
                       flexDirection: 'row',
-                      gap: '32px',
-                      p: '16px',
+                      gap: 4,
+                      p: { xs: 0, sm: 2 },
                     }}
                   >
                     <NotaryStep currentStep={currentStep} />
-                    <NotaryFeedback feedback={feedback} missingFiles={missingFiles}></NotaryFeedback>
-                  </Box>
-                  {/* Contact Section */}
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      p: 1,
-                      width: 'fit-content',
-                      border: `1px solid ${black[50]}`,
-                      borderRadius: 1,
-                      backgroundColor: gray[50],
-                    }}
-                  >
-                    <Typography sx={{ color: black[900], fontSize: 14, fontWeight: 500, mb: 1 }}>
-                      Hỗ trợ khách hàng
-                    </Typography>
-                    <Typography sx={{ color: black[900], fontSize: 12, fontWeight: 400 }}>
-                      Liên hệ: 1900-123-456 hoặc email: support@notary.vn
-                    </Typography>
+                    <NotaryFeedback feedback={notarizationData.status.feedback}></NotaryFeedback>
                   </Box>
                 </>
               )}
