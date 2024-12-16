@@ -9,7 +9,7 @@ const NOTARIZATION_SERVICE_ENDPOINT = `${API_BASE_URL}/notarization-services`;
 const getStatusById = async (documentId) => {
   try {
     const response = await axios.get(`${NOTARIZATION_ENDPOINT}/getStatusById/${documentId}`);
-    return response.data;
+    return response;
   } catch (error) {
     const status = error.response?.status;
     const message = error.response?.data?.message;

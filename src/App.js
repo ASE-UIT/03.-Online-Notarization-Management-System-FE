@@ -40,12 +40,15 @@ const NotaryDashboard = lazy(() => import('./pages/notary/NotaryDashboard'));
 const ProcessingNotarizationDocuments = lazy(() => import('./pages/notary/ProcessingNotarizationDocuments'));
 const NotarizationHistory = lazy(() => import('./pages/notary/NotarizedHistory'));
 const AwaitingSignatureDocuments = lazy(() => import('./pages/notary/AwaitingSignatureDocuments'));
+const ForgotPassword = lazy(() => import('./pages/signin/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/signin/ResetPassword'));
 
 function App() {
   const dispatch = useDispatch();
   const theme = createTheme(getDesignTokens());
   const { isAuthenticated } = useSelector((state) => state.auth);
   const { token, refreshToken } = TokenService.getAccessTokenFromURL(window.location.search);
+  const resetPasswordToken = TokenService.getResetPasswordTokenFromURL(window.location.search);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -65,6 +68,13 @@ function App() {
 
     fetchUser();
   }, [token, refreshToken, dispatch]);
+
+  useEffect(() => {
+    if (resetPasswordToken) {
+      Cookies.set('resetPasswordToken', resetPasswordToken);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
@@ -124,6 +134,22 @@ function App() {
                 }
               />
               <Route
+                path="/forgot-password"
+                element={
+                  <PublicRoute>
+                    <ForgotPassword />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/reset-password"
+                element={
+                  <PublicRoute>
+                    <ResetPassword />
+                  </PublicRoute>
+                }
+              />
+              <Route
                 path="/third-party"
                 element={
                   <PublicRoute>
@@ -135,6 +161,8 @@ function App() {
               {/* Auth Routes */}
               <Route path="/signin" element={<PublicRoute element={<SignIn />} />} />
               <Route path="/signup" element={<PublicRoute element={<SignUp />} />} />
+              <Route path="/forgot-password" element={<PublicRoute element={<ForgotPassword />} />} />
+              <Route path="/reset-password" element={<PublicRoute element={<ResetPassword />} />} />
 
               {/* User Routes */}
               <Route element={<PrivateRoute allowedRoles={['user']} />}>
