@@ -15,13 +15,16 @@ const ResetPassword = () => {
 
   const handleResetPassword = async () => {
     if (password === '') {
-      alert('Vui lòng nhập mật khẩu mới');
+      toast.error('Vui lòng nhập mật khẩu mới');
       return;
     } else if (password.length < 8) {
-      alert('Mật khẩu phải chứa ít nhất 8 ký tự');
+      toast.error('Mật khẩu phải chứa ít nhất 8 ký tự');
       return;
     } else if (password !== confirmPassword) {
-      alert('Mật khẩu không khớp');
+      toast.error('Mật khẩu không khớp');
+      return;
+    } else if (!/\d/.test(password) || !/\d/.test(confirmPassword)) {
+      toast.error('Mật khẩu phải chứa ít nhất một số');
       return;
     }
 
@@ -32,9 +35,14 @@ const ResetPassword = () => {
       setLoading(false);
       setTimeout(() => {
         window.location.href = '/signin';
-      }, 2000);
+      }, 2500);
     } catch (error) {
-      toast.error(error);
+      if (error.status === 401) {
+        toast.error('Yêu cầu hết hạn. Vui lòng thử lại');
+        setTimeout(() => {
+          window.location.href = '/forgot-password';
+        }, 3000);
+      }
       setLoading(false);
     }
   };
@@ -153,33 +161,7 @@ const ResetPassword = () => {
                 color: gray[400],
               }}
             >
-              <FiberManualRecord sx={{ height: 8, width: 8, marginRight: 1 }} /> Ít nhất một ký tự viết hoa
-            </Typography>
-          </Box>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            <Typography
-              sx={{
-                fontSize: 12,
-                fontWeight: 400,
-                color: gray[400],
-              }}
-            >
-              <FiberManualRecord sx={{ height: 8, width: 8, marginRight: 1 }} /> Mật khẩu nhiều hơn 8 ký tự
-            </Typography>
-
-            <Typography
-              sx={{
-                fontSize: 12,
-                fontWeight: 400,
-                color: gray[400],
-              }}
-            >
-              <FiberManualRecord sx={{ height: 8, width: 8, marginRight: 1 }} /> Ít nhất một ký tự viết thường
+              <FiberManualRecord sx={{ height: 8, width: 8, marginRight: 1 }} /> Ít nhất một ký tự số 0-9
             </Typography>
           </Box>
         </Box>
