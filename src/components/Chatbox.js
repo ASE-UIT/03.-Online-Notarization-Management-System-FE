@@ -40,7 +40,7 @@ const Chatbox = ({ showChatbox, setShowChatbox }) => {
 
   return (
     <>
-      <Modal open={showChatbox} onClose={handleClose}>
+      <Modal open={showChatbox} onClose={handleClose} data-testid="chatbox-container">
         <Box
           sx={{
             width: '25vw',
@@ -68,7 +68,7 @@ const Chatbox = ({ showChatbox, setShowChatbox }) => {
             <Typography variant="h6" sx={{ textAlign: 'center', flexGrow: 1 }}>
               Trợ lý ảo
             </Typography>
-            <Button onClick={handleClose}>
+            <Button onClick={handleClose} data-testid="close-button">
               <Close />
             </Button>
           </Box>
@@ -86,6 +86,7 @@ const Chatbox = ({ showChatbox, setShowChatbox }) => {
               '-ms-overflow-style': 'none',
               'scrollbar-width': 'none',
             }}
+            data-testid="messages-container"
           >
             {messages.map((message, index) => (
               <Box
@@ -168,7 +169,7 @@ const Chatbox = ({ showChatbox, setShowChatbox }) => {
               size="small"
               disabled={onLoading}
             />
-            <IconButton onClick={handleSubmit} disabled={onLoading}>
+            <IconButton onClick={handleSubmit} disabled={onLoading} data-testid="send-button">
               <SendRounded fontSize="large" sx={{ color: primary[500] }} />
             </IconButton>
           </Box>

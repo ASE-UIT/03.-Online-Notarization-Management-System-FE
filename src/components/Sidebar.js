@@ -146,6 +146,7 @@ const Sidebar = () => {
       variant="permanent"
       open={openSideBar}
       anchor="left"
+      data-testid="sidebar-container"
       sx={{
         width: drawerWidth,
         flexShrink: 0,
@@ -166,6 +167,7 @@ const Sidebar = () => {
             </Typography>
           )}
           <IconButton
+            data-testid="sidebar-toggle"
             onClick={() => setOpenSideBar(!openSideBar)}
             sx={{ color: dark[500], fontSize: 20, '&:hover': { backgroundColor: primary[500], color: white[50] } }}
           >
