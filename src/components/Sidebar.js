@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Box, Divider, Drawer, IconButton, List, Typography } from '@mui/material';
-import { Article, HistoryEdu, KeyboardDoubleArrowLeft, KeyboardDoubleArrowRight, Logout } from '@mui/icons-material';
+import { Article, HistoryEdu, KeyboardDoubleArrowLeft, KeyboardDoubleArrowRight, Logout, Wallet } from '@mui/icons-material';
 import { dark, primary, white, red } from '../config/theme/themePrimitives';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -68,6 +68,12 @@ const Sidebar = () => {
           icon: <Groups2Rounded />,
           title: 'Phiên công chứng',
           href: '/user/notarization-session',
+        },
+        {
+          type: 'document-wallet',
+          icon: <Wallet />,
+          title: 'Ví tài liệu',
+          href: '/user/document-wallet',
         },
       );
     } else if (role === 'admin') {

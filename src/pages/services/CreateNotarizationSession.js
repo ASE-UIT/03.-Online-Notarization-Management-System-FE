@@ -21,11 +21,11 @@ const CreateNotarizationSession = () => {
   const fetchSessions = async () => {
     setLoading(true);
     try {
-      const sessions = await SessionService.getSessionsByUserId();
-      console.log(sessions);
-      setSessions(sessions.results);
+      const response = await SessionService.getSessionsByUserId();
+      setSessions(response?.results || []);
     } catch (error) {
       console.error('Error fetching sessions:', error);
+      setSessions([]);
     } finally {
       setLoading(false);
     }
@@ -69,9 +69,11 @@ const CreateNotarizationSession = () => {
   const indexOfLastSession = currentPage * sessionsPerPage;
   const indexOfFirstSession = indexOfLastSession - sessionsPerPage;
   const currentSessions =
-    searchingSessions.length > 0
+    Array.isArray(searchingSessions) && searchingSessions.length > 0
       ? searchingSessions.slice(indexOfFirstSession, indexOfLastSession)
-      : sessions.slice(indexOfFirstSession, indexOfLastSession);
+      : Array.isArray(sessions)
+        ? sessions.slice(indexOfFirstSession, indexOfLastSession)
+        : [];
 
   const totalSessions = searchingSessions.length > 0 ? searchingSessions.length : sessions.length;
   const totalPages = Math.ceil(totalSessions / sessionsPerPage);
