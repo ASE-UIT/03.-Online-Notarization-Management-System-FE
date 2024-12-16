@@ -29,12 +29,12 @@ axiosConfig.interceptors.response.use(
     return response;
   },
   async (error) => {
-    if (error.response?.status === 401) {
-      const refreshToken = Cookies.get('refreshToken');
-      await AuthService.logout(refreshToken).then(() => {
-        window.location.href = '/signin';
-      });
-    }
+    // if (error.response?.status === 401) {
+    //   const refreshToken = Cookies.get('refreshToken');
+    //   await AuthService.logout(refreshToken).then(() => {
+    //     window.location.href = '/signin';
+    //   });
+    // }
 
     // if (error.response?.status !== 410) {
     //   toast.error(error.response?.data?.message || error?.message);
@@ -47,15 +47,18 @@ axiosConfig.interceptors.response.use(
 
         refreshTokenPromise = await AuthService.refreshAccessToken(refreshToken)
           .then((response) => {
-            const newAccessToken = response.tokens.access.token;
+            console.log('Response:', response);
+            const newAccessToken = response.data.access.token;
+            const newRefreshToken = response.data.refresh.token;
             Cookies.set('accessToken', newAccessToken);
+            Cookies.set('refreshToken', newRefreshToken);
             axiosConfig.defaults.headers.Authorization = `Bearer ${newAccessToken}`;
             return axiosConfig(originalRequest);
           })
           .catch((error) => {
-            AuthService.logout(refreshToken).then(() => {
-              window.location.href = '/signin';
-            });
+            // AuthService.logout(refreshToken).then(() => {
+            //   window.location.href = '/signin';
+            // });
           })
           .finally(() => {
             refreshTokenPromise = null;
