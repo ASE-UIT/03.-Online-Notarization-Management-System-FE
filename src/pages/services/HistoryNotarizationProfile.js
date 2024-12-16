@@ -17,14 +17,12 @@ import EditNoteIcon from '@mui/icons-material/EditNote';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import VerifiedIcon from '@mui/icons-material/Verified';
-import NotaryDocumentCard from '../admin/user-management/NotaryDocumentCard';
 
 const HistoryNotarizationProfile = () => {
   const statusTypes = {
     All: 'Tất cả',
     Pending: 'Chờ xử lý',
     Processing: 'Đang xử lý',
-    Verification: 'Đang xác minh',
     DigitalSignature: 'Sẵn sàng ký số',
     Completed: 'Hoàn tất',
     Rejected: 'Không hợp lệ',
@@ -35,7 +33,6 @@ const HistoryNotarizationProfile = () => {
     [statusTypes.Pending]: <HourglassTopIcon sx={{ height: '18px', width: '18px' }} />,
     [statusTypes.Processing]: <LoopIcon sx={{ height: '18px', width: '18px' }} />,
     [statusTypes.DigitalSignature]: <EditNoteIcon sx={{ height: '18px', width: '18px' }} />,
-    [statusTypes.Verification]: <VerifiedIcon sx={{ height: '18px', width: '18px' }} />,
     [statusTypes.Completed]: <CheckCircleIcon sx={{ height: '18px', width: '18px' }} />,
     [statusTypes.Rejected]: <ErrorIcon sx={{ height: '18px', width: '18px' }} />,
   };
@@ -177,34 +174,6 @@ const HistoryNotarizationProfile = () => {
 
           <Typography variant="caption">Toàn bộ lịch sử công chứng của bạn sẽ hiển thị ở đây</Typography>
         </Box>
-
-        {/* Tra cứu hồ sơ */}
-        <Button
-          startIcon={<FindInPageIcon />}
-          disableElevation
-          onClick={handleClick}
-          sx={{
-            display: 'flex',
-            p: '6px 12px',
-            borderRadius: '8px',
-            border: '1px solid #A91D3A',
-            background: '#FFF',
-            fontSize: '14px',
-            height: 'fit-content',
-            mt: {
-              xs: 2,
-              sm: 2,
-              md: 0,
-              lg: 0,
-              xl: 0,
-            },
-          }}
-          size="small"
-        >
-          <Typography variant="button" sx={{ textTransform: 'none', padding: 0 }}>
-            Tra cứu hồ sơ
-          </Typography>
-        </Button>
       </Box>
 
       {/* Main */}
@@ -257,15 +226,6 @@ const HistoryNotarizationProfile = () => {
               handleFilterByStatus={() => {
                 setStatusFilter(statusTypes.Processing);
                 setStatusClicked(statusTypes.Processing);
-              }}
-              clickedButton={statusClicked}
-              iconMap={iconMap}
-            />
-            <StatusFilterButton
-              statusFilter={statusTypes.Verification}
-              handleFilterByStatus={() => {
-                setStatusFilter(statusTypes.Verification);
-                setStatusClicked(statusTypes.Verification);
               }}
               clickedButton={statusClicked}
               iconMap={iconMap}
