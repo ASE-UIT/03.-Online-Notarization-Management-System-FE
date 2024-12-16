@@ -153,7 +153,7 @@ const ResetPassword = () => {
                 color: gray[400],
               }}
             >
-              <FiberManualRecord sx={{ height: 8, width: 8, marginRight: 1 }} /> Ít nhất một ký tự viết thường
+              <FiberManualRecord sx={{ height: 8, width: 8, marginRight: 1 }} /> Ít nhất một ký tự viết hoa
             </Typography>
           </Box>
           <Box
