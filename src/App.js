@@ -16,6 +16,8 @@ import PrivateRoute from './routes/PrivateRoute';
 import PublicRoute from './routes/PublicRoute';
 import { setUser } from './stores/slices/userSlice';
 import Settings from './pages/admin/Settings';
+import ThirdParty from './pages/static/Loader';
+import Loader from './pages/static/Loader';
 
 const Home = lazy(() => import('./pages/home/Home'));
 const Services = lazy(() => import('./pages/services/Services'));
@@ -36,7 +38,7 @@ const UserManagement = lazy(() => import('./pages/admin/user-management/UserMana
 const NotaryManagement = lazy(() => import('./pages/admin/notary-management/NotaryManagement'));
 const NotaryDashboard = lazy(() => import('./pages/notary/NotaryDashboard'));
 const ProcessingNotarizationDocuments = lazy(() => import('./pages/notary/ProcessingNotarizationDocuments'));
-const NotarizationHistory = lazy(() => import('./pages/notary/NotarizedHistory'))
+const NotarizationHistory = lazy(() => import('./pages/notary/NotarizedHistory'));
 const AwaitingSignatureDocuments = lazy(() => import('./pages/notary/AwaitingSignatureDocuments'));
 
 function App() {
@@ -54,6 +56,7 @@ function App() {
           const user = await UserService.getUserById(TokenService.decodeToken(token).sub);
           dispatch(setUser(user));
           window.history.replaceState({}, document.title, window.location.pathname);
+          window.location.reload();
         } catch (error) {
           console.error('Failed to fetch user:', error);
         }
@@ -117,6 +120,14 @@ function App() {
                 element={
                   <PublicRoute>
                     <SignUp />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/third-party"
+                element={
+                  <PublicRoute>
+                    <Loader />
                   </PublicRoute>
                 }
               />
