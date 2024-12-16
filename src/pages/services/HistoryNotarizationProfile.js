@@ -152,7 +152,7 @@ const HistoryNotarizationProfile = () => {
 
   useEffect(() => {
     getHistoryFromDB();
-  });
+  }, []);
 
   const handleClick = () => {
     navigate('/lookup');
@@ -345,23 +345,6 @@ const HistoryNotarizationProfile = () => {
               data={fullData}
             ></HistoryDataTable>
           )}
-        </Box>
-        <Box sx={{ display: { xs: 'grid', sm: 'grid', md: 'none', lg: 'none', xl: 'none' }, gap: 2 }}>
-          {rows.map((doc, index) => (
-            <Grid item xs={12} sm={12} md={6} key={index}>
-              <NotaryDocumentCard
-                docType={doc.service}
-                documentId={doc.profile}
-                date={doc.date}
-                status={doc.status}
-                onClick={() =>
-                  toast.info('Vui lòng truy cập trên máy tính để xem chi tiết', {
-                    position: 'top-center',
-                  })
-                }
-              />
-            </Grid>
-          ))}
         </Box>
       </Box>
     </Box>
