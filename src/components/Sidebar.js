@@ -98,12 +98,6 @@ const Sidebar = () => {
           title: 'Quản lý công chứng',
           href: '/admin/notary-management',
         },
-        {
-          type: 'settings',
-          icon: <Settings />,
-          title: 'Cài đặt',
-          href: '/admin/settings',
-        },
       );
     } else if (role === 'secretary') {
     } else if (role === 'notary') {
