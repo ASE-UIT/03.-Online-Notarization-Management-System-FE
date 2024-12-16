@@ -53,6 +53,7 @@ axiosConfig.interceptors.response.use(
             Cookies.set('accessToken', newAccessToken);
             Cookies.set('refreshToken', newRefreshToken);
             axiosConfig.defaults.headers.Authorization = `Bearer ${newAccessToken}`;
+            window.location.reload();
             return axiosConfig(originalRequest);
           })
           .catch((error) => {
