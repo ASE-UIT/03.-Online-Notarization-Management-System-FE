@@ -10,7 +10,6 @@ import {
   AddCircleOutline,
   DocumentScanner,
   Groups2Rounded,
-  Settings,
   GridViewRounded,
   SupervisorAccountRounded,
   AccountCircleRounded,
@@ -67,10 +66,9 @@ const Sidebar = () => {
         {
           type: 'create-notarization-session',
           icon: <Groups2Rounded />,
-          title: 'Tạo phiên công chứng',
-          href: '/user/create-notarization-session',
+          title: 'Phiên công chứng',
+          href: '/user/notarization-session',
         },
-        { type: 'settings', icon: <Settings />, title: 'Cài đặt', href: '/user/settings' },
       );
     } else if (role === 'admin') {
       items.push(
@@ -97,12 +95,6 @@ const Sidebar = () => {
           icon: <WorkHistoryRounded />,
           title: 'Quản lý công chứng',
           href: '/admin/notary-management',
-        },
-        {
-          type: 'settings',
-          icon: <Settings />,
-          title: 'Cài đặt',
-          href: '/admin/settings',
         },
       );
     } else if (role === 'secretary') {

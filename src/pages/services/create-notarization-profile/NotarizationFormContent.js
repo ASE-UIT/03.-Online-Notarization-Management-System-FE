@@ -35,26 +35,31 @@ const requiredFields = [
     label: 'Số bản sao',
     name: 'amount',
     placeholder: 'Nhập số lượng bản sao',
+    type: 'number',
   },
   {
     label: 'Họ và tên',
     name: 'fullName',
     placeholder: 'Nhập họ và tên',
+    type: 'text',
   },
   {
     label: 'Số điện thoại',
     name: 'phoneNumber',
     placeholder: 'Nhập số điện thoại',
+    type: 'tel',
   },
   {
     label: 'Số CMND/CCCD/Hộ chiếu',
     name: 'citizenId',
     placeholder: 'Nhập số CMND/CCCD/Hộ chiếu',
+    type: 'text',
   },
   {
     label: 'Email',
     name: 'email',
     placeholder: 'Nhập địa chỉ email',
+    type: 'email',
   },
 ];
 
@@ -125,6 +130,7 @@ const NotarizationFormContent = ({
                 value={notarizationData[field.name]}
                 placeholder={field.placeholder}
                 onChange={handleInputChange}
+                type={field.type}
                 required
               />
             ))}

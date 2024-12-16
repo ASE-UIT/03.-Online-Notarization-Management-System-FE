@@ -168,7 +168,7 @@ function App() {
               <Route element={<PrivateRoute allowedRoles={['user']} />}>
                 <Route path="/user/create-notarization-profile" element={<CreateNotarizationProfile />} />
                 <Route path="/user/history" element={<HistoryNotarizationProfile />} />
-                <Route path="/user/create-notarization-session" element={<CreateNotarizationSession />} />
+                <Route path="/user/notarization-session" element={<CreateNotarizationSession />} />
               </Route>
 
               {/* Admin Routes */}
