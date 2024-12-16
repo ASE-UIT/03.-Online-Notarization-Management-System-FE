@@ -8,6 +8,13 @@ const getAccessTokenFromURL = (url) => {
   return { token, refreshToken };
 };
 
+const getResetPasswordTokenFromURL = (url) => {
+  const urlParams = new URLSearchParams(url);
+  const resetPasswordToken = urlParams.get('resetPassword');
+
+  return resetPasswordToken;
+};
+
 const decodeToken = (token) => {
   if (token) {
     return jwtDecode(token);
@@ -17,6 +24,7 @@ const decodeToken = (token) => {
 const TokenService = {
   getAccessTokenFromURL,
   decodeToken,
+  getResetPasswordTokenFromURL,
 };
 
 export default TokenService;
