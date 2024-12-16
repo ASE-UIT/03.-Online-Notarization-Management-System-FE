@@ -326,7 +326,7 @@ const HistoryNotarizationProfile = () => {
         </Box>
         <Box
           sx={{
-            display: { xs: 'none', sm: 'none', md: 'flex', lg: 'flex', xl: 'flex' },
+            display: 'flex',
             border: !loadingStatus ? '1px solid var(--black-50, #E0E0E0)' : 'none',
             borderRadius: '8px',
             background: white[50],
