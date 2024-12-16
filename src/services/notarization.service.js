@@ -145,7 +145,7 @@ const forwardDocumentStatus = async (documentId, formData) => {
 const approveSignatureByNotary = async (documentId) => {
   try {
     const response = await axiosConfig.post(`${NOTARIZATION_ENDPOINT}/approve-signature-by-notary`, { documentId });
-    return response.data;
+    return response;
   } catch (error) {
     const status = error.response?.status;
     const message = error.response?.data?.message;

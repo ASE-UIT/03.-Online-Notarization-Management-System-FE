@@ -2,7 +2,7 @@ import React from 'react';
 import { Typography, Box } from '@mui/material';
 import { black, primary, white } from '../../../config/theme/themePrimitives';
 
-const NotaryDocumentCard = ({ docType, documentId, date, status }) => {
+const NotaryDocumentCard = ({ docType, documentId, date, status, onClick }) => {
   return (
     <Box
       sx={{
@@ -17,14 +17,16 @@ const NotaryDocumentCard = ({ docType, documentId, date, status }) => {
         },
         transition: 'transform 0.2s',
       }}
+      onClick={onClick}
     >
       <Box
         sx={{
           display: 'flex',
           gap: 2,
           justifyContent: 'space-between',
-          alignItems: 'center',
+          alignItems: { xs: 'flex-start', sm: 'center' },
           mb: 2,
+          flexDirection: { xs: 'column', sm: 'row' },
         }}
       >
         <Typography sx={{ fontSize: 14, fontWeight: 600, color: black[900] }}>{docType}</Typography>
