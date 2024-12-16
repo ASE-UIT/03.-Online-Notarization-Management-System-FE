@@ -8,11 +8,19 @@ const ForgotPassword = () => {
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
 
+    const validateEmail = (email) => {
+        const re = /\S+@\S+\.\S+/;
+        return re.test(email);
+    }
+
     const handleForgotPassword = async () => {
         if (email === '') {
-            toast.error('Vui lòng nhập email của bạn');
+            console.log('Vui lòng nhập email');
+            toast.error('Vui lòng nhập email');
             return;
-        } else if (!email.includes('@')) {
+        }
+        if (!validateEmail(email)) {
+            console.log('Email không hợp lệ');
             toast.error('Email không hợp lệ');
             return;
         }
