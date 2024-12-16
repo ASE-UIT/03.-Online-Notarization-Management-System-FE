@@ -150,7 +150,7 @@ function App() {
                 }
               />
               <Route
-                path="/reset-password"
+                path="/third-party"
                 element={
                   <PublicRoute>
                     <Loader />
