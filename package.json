@@ -39,20 +39,10 @@
     "dev": "react-scripts start"
   },
   "jest": {
-    "testEnvironment": "jsdom",
-    "transform": {
-      "^.+\\.(js|jsx)$": "babel-jest"
-    },
-    "moduleNameMapper": {
-      "\\.(css|less|scss|sass)$": "identity-obj-proxy"
-    },
     "transformIgnorePatterns": [
       "node_modules/(?!(axios|react-markdown|vfile|unist|unified|bail|is-plain-obj|trough|remark-parse|mdast-util-from-markdown|micromark|decode-named-character-reference|character-entities|mdast-util-to-string|space-separated-tokens|comma-separated-tokens|property-information|hast-util-whitespace)/)"
-    ],
-    "testPathIgnorePatterns": [
-      "src/App.test.js"
     ]
-  },
+},
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -76,12 +66,15 @@
     "@babel/preset-react": "^7.26.3",
     "@eslint/js": "^9.11.1",
     "@reduxjs/toolkit": "^2.5.0",
+    "babel-jest": "^29.7.0",
     "eslint": "^8.57.1",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.30.0",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-security": "^3.0.1",
+    "identity-obj-proxy": "^3.0.0",
+    "jest-environment-jsdom": "^29.7.0",
     "prettier": "^3.3.3",
     "redux-mock-store": "^1.5.5"
   }
