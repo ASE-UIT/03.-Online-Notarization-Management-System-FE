@@ -15,8 +15,26 @@ const getUserWallet = async () => {
     }
 }
 
+const transferNft = async (transactionHash, toUserEmail, amount) => {
+    try {
+        const response = await axiosConfig.post(`${USER_WALLET_ENDPOINT}/wallet/transfer`, {
+            transactionHash,
+            toUserEmail,
+            amount
+        });
+        return response;
+    } catch (error) {
+        if (error.response) {
+            throw error.response.status;
+        } else {
+            throw new Error('Network Error');
+        }
+    }
+}
+
 const UserWalletService = {
     getUserWallet,
+    transferNft
 }
 
 export default UserWalletService;

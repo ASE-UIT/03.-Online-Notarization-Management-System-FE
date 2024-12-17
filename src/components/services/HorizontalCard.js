@@ -1,11 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Box, Button, Divider, Typography } from '@mui/material'
 import { black, gray, red, white, yellow } from '../../config/theme/themePrimitives'
 import { Info } from '@mui/icons-material';
 import { PictureAsPdf, Image } from '@mui/icons-material';
+import TransferModal from './TransferModal';
 
 const HorizontalCard = ({ document }) => {
     const isPDF = document.filename.split('.').pop() === 'pdf';
+    const [open, setOpen] = useState(false);
 
     return (
         <Box
@@ -18,6 +20,11 @@ const HorizontalCard = ({ document }) => {
                 padding: 1,
                 border: `1px solid ${gray[200]}`,
                 alignItems: 'center',
+                cursor: 'pointer',
+                transition: 'transform 0.4s',
+                '&:hover': {
+                    transform: 'scale(1.02)',
+                },
             }}
         >
             {/* Image Section */}
@@ -32,6 +39,7 @@ const HorizontalCard = ({ document }) => {
                     backgroundColor: isPDF ? red[50] : yellow[50],
                     marginX: 2
                 }}
+                onClick={() => { window.open(document.tokenURI) }}
             >
                 {isPDF ? (
                     <PictureAsPdf
@@ -184,10 +192,12 @@ const HorizontalCard = ({ document }) => {
                     marginX: 2
                 }}
                 endIcon={<Info />}
-                onClick={() => { window.open(document.tokenURI) }}
+                onClick={() => setOpen(true)}
             >
-                Chi tiết tài liệu
+                Chia sẻ tài liệu
             </Button>
+
+            <TransferModal open={open} onClose={() => setOpen(false)} document={document} />
         </Box>
     );
 };
