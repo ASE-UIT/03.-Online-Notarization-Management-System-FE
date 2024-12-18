@@ -15,8 +15,9 @@ const NotaryFeedback = ({ signature, output, feedback, onSignatureSave, loading 
   };
 
   const onSave = () => {
-    const trimmedDataURL = sigCanvasRef.current.getTrimmedCanvas().toDataURL('image/png');
-    onSignatureSave(trimmedDataURL);
+    sigCanvasRef.current.getTrimmedCanvas().toBlob((blob) => {
+      onSignatureSave(blob);
+    });
   };
 
   const { content, type, missingFiles } = useMemo(() => {
