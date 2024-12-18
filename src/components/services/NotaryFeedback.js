@@ -1,10 +1,24 @@
-import { ErrorRounded, FiberManualRecordRounded, HelpRounded, WarningRounded } from '@mui/icons-material';
-import { Box, Typography } from '@mui/material';
-import { useMemo } from 'react';
+import { ErrorRounded, FiberManualRecordRounded, HelpRounded, OpenInNewRounded, WarningRounded } from '@mui/icons-material';
+import { Box, Button, CircularProgress, Typography } from '@mui/material';
+import { useMemo, useRef, useState } from 'react';
 import { red, black, white, yellow, gray } from '../../config/theme/themePrimitives';
 import { getDocumentNameByCode } from '../../utils/constants';
+import SignatureCanvas from 'react-signature-canvas';
+import useWindowSize from '../../hooks/useWindowSize';
 
-const NotaryFeedback = ({ feedback }) => {
+const NotaryFeedback = ({ signature, output, feedback, onSignatureSave, loading }) => {
+  const { width, height } = useWindowSize();
+  const sigCanvasRef = useRef(null);
+
+  const onClear = () => {
+    sigCanvasRef.current.clear();
+  };
+
+  const onSave = () => {
+    const trimmedDataURL = sigCanvasRef.current.getTrimmedCanvas().toDataURL('image/png');
+    onSignatureSave(trimmedDataURL);
+  };
+
   const { content, type, missingFiles } = useMemo(() => {
     if (!feedback) {
       return {
@@ -45,16 +59,102 @@ const NotaryFeedback = ({ feedback }) => {
     }
   }, [type]);
 
+  const renderOutputSection = () => {
+    if (output) {
+      return output.map((item, index) => (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            px: 2,
+            py: 1,
+            borderRadius: 1,
+            backgroundColor: white[50],
+            border: `1px solid ${black[50]}`,
+            gap: 1,
+          }}
+        >
+          <Typography sx={{ fontSize: 12, fontWeight: 600 }}>Xem tài liệu phản hồi</Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              width: 'fit-content',
+              alignItems: 'center',
+              padding: '4px 12px',
+              borderRadius: 100,
+              backgroundColor: gray[100],
+              cursor: 'pointer',
+              '&:hover': {
+                backgroundColor: gray[200],
+              },
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: 12,
+                fontWeight: 500,
+                color: black[500],
+                marginRight: 1,
+                userSelect: 'none',
+                ':hover': {
+                  textDecoration: 'underline',
+                },
+              }}
+            >
+              {item.filename}
+            </Typography>
+            <OpenInNewRounded sx={{ color: black[500], fontSize: 16 }} />
+          </Box>
+        </Box>
+      ));
+    }
+  };
+
+  const renderSignaturePad = () => {
+    if (output && !signature?.approvalStatus.user.approved) {
+      return (
+        <Box sx={{ backgroundColor: gray[50], mt: 2, px: 2, py: 1, borderRadius: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Typography sx={{ fontSize: 12, fontWeight: 500 }}>Điền chữ ký của bạn vào phần dưới đây</Typography>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button variant="text" onClick={onClear}>
+                <Typography sx={{ fontSize: 12, fontWeight: 500, color: black[900], textTransform: 'none' }}>
+                  Huỷ bỏ
+                </Typography>
+              </Button>
+              <Button variant="contained" onClick={onSave}>
+                {loading ? (
+                  <CircularProgress size={20} color="inherit" />
+                ) : (
+                  <Typography sx={{ fontSize: 12, fontWeight: 500, color: white[50], textTransform: 'none' }}>
+                    Lưu thay đổi
+                  </Typography>
+                )}
+              </Button>
+            </Box>
+          </Box>
+          <Box sx={{ backgroundColor: white[50], borderRadius: 1, border: `1px solid ${black[50]}`, mt: 1 }}>
+            <SignatureCanvas
+              ref={sigCanvasRef}
+              penColor="black"
+              canvasProps={{ width: width - 600, height: 300, className: 'sigCanvas' }}
+            />
+          </Box>
+        </Box>
+      );
+    }
+  };
+
   return (
     <Box
       sx={{
         flex: 1,
+        display: 'flex',
         backgroundColor: white[50],
         boxShadow: 1,
         flexDirection: 'column',
-        alignItems: 'center',
         p: 2,
-        height: '90%',
         borderRadius: 1,
         border: `1px solid ${black[50]}`,
       }}
@@ -104,6 +204,8 @@ const NotaryFeedback = ({ feedback }) => {
           ))}
         </>
       )}
+      {renderOutputSection()}
+      {renderSignaturePad()}
     </Box>
   );
 };

@@ -1,10 +1,12 @@
 import { ArrowBack, PictureAsPdf, PhotoRounded } from '@mui/icons-material';
 import { Backdrop, Box, CircularProgress, IconButton, Modal, Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { dark, red, black, white, gray, yellow, blue, green } from '../../config/theme/themePrimitives';
 import NotaryStep from './NotaryStep';
 import NotaryFeedback from '../services/NotaryFeedback.js';
 import useWindowSize from '../../hooks/useWindowSize';
+import NotarizationService from '../../services/notarization.service.js';
+import { toast } from 'react-toastify';
 
 const InfoRow = ({ label, value }) => (
   <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -37,10 +39,28 @@ const HistoryDetailModal = ({ open, handleClose, data, notaryId, load }) => {
   });
 
   const [currentStep, setCurrentStep] = useState(0);
-  const loading = false;
+  const [loadingSignature, setLoadingSignature] = useState(false);
   const [documentFiles, setDocumentFiles] = useState([]);
   const [imageFiles, setImageFiles] = useState([]);
   const { width, height } = useWindowSize();
+
+  const handleSignatureSave = async (signatureImageUrl) => {
+    const signatureImageFile = new File([signatureImageUrl], notarizationData?.userId + '.png', { type: 'image/png' });
+    const formData = new FormData();
+    formData.append('signatureImage', signatureImageFile);
+    formData.append('documentId', notarizationData._id);
+    setLoadingSignature(true);
+    try {
+      await NotarizationService.approveSignatureByUser(formData);
+      setLoadingSignature(false);
+      toast.success('Lưu chữ ký thành công');
+    } catch (error) {
+      setLoadingSignature(false);
+      if (error.status === 409) {
+        toast.error('Tài liệu này đã được ký số');
+      }
+    }
+  };
 
   const renderStatusBox = (status) => {
     const statusConfig = {
@@ -331,6 +351,7 @@ const HistoryDetailModal = ({ open, handleClose, data, notaryId, load }) => {
                   </Box>
                 </Section>
               )}
+
               {notarizationData.status.status !== undefined && (
                 <>
                   {/* Steps Section */}
@@ -343,21 +364,17 @@ const HistoryDetailModal = ({ open, handleClose, data, notaryId, load }) => {
                     }}
                   >
                     <NotaryStep currentStep={currentStep} />
-                    <NotaryFeedback feedback={notarizationData.status.feedback}></NotaryFeedback>
+                    <NotaryFeedback
+                      signature={notarizationData.signature}
+                      output={notarizationData.output}
+                      feedback={notarizationData.status.feedback}
+                      onSignatureSave={handleSignatureSave}
+                      loading={loadingSignature}
+                    />
                   </Box>
                 </>
               )}
             </Box>
-
-            <Backdrop
-              sx={{
-                color: '#fff',
-                zIndex: (theme) => theme.zIndex.modal + 1,
-              }}
-              open={loading}
-            >
-              <CircularProgress color="inherit" />
-            </Backdrop>
           </Box>
         )}
       </Box>
