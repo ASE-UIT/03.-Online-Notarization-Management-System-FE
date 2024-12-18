@@ -80,6 +80,9 @@ const NotarizationFormContent = ({
   handleRemoveFile,
   loadingNotarization,
   notarizationData,
+  handleDocumentWalletChange,
+  documentWalletFiles,
+  handleRemoveDocumentWalletFile,
 }) => {
   const stepTitles = [
     'Chọn lĩnh vực và dịch vụ công chứng bạn cần',
@@ -143,10 +146,13 @@ const NotarizationFormContent = ({
               {notarizationData?.notaryService?.required_documents.map((document, index) => (
                 <FileUploadSection
                   key={index}
-                  uploadedFiles={uploadedFiles.filter((file) => file.type === document)}
+                  currentFiles={uploadedFiles.filter((file) => file.type === document)}
                   handleFileChange={(e) => handleFileChange(e, document)}
                   handleRemoveFile={handleRemoveFile}
                   title={getDocumentNameByCode(document)}
+                  handleDocumentWalletChange={(file) => handleDocumentWalletChange(file, document)}
+                  documentWalletFiles={documentWalletFiles.filter((file) => file.type === document)}
+                  handleRemoveDocumentWalletFile={handleRemoveDocumentWalletFile}
                 />
               ))}
             </Box>
@@ -188,10 +194,13 @@ const NotarizationFormContent = ({
               {notarizationData?.notaryService?.required_documents.map((document, index) => (
                 <FileUploadSection
                   key={index}
-                  uploadedFiles={uploadedFiles.filter((file) => file.type === document)}
+                  currentFiles={uploadedFiles.filter((file) => file.type === document)}
                   handleFileChange={(e) => handleFileChange(e, document)}
                   handleRemoveFile={handleRemoveFile}
                   title={getDocumentNameByCode(document)}
+                  handleDocumentWalletChange={(file) => handleDocumentWalletChange(file, document)}
+                  documentWalletFiles={documentWalletFiles.filter((file) => file.type === document)}
+                  handleRemoveDocumentWalletFile={handleRemoveDocumentWalletFile}
                   confirmed
                 />
               ))}
