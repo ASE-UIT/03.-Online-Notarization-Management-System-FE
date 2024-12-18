@@ -1,13 +1,13 @@
 import { ErrorRounded, FiberManualRecordRounded, HelpRounded, OpenInNewRounded, WarningRounded } from '@mui/icons-material';
 import { Box, Button, CircularProgress, Typography } from '@mui/material';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import { red, black, white, yellow, gray } from '../../config/theme/themePrimitives';
 import { getDocumentNameByCode } from '../../utils/constants';
 import SignatureCanvas from 'react-signature-canvas';
 import useWindowSize from '../../hooks/useWindowSize';
 
 const NotaryFeedback = ({ signature, output, feedback, onSignatureSave, loading }) => {
-  const { width, height } = useWindowSize();
+  const { width } = useWindowSize();
   const sigCanvasRef = useRef(null);
 
   const onClear = () => {

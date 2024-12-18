@@ -1,12 +1,12 @@
+import React, { useEffect, useState } from 'react';
+import { Box, IconButton, Modal, Typography } from '@mui/material';
 import { ArrowBack, PictureAsPdf, PhotoRounded } from '@mui/icons-material';
-import { Backdrop, Box, CircularProgress, IconButton, Modal, Typography } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
 import { dark, red, black, white, gray, yellow, blue, green } from '../../config/theme/themePrimitives';
+import { toast } from 'react-toastify';
 import NotaryStep from './NotaryStep';
 import NotaryFeedback from '../services/NotaryFeedback.js';
 import useWindowSize from '../../hooks/useWindowSize';
 import NotarizationService from '../../services/notarization.service.js';
-import { toast } from 'react-toastify';
 
 const InfoRow = ({ label, value }) => (
   <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -31,13 +31,8 @@ const Section = ({ title, children }) => (
   </Box>
 );
 
-const HistoryDetailModal = ({ open, handleClose, data, notaryId, load }) => {
-  let notarizationData;
-
-  data.forEach((element) => {
-    if (element._id === notaryId) notarizationData = element;
-  });
-
+const HistoryDetailModal = ({ open, handleClose, data, notaryId }) => {
+  const notarizationData = data.find((item) => item._id === notaryId);
   const [currentStep, setCurrentStep] = useState(0);
   const [loadingSignature, setLoadingSignature] = useState(false);
   const [documentFiles, setDocumentFiles] = useState([]);
@@ -52,13 +47,16 @@ const HistoryDetailModal = ({ open, handleClose, data, notaryId, load }) => {
     setLoadingSignature(true);
     try {
       await NotarizationService.approveSignatureByUser(formData);
-      setLoadingSignature(false);
       toast.success('Lưu chữ ký thành công');
     } catch (error) {
       setLoadingSignature(false);
       if (error.status === 409) {
         toast.error('Tài liệu này đã được ký số');
+      } else {
+        toast.error('Đã xảy ra lỗi khi lưu chữ ký');
       }
+    } finally {
+      setLoadingSignature(false);
     }
   };
 
@@ -89,111 +87,51 @@ const HistoryDetailModal = ({ open, handleClose, data, notaryId, load }) => {
     );
   };
 
-  const renderDocumentFiles = (file) => {
-    return (
-      <Box
-        sx={{
-          p: 1,
-          display: 'flex',
-          flexDirection: 'row',
-          gap: 2,
-          borderRadius: 1,
-          boxShadow: 1,
-          border: `1px solid ${black[50]}`,
-          alignItems: 'center',
-          width: 'fit-content',
-        }}
-      >
-        <Box
-          sx={{
-            borderRadius: 100,
-            backgroundColor: red[50],
-            justifyContent: 'center',
-            alignItems: 'center',
-            display: 'flex',
-            p: 1,
-          }}
-        >
-          <PictureAsPdf sx={{ fontSize: 14, color: red[500] }} />
-        </Box>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            minWidth: '100px',
-            overflow: 'clip',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          <Typography
-            onClick={() => window.open(file.firebaseUrl)}
-            sx={{
-              flex: 1,
-              fontSize: 12,
-              fontWeight: 500,
-              cursor: 'pointer',
-              ':hover': {
-                textDecoration: 'underline',
-              },
-            }}
-          >
-            {file.filename}
-          </Typography>
-        </Box>
-      </Box>
-    );
-  };
+  const renderFile = (file, isImage) => {
+    const iconConfig = isImage
+      ? { bgColor: yellow[50], color: yellow[500], Icon: PhotoRounded }
+      : { bgColor: red[50], color: red[500], Icon: PictureAsPdf };
 
-  const renderImageFiles = (file) => {
     return (
       <Box
+        key={file.filename}
         sx={{
-          p: 1,
           display: 'flex',
-          flexDirection: 'row',
           gap: 2,
+          p: 1,
           borderRadius: 1,
-          boxShadow: 1,
           border: `1px solid ${black[50]}`,
           alignItems: 'center',
+          boxShadow: 1,
           width: 'fit-content',
         }}
       >
         <Box
           sx={{
+            backgroundColor: iconConfig.bgColor,
+            color: iconConfig.color,
             borderRadius: 100,
-            backgroundColor: yellow[50],
+            display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            display: 'flex',
             p: 1,
           }}
         >
-          <PhotoRounded sx={{ fontSize: 14, color: yellow[500] }} />
+          <iconConfig.Icon sx={{ fontSize: 14 }} />
         </Box>
-        <Box
+        <Typography
+          onClick={() => window.open(file.firebaseUrl)}
           sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            minWidth: '100px',
-            overflow: 'clip',
+            fontSize: 12,
+            fontWeight: 500,
+            cursor: 'pointer',
             textOverflow: 'ellipsis',
+            overflow: 'hidden',
+            ':hover': { textDecoration: 'underline' },
           }}
         >
-          <Typography
-            sx={{
-              flex: 1,
-              fontSize: 12,
-              fontWeight: 500,
-              cursor: 'pointer',
-              ':hover': {
-                textDecoration: 'underline',
-              },
-            }}
-          >
-            {file.filename}
-          </Typography>
-        </Box>
+          {file.filename}
+        </Typography>
       </Box>
     );
   };
@@ -202,11 +140,9 @@ const HistoryDetailModal = ({ open, handleClose, data, notaryId, load }) => {
     if (notarizationData?.files) {
       const [docs, images] = notarizationData.files.reduce(
         ([docAcc, imgAcc], file) => {
-          if (['.pdf', '.docx'].some((ext) => file.filename?.toString().toLowerCase().endsWith(ext))) {
-            docAcc.push(file);
-          } else if (['.png', '.jpg', '.jpeg'].some((ext) => file.filename?.toString().toLowerCase().endsWith(ext))) {
-            imgAcc.push(file);
-          }
+          const filename = file.filename?.toLowerCase();
+          if (filename?.endsWith('.pdf') || filename?.endsWith('.docx')) docAcc.push(file);
+          if (['.png', '.jpg', '.jpeg'].some((ext) => filename?.endsWith(ext))) imgAcc.push(file);
           return [docAcc, imgAcc];
         },
         [[], []],
@@ -215,168 +151,119 @@ const HistoryDetailModal = ({ open, handleClose, data, notaryId, load }) => {
       setImageFiles(images);
     }
 
-    if (notarizationData.status.status === 'pending') setCurrentStep(0);
-    if (notarizationData.status.status === 'processing') setCurrentStep(1);
-    if (notarizationData.status.status === 'verification') setCurrentStep(2);
-    if (notarizationData.status.status === 'digitalSignature') setCurrentStep(3);
-    if (notarizationData.status.status === 'completed') setCurrentStep(4);
+    const statusSteps = {
+      pending: 0,
+      processing: 1,
+      verification: 2,
+      digitalSignature: 3,
+      completed: 4,
+    };
+
+    setCurrentStep(statusSteps[notarizationData?.status?.status] ?? 0);
   }, [notarizationData]);
 
   return (
     <Modal open={open} onClose={handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
       <Box>
-        {load ? (
+        <Box>
           <Box
             sx={{
               position: 'absolute',
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: `${width}px - 20%`,
-              height: `${height}px - 50%`,
+              width: `calc(${width}px - 20%)`,
+              height: `calc(${height}px - 20%)`,
               backgroundColor: white[50],
               borderRadius: 2,
               overflowY: 'scroll',
               display: 'flex',
+              flexDirection: 'column',
               boxShadow: 1,
               p: 2,
               gap: 1,
-              alignItems: 'center',
-              justifyContent: 'center',
+              scrollbarWidth: { xs: 'none', sm: 'auto' },
             }}
           >
-            <CircularProgress></CircularProgress>
-          </Box>
-        ) : (
-          <Box>
+            {/* Header Section */}
             <Box
               sx={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: `calc(${width}px - 20%)`,
-                height: `calc(${height}px - 20%)`,
-                backgroundColor: white[50],
-                borderRadius: 2,
-                overflowY: 'scroll',
                 display: 'flex',
-                flexDirection: 'column',
-                boxShadow: 1,
-                p: 2,
+                justifyContent: 'space-between',
+                alignItems: { xs: 'flex-start', sm: 'center' },
+                flexDirection: { xs: 'column', sm: 'row' },
                 gap: 1,
-                scrollbarWidth: { xs: 'none', sm: 'auto' },
               }}
             >
-              {/* Header Section */}
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: { xs: 'flex-start', sm: 'center' },
-                  flexDirection: { xs: 'column', sm: 'row' },
-                  gap: 1,
-                }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
-                  <IconButton onClick={handleClose}>
-                    <ArrowBack
-                      sx={{
-                        color: black[900],
-                      }}
-                      fontSize="small"
-                    />
-                  </IconButton>
-                  <Box
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
+                <IconButton onClick={handleClose}>
+                  <ArrowBack
                     sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: { xs: 'flex-start', sm: 'center' },
-                      flexDirection: { xs: 'column', sm: 'row' },
-                      gap: 1,
-                      width: '100%',
+                      color: black[900],
                     }}
-                  >
-                    <Typography sx={{ fontSize: 'clamp(14px, 2vw, 16px)', fontWeight: 600, color: black[900] }}>
-                      Chi tiết hồ sơ công chứng {notarizationData._id && `- Mã số: #${notarizationData._id}`}
-                    </Typography>
-                    {renderStatusBox(notarizationData.status.status)}
-                  </Box>
+                    fontSize="small"
+                  />
+                </IconButton>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: { xs: 'flex-start', sm: 'center' },
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    gap: 1,
+                    width: '100%',
+                  }}
+                >
+                  <Typography sx={{ fontSize: 'clamp(14px, 2vw, 16px)', fontWeight: 600, color: black[900] }}>
+                    Chi tiết hồ sơ công chứng {notarizationData._id && `- Mã số: #${notarizationData._id}`}
+                  </Typography>
+                  {renderStatusBox(notarizationData.status.status)}
                 </Box>
               </Box>
-              {/* User Information Section */}
-              <Section title="Thông tin khách hàng">
-                <InfoRow label="Họ và tên:" value={notarizationData?.requesterInfo?.fullName} />
-                <InfoRow label="Số CMND/CCCD:" value={notarizationData?.requesterInfo?.citizenId} />
-                <InfoRow label="Số điện thoại:" value={notarizationData?.requesterInfo?.phoneNumber} />
-                <InfoRow label="Email:" value={notarizationData?.requesterInfo?.email} />
-              </Section>
-
-              {/* Notarization Information Section */}
-              <Section title="Thông tin công chứng">
-                <InfoRow label="Lĩnh vực công chứng:" value={notarizationData?.notarizationField?.name} />
-                <InfoRow label="Dịch vụ công chứng:" value={notarizationData?.notarizationService?.name} />
-              </Section>
-
-              {/* Files Section */}
-              {documentFiles.length > 0 && (
-                <Section title={'Tệp'}>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',
-                      gap: 1,
-                      flex: 1,
-                    }}
-                  >
-                    {documentFiles.map((file) => renderDocumentFiles(file))}
-                  </Box>
-                </Section>
-              )}
-
-              {/* Images Section */}
-              {imageFiles.length > 0 && (
-                <Section title={'Ảnh'}>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',
-                      gap: 1,
-                      flex: 1,
-                    }}
-                  >
-                    {imageFiles.map((file) => renderImageFiles(file))}
-                  </Box>
-                </Section>
-              )}
-
-              {notarizationData.status.status !== undefined && (
-                <>
-                  {/* Steps Section */}
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      gap: 4,
-                      p: { xs: 0, sm: 2 },
-                    }}
-                  >
-                    <NotaryStep currentStep={currentStep} />
-                    <NotaryFeedback
-                      signature={notarizationData.signature}
-                      output={notarizationData.output}
-                      feedback={notarizationData.status.feedback}
-                      onSignatureSave={handleSignatureSave}
-                      loading={loadingSignature}
-                    />
-                  </Box>
-                </>
-              )}
             </Box>
+            {/* User Information Section */}
+            <Section title="Thông tin khách hàng">
+              <InfoRow label="Họ và tên:" value={notarizationData?.requesterInfo?.fullName} />
+              <InfoRow label="Số CMND/CCCD:" value={notarizationData?.requesterInfo?.citizenId} />
+              <InfoRow label="Số điện thoại:" value={notarizationData?.requesterInfo?.phoneNumber} />
+              <InfoRow label="Email:" value={notarizationData?.requesterInfo?.email} />
+            </Section>
+
+            {/* Notarization Information Section */}
+            <Section title="Thông tin công chứng">
+              <InfoRow label="Lĩnh vực công chứng:" value={notarizationData?.notarizationField?.name} />
+              <InfoRow label="Dịch vụ công chứng:" value={notarizationData?.notarizationService?.name} />
+            </Section>
+
+            {documentFiles.length > 0 && (
+              <Section title="Tệp">{documentFiles.map((file) => renderFile(file, false))}</Section>
+            )}
+            {imageFiles.length > 0 && <Section title="Ảnh">{imageFiles.map((file) => renderFile(file, true))}</Section>}
+
+            {notarizationData.status.status !== undefined && (
+              <>
+                {/* Steps Section */}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    gap: 4,
+                    p: { xs: 0, sm: 2 },
+                  }}
+                >
+                  <NotaryStep currentStep={currentStep} />
+                  <NotaryFeedback
+                    signature={notarizationData.signature}
+                    output={notarizationData.output}
+                    feedback={notarizationData.status.feedback}
+                    onSignatureSave={handleSignatureSave}
+                    loading={loadingSignature}
+                  />
+                </Box>
+              </>
+            )}
           </Box>
-        )}
+        </Box>
       </Box>
     </Modal>
   );

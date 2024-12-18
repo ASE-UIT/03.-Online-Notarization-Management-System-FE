@@ -29,4 +29,13 @@ export const DOCUMENT_TYPE_LABELS = {
   default: 'Tài liệu không xác định',
 };
 
+export const STATUS_TYPES = {
+  All: 'Tất cả',
+  Pending: 'Chờ xử lý',
+  Processing: 'Đang xử lý',
+  DigitalSignature: 'Sẵn sàng ký số',
+  Completed: 'Hoàn tất',
+  Rejected: 'Không hợp lệ',
+};
+
 export const getDocumentNameByCode = (code) => DOCUMENT_TYPE_LABELS[code] || DOCUMENT_TYPE_LABELS.default;
