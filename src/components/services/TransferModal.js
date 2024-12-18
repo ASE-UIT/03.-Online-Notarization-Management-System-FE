@@ -71,6 +71,7 @@ const TransferModal = ({ open, onClose, document }) => {
     const [options, setOptions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [amount, setAmount] = useState(1);
+    const [sending, setSending] = useState(false);
     const disabled = !email || !amount;
 
     const debounce = (func, wait) => {
@@ -131,6 +132,7 @@ const TransferModal = ({ open, onClose, document }) => {
         }
 
         try {
+            setSending(true);
             const response = await UserWalletService.transferNft(document.transactionHash, email, amount);
             if (response.status === 200) {
                 toast.success('Chuyển tài liệu thành công.');
@@ -138,9 +140,11 @@ const TransferModal = ({ open, onClose, document }) => {
             } else {
                 toast.error('Chuyển tài liệu thất bại.');
             }
+            setSending(false);
         } catch (error) {
             console.error('Error transferring NFT:', error);
             toast.error('Chuyển tài liệu thất bại.');
+            setSending(false);
         }
     };
 
@@ -168,7 +172,7 @@ const TransferModal = ({ open, onClose, document }) => {
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    width: { xs: '90%', sm: '60%', md: '40%' },
+                    width: { xs: '70%', sm: '60%', md: '40%' },
                     bgcolor: white[50],
                     boxShadow: 24,
                     borderRadius: 1,
@@ -271,13 +275,13 @@ const TransferModal = ({ open, onClose, document }) => {
                             border: `2px solid ${gray[200]}`,
                         },
                         alignSelf: 'flex-start',
-                        paddingX: 6,
+                        width: 150,
                         paddingY: 1,
                         marginTop: 2,
                     }}
                     disabled={disabled}
                 >
-                    <Typography sx={{ fontSize: 16, fontWeight: 600 }}>Chia sẻ</Typography>
+                    {sending ? <CircularProgress size={24} color="inherit" /> : <Typography sx={{ fontSize: 16, fontWeight: 600 }}>Chia sẻ</Typography>}
                 </Button>
             </Box>
         </Modal>
