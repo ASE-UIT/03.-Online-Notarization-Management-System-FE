@@ -101,6 +101,7 @@ const NotaryFeedback = ({ signature, output, feedback, onSignatureSave, loading 
                   textDecoration: 'underline',
                 },
               }}
+              onClick={() => window.open(item.firebaseUrl, '_blank')}
             >
               {item.filename}
             </Typography>
@@ -112,37 +113,48 @@ const NotaryFeedback = ({ signature, output, feedback, onSignatureSave, loading 
   };
 
   const renderSignaturePad = () => {
-    if (output && !signature?.approvalStatus.user.approved) {
-      return (
-        <Box sx={{ backgroundColor: gray[50], mt: 2, px: 2, py: 1, borderRadius: 1 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Typography sx={{ fontSize: 12, fontWeight: 500 }}>Điền chữ ký của bạn vào phần dưới đây</Typography>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <Button variant="text" onClick={onClear}>
-                <Typography sx={{ fontSize: 12, fontWeight: 500, color: black[900], textTransform: 'none' }}>
-                  Huỷ bỏ
-                </Typography>
-              </Button>
-              <Button variant="contained" onClick={onSave}>
-                {loading ? (
-                  <CircularProgress size={20} color="inherit" />
-                ) : (
-                  <Typography sx={{ fontSize: 12, fontWeight: 500, color: white[50], textTransform: 'none' }}>
-                    Lưu thay đổi
+    if (output) {
+      if (!signature?.approvalStatus.user.approved) {
+        return (
+          <Box sx={{ backgroundColor: gray[50], mt: 2, px: 2, py: 1, borderRadius: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Typography sx={{ fontSize: 12, fontWeight: 500 }}>Điền chữ ký của bạn vào phần dưới đây</Typography>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button variant="text" onClick={onClear}>
+                  <Typography sx={{ fontSize: 12, fontWeight: 500, color: black[900], textTransform: 'none' }}>
+                    Huỷ bỏ
                   </Typography>
-                )}
-              </Button>
+                </Button>
+                <Button variant="contained" onClick={onSave}>
+                  {loading ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : (
+                    <Typography sx={{ fontSize: 12, fontWeight: 500, color: white[50], textTransform: 'none' }}>
+                      Lưu thay đổi
+                    </Typography>
+                  )}
+                </Button>
+              </Box>
+            </Box>
+            <Box sx={{ backgroundColor: white[50], borderRadius: 1, border: `1px solid ${black[50]}`, mt: 1 }}>
+              <SignatureCanvas
+                ref={sigCanvasRef}
+                penColor="black"
+                canvasProps={{ width: width - 600, height: 300, className: 'sigCanvas' }}
+              />
             </Box>
           </Box>
-          <Box sx={{ backgroundColor: white[50], borderRadius: 1, border: `1px solid ${black[50]}`, mt: 1 }}>
-            <SignatureCanvas
-              ref={sigCanvasRef}
-              penColor="black"
-              canvasProps={{ width: width - 600, height: 300, className: 'sigCanvas' }}
-            />
+        );
+      } else if (signature?.signatureImage !== null) {
+        return (
+          <Box sx={{ backgroundColor: gray[50], mt: 2, px: 2, py: 1, borderRadius: 1 }}>
+            <Typography sx={{ fontSize: 12, fontWeight: 500 }}>Chữ ký của bạn</Typography>
+            <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+              <img src={signature.signatureImage} alt="Your signature" />
+            </Box>
           </Box>
-        </Box>
-      );
+        );
+      }
     }
   };
 
