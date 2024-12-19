@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 import NotaryDocumentDetailsModal from '../../../src/components/modals/NotaryDocumentDetailsModal';
 import React from 'react';
 
