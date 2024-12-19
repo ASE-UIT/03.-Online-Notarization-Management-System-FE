@@ -20,7 +20,7 @@ const NotaryManagement = () => {
   const [totalNotarizations, setTotalNotarizations] = useState(0);
   const [totalSessions, setTotalSessions] = useState(0);
   const [notaryPaginationModel, setNotaryPaginationModel] = useState({
-    pageSize: 25,
+    pageSize: 10,
     page: 0,
   });
   const [sessionPaginationModel, setSessionPaginationModel] = useState({

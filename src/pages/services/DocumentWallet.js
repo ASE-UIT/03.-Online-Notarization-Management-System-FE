@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Skeleton } from '@mui/material';
 import HorizontalCard from '../../components/services/HorizontalCard';
 import BoxCard from '../../components/services/BoxCard';
 import UserWalletService from '../../services/userwallet.service';
 
 const DocumentWallet = () => {
     const [documentWallet, setDocumentWallet] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const fetchDocumentWallet = async () => {
             try {
+                setLoading(true);
                 const response = await UserWalletService.getUserWallet();
                 if (response.status === 200) {
                     setDocumentWallet(response.data.nftItems);
                 } else {
                     console.log(response);
                 }
+                setLoading(false);
             } catch (error) {
                 console.log(error);
             }
@@ -40,9 +43,13 @@ const DocumentWallet = () => {
                     padding: 3,
                 }}
             >
-                {documentWallet.map((document, index) => (
-                    <HorizontalCard key={index} document={document} />
-                ))}
+                {loading
+                    ? Array.from({ length: 5 }).map((_, index) => (
+                        <Skeleton key={index} variant="rectangular" height={80} sx={{ borderRadius: 1 }} />
+                    ))
+                    : documentWallet.map((document, index) => (
+                        <HorizontalCard key={index} document={document} />
+                    ))}
             </Box>
 
             <Box
@@ -53,9 +60,13 @@ const DocumentWallet = () => {
                     padding: 3,
                 }}
             >
-                {documentWallet.map((document, index) => (
-                    <BoxCard key={index} document={document} />
-                ))}
+                {loading
+                    ? Array.from({ length: 5 }).map((_, index) => (
+                        <Skeleton key={index} variant="rectangular" height={120} sx={{ borderRadius: 1 }} />
+                    ))
+                    : documentWallet.map((document, index) => (
+                        <BoxCard key={index} document={document} />
+                    ))}
             </Box>
         </Box>
     );

@@ -3,6 +3,19 @@ import { Box, Typography, Avatar } from '@mui/material';
 import { blue, dark } from '../../../config/theme/themePrimitives';
 
 const StatCard = ({ title, value, percentageChange, color, icon }) => {
+  const shortenDecimal = (numStr) => {
+    const num = parseFloat(numStr);
+    if (isNaN(num)) return numStr;
+    return num.toFixed(2);
+  };
+
+  const formatValue = (value) => {
+    if (title === 'Tổng doanh thu') {
+      return value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+    }
+    return value;
+  }
+
   return (
     <Box
       sx={{
@@ -18,7 +31,7 @@ const StatCard = ({ title, value, percentageChange, color, icon }) => {
       }}
     >
       <Avatar sx={{ width: 32, height: 32, backgroundColor: color[500] }}>{icon}</Avatar>
-      <Typography sx={{ fontSize: 20, fontWeight: 600, color: dark[900] }}>{value}</Typography>
+      <Typography sx={{ fontSize: 20, fontWeight: 600, color: dark[900] }}>{formatValue(value)}</Typography>
       <Typography
         sx={{
           fontSize: 16,
@@ -40,7 +53,7 @@ const StatCard = ({ title, value, percentageChange, color, icon }) => {
           overflow: 'hidden',
         }}
       >
-        {percentageChange}
+        {shortenDecimal(percentageChange) + '%'}
       </Typography>
     </Box>
   );
