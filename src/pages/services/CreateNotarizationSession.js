@@ -8,10 +8,8 @@ import NotarySessionForm from './NotarySessionForm';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 import SessionService from '../../services/session.service';
-import { use } from 'react';
 import JoinSessionModal from './JoinSessionModal';
 import { useSearchParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 
 const CreateNotarizationSession = () => {
   const [openNotarySessionForm, setOpenNotarySessionForm] = useState(false);
@@ -30,15 +28,8 @@ const CreateNotarizationSession = () => {
     try {
       const response = await SessionService.getSessionsByUserId();
 
-      const sessions = [];
-      response.results.map((session) => {
-        if (session.users.length > 0) {
-          session.users.map((user) => {
-            if (user.status !== 'rejected') {
-              sessions.push(session);
-            }
-          });
-        }
+      const sessions = response.results.filter((session) => {
+        return session.users.every((user) => user.status !== 'rejected');
       });
 
       setSessions(sessions);
@@ -285,7 +276,7 @@ const CreateNotarizationSession = () => {
               }}
             >
               {currentSessions.map((session, index) => (
-                <SessionCard key={index} session={session} />
+                <SessionCard key={session._id} session={session} />
               ))}
             </Box>
           ) : (
