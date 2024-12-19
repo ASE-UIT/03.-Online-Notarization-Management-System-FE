@@ -66,10 +66,10 @@ const FileUploadSection = ({ uploadedFiles, handleFileChange, handleRemoveFile, 
                 textDecoration: 'underline',
               },
             }}
-            onClick={() => window.open(file.file.url || URL.createObjectURL(file.file), '_blank')}
+            onClick={() => window.open(file.file.url || file.file.firebaseUrl || URL.createObjectURL(file.file), '_blank')}
           >
             <Typography sx={{ display: 'list-item', ml: '1rem', fontSize: 14, color: black[500] }}>
-              {file.file.name}
+              {file.file.name || file.file.filename}
             </Typography>
             <OpenInNewRounded sx={{ fontSize: 14, color: black[500] }} />
           </Box>

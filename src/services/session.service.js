@@ -69,6 +69,43 @@ const getSessionsByUserId = async () => {
   }
 };
 
+const uploadSessionDocument = async (sessionId, files) => {
+  try {
+    const formData = new FormData();
+    files.forEach((file) => formData.append('files', file));
+    const response = await axiosConfig.post(`${SESSION_ENDPOINT}/upload-session-document/${sessionId}`, formData);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      return error.response.data;
+    }
+    return error.message;
+  }
+};
+
+const joinSession = async (sessionId, action) => {
+  try {
+    const response = await axiosConfig.post(`${SESSION_ENDPOINT}/joinSession/${sessionId}`, { action });
+    return response.data;
+  } catch (error) {
+    const status = error.response?.status;
+    const message = error.response?.data?.message;
+    return { status, message };
+  }
+};
+
+const deleteSessionFile = async (sessionId, fileId) => {
+  try {
+    const response = await axiosConfig.delete(`${SESSION_ENDPOINT}/delete-session-document/${sessionId}/${fileId}`);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      return error.response.data;
+    }
+    return error.message;
+  }
+};
+
 const SessionService = {
   createSession,
   getAllSessions,
@@ -76,6 +113,9 @@ const SessionService = {
   deleteUserOutOfSession,
   addUser,
   getSessionsByUserId,
+  uploadSessionDocument,
+  joinSession,
+  deleteSessionFile,
 };
 
 export default SessionService;

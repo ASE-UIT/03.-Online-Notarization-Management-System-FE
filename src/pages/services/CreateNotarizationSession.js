@@ -8,21 +8,40 @@ import NotarySessionForm from './NotarySessionForm';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 import SessionService from '../../services/session.service';
+import { use } from 'react';
+import JoinSessionModal from './JoinSessionModal';
+import { useSearchParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const CreateNotarizationSession = () => {
   const [openNotarySessionForm, setOpenNotarySessionForm] = useState(false);
+  const [openJoinSessionModal, setOpenJoinSessionModal] = useState(false);
   const [sessions, setSessions] = useState([]);
   const [searchingSessions, setSearchingSessions] = useState([]);
   const [searchValue, setSearchValue] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const sessionsPerPage = 6;
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get('sessionId');
 
   const fetchSessions = async () => {
     setLoading(true);
     try {
       const response = await SessionService.getSessionsByUserId();
-      setSessions(response?.results || []);
+
+      const sessions = [];
+      response.results.map((session) => {
+        if (session.users.length > 0) {
+          session.users.map((user) => {
+            if (user.status !== 'rejected') {
+              sessions.push(session);
+            }
+          });
+        }
+      });
+
+      setSessions(sessions);
     } catch (error) {
       console.error('Error fetching sessions:', error);
       setSessions([]);
@@ -100,6 +119,13 @@ const CreateNotarizationSession = () => {
       <Skeleton width="40%" height={20} />
     </Box>
   ));
+
+  useEffect(() => {
+    if (sessionId) {
+      setOpenJoinSessionModal(true);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
 
   return (
     <Box sx={{ display: 'flex', width: '100%', height: '100vh', flexDirection: 'column' }}>
@@ -314,6 +340,7 @@ const CreateNotarizationSession = () => {
           setOpen={setOpenNotarySessionForm}
           handleSuccess={handleAddSessionSuccess}
         />
+        <JoinSessionModal sessionId={sessionId} open={openJoinSessionModal} setOpen={setOpenJoinSessionModal} />
       </Box>
     </Box>
   );
