@@ -104,26 +104,25 @@ const HistoryDataTable = ({ filterStatus, searchText, rows, headCells, statusTyp
   };
 
   const handleSelectAllClick = (event) => {
-      return;
+    return;
   };
 
   const handleClick = (event, id, notaryId) => {
     setLoading(true);
     let newSelected = [];
-    newSelected = newSelected.concat(selected, id); 
+    newSelected = newSelected.concat(selected, id);
     setSelected(newSelected);
-    setNotaryId(notaryId);      
+    setNotaryId(notaryId);
     setOpen(true);
     setTimeout(() => {
       setLoading(false);
-    }, 200)
+    }, 200);
   };
 
   const handleCloseModal = () => {
     setOpen(false);
     setSelected([]);
-    
-  }
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -156,7 +155,7 @@ const HistoryDataTable = ({ filterStatus, searchText, rows, headCells, statusTyp
     setSelected([]);
 
     return filteredRows.sort(getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-  }, [filterStatus, searchText, order, orderBy, page, rowsPerPage]);
+  }, [filterStatus, searchText, order, orderBy, page, rowsPerPage, rows, statusTypes.All]);
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -256,7 +255,15 @@ const HistoryDataTable = ({ filterStatus, searchText, rows, headCells, statusTyp
           }}
         />
       </Paper>
-       {notaryId && <HistoryDetailModal open={open} handleClose={handleCloseModal} data={data} notaryId={notaryId} load={loading}></HistoryDetailModal>}
+      {notaryId && (
+        <HistoryDetailModal
+          open={open}
+          handleClose={handleCloseModal}
+          data={data}
+          notaryId={notaryId}
+          load={loading}
+        ></HistoryDetailModal>
+      )}
     </Box>
   );
 };

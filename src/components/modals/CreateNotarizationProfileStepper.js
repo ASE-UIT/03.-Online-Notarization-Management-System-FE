@@ -8,7 +8,6 @@ const steps = [
   { label: 'Chọn loại công chứng' },
   { label: 'Cung cấp thông tin' },
   { label: 'Kiểm tra lại yêu cầu' },
-  { label: 'Thanh toán' },
 ];
 
 const CustomConnector = styled(StepConnector)(({ lineColor }) => ({

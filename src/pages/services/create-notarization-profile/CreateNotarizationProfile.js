@@ -58,15 +58,22 @@ const CreateNotarizationProfile = () => {
   }, [fieldsAndServices, selectedField]);
 
   const handleInputChange = (event) => {
-    if (event.target.name === 'amount') {
-      setNotarizationData((prev) => ({ ...prev, [event.target.name]: parseInt(event.target.value) }));
+    const { name, value } = event.target;
+
+    if (name === 'amount') {
+      setNotarizationData((prev) => ({
+        ...prev,
+        [name]: value === '' ? undefined : parseInt(value, 10),
+      }));
       return;
     }
+
     setNotarizationData((prev) => ({
       ...prev,
-      requesterInfo: { ...prev.requesterInfo, [event.target.name]: event.target.value },
+      requesterInfo: { ...prev.requesterInfo, [name]: value },
     }));
   };
+
 
   const handleFileChange = (e, documentType) => {
     const files = Array.from(e.target.files);

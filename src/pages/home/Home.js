@@ -8,7 +8,6 @@ import Reviews from "../../components/home/Reviews";
 import Usages from "../../components/home/Usages";
 import DocumentSupport from "../../components/home/DocumentSupport";
 import { dark } from "../../config/theme/themePrimitives";
-import NotaryDocumentDetailsModal from "../../components/modals/NotaryDocumentDetailsModal";
 
 const Home = () => {
 	const [showChatbox, setShowChatbox] = useState(false);
@@ -272,6 +271,7 @@ const Home = () => {
 				onClick={handleChatboxClick}
 			>
 				<AssistantIcon
+					data-testid = 'assistant-icon'
 					sx={{
 						position: "fixed",
 						width: "3vw",
@@ -305,6 +305,7 @@ const Home = () => {
 				}}
 			>
 				<PhoneIcon
+					data-testid ='phone-icon'
 					sx={{
 						position: "fixed",
 						width: "3vw",

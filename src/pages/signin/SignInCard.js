@@ -13,7 +13,7 @@ import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import ForgotPassword from './ForgotPassword';
+import ForgotPasswordModal from './ForgotPasswordModal';
 import { GoogleIcon } from './CustomIcons';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -74,7 +74,7 @@ export default function SignInCard() {
   };
 
   const handleClickOpen = () => {
-    setOpen(true);
+    window.location.href = '/forgot-password';
   };
 
   const handleClose = () => {
@@ -118,6 +118,7 @@ export default function SignInCard() {
     <Card variant="outlined">
       <Box sx={{ display: { xs: 'flex', md: 'none' } }}></Box>
       <Typography
+        data-testid=".signinH1"
         component="h1"
         variant="h4"
         sx={{
@@ -194,13 +195,14 @@ export default function SignInCard() {
           }}
         >
           <FormControlLabel control={<Checkbox value="remember" color="primary" />} label="Ghi nhớ tôi" />
-          <Link onClick={handleClickOpen} variant="body2" role="link" sx={{ cursor: 'pointer' }}>
+          <Link onClick={handleClickOpen} data-testid="ForgotPass" variant="body2" role="link" sx={{ cursor: 'pointer' }}>
             Quên mật khẩu?
           </Link>
         </Box>
-        <ForgotPassword open={open} handleClose={handleClose} />
+        <ForgotPasswordModal open={open} handleClose={handleClose} />
         <Button
           type="submit"
+          data-testid="Loginbtn"
           fullWidth
           variant="contained"
           onClick={handleSignIn} // Only pass the function here
@@ -212,7 +214,7 @@ export default function SignInCard() {
         <Typography sx={{ textAlign: 'center' }}>
           Chưa có tài khoản?{' '}
           <span>
-            <Link href="/signup/" variant="body2" sx={{ alignSelf: 'center' }}>
+            <Link data-testid ="SignUp" href="/signup/" variant="body2" sx={{ alignSelf: 'center' }}>
               Đăng ký
             </Link>
           </span>
@@ -220,7 +222,7 @@ export default function SignInCard() {
       </Box>
       <Divider>hoặc</Divider>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Button type="submit" fullWidth variant="outlined" onClick={() => signInWithGoogle()} startIcon={<GoogleIcon />}>
+        <Button type="submit" data-testid="LoginwG" fullWidth variant="outlined" onClick={() => signInWithGoogle()} startIcon={<GoogleIcon />}>
           Đăng nhập với Google
         </Button>
       </Box>

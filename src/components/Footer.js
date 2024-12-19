@@ -7,6 +7,7 @@ import {
     ListItem,
     ListItemText,
 } from "@mui/material";
+import React from "react";
 import { LinkedIn, Facebook, Instagram } from "@mui/icons-material"
 
 const Footer = () => {
@@ -54,6 +55,7 @@ const Footer = () => {
                                 Kết nối với chúng tôi:
                             </Typography>
                             <IconButton
+                                data-testid = 'Facebook'
                                 sx={{
                                     color: "white",
                                     padding: 0,
@@ -67,10 +69,12 @@ const Footer = () => {
                                     },
                                 }}
                                 size="large"
+                                
                             >
                                 <Facebook />
                             </IconButton>
                             <IconButton
+                                data-testid="Instagram"
                                 sx={{
                                     color: "white",
                                     padding: 0,
@@ -88,6 +92,7 @@ const Footer = () => {
                                 <Instagram />
                             </IconButton>
                             <IconButton
+                                data-testid="LinkedIn"
                                 sx={{
                                     color: "white",
                                     padding: 0,
