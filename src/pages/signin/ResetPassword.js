@@ -21,17 +21,17 @@ const ResetPassword = () => {
       toast.error('Mật khẩu phải chứa ít nhất 8 ký tự');
       return;
     } else if (password !== confirmPassword) {
-      toast.error('Mật khẩu không khớp');
+      toast.error('Mật khẩu không khớp. Vui lòng nhập lại.');
       return;
     } else if (!/\d/.test(password) || !/\d/.test(confirmPassword)) {
-      toast.error('Mật khẩu phải chứa ít nhất một số');
+      toast.error('Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ ký tự chữ và số.');
       return;
     }
 
     try {
       setLoading(true);
       await AuthService.resetPassword(token, password);
-      toast.success('Mật khẩu đã được cập nhật');
+      toast.success('Đổi mật khẩu thành công');
       setLoading(false);
       setTimeout(() => {
         window.location.href = '/signin';
