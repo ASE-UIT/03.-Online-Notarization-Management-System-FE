@@ -5,7 +5,7 @@ module.exports = {
   },
   moduleNameMapper: {
     '\\.(jpg|jpeg|png|gif|svg)$': '<rootDir>/src/tests/mocks/fileMock.js',
-    '\\.(css|less|scss|sass)$': '<rootDir>/src/tests/mocks/styleMock.js',
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
   },
   restoreMocks: true,
   coveragePathIgnorePatterns: ['node_modules', 'src/config', 'src/app.js', 'tests'],
@@ -13,8 +13,8 @@ module.exports = {
   transform: {
     '^.+\\.jsx?$': 'babel-jest',
   },
-  transformIgnorePatterns: ['/node_modules/(?!axios/.*)', 'src/App.test.js'],
-  testPathIgnorePatterns: [
-    'src/App.test.js',
+  transformIgnorePatterns: [
+    'node_modules/(?!(axios|react-markdown|vfile|unist|unified|bail|is-plain-obj|trough|remark-parse|mdast-util-from-markdown|micromark|decode-named-character-reference|character-entities|mdast-util-to-string|space-separated-tokens|comma-separated-tokens|property-information|hast-util-whitespace)/)',
   ],
+  testPathIgnorePatterns: ['src/App.test.js'],
 };
