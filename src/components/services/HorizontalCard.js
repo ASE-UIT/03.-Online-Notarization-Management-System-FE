@@ -1,13 +1,15 @@
 import React, { useState } from 'react'
 import { Box, Button, Divider, Typography } from '@mui/material'
 import { black, gray, red, white, yellow } from '../../config/theme/themePrimitives'
-import { Info } from '@mui/icons-material';
+import { Add, Info } from '@mui/icons-material';
 import { PictureAsPdf, Image } from '@mui/icons-material';
 import TransferModal from './TransferModal';
+import PurchaseModal from './PurchaseModal';
 
 const HorizontalCard = ({ document }) => {
     const isPDF = document.filename.split('.').pop() === 'pdf';
     const [open, setOpen] = useState(false);
+    const [openPurchase, setOpenPurchase] = useState(false);
 
     return (
         <Box
@@ -176,28 +178,62 @@ const HorizontalCard = ({ document }) => {
                     {document.amount}
                 </Typography>
             </Box>
-            {/* Button Section */}
-            <Button
+            <Box
                 sx={{
-                    backgroundColor: gray[900],
-                    color: white[50],
-                    borderRadius: 1,
-                    paddingX: 2,
-                    fontSize: 12,
-                    textTransform: 'none',
-                    marginLeft: 'auto',
-                    '&:hover': {
-                        backgroundColor: gray[800],
-                    },
-                    marginX: 2
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    flex: 1,
+                    alignItems: 'flex-start',
+                    marginX: 2,
+                    gap: 1
                 }}
-                endIcon={<Info />}
-                onClick={() => setOpen(true)}
             >
-                Chia sẻ tài liệu
-            </Button>
+                <Button
+                    sx={{
+                        width: 150,
+                        backgroundColor: gray[900],
+                        color: white[50],
+                        borderRadius: 1,
+                        paddingX: 2,
+                        fontSize: 12,
+                        textTransform: 'none',
+                        marginLeft: 'auto',
+                        '&:hover': {
+                            backgroundColor: gray[800],
+                        },
+                        marginX: 2
+                    }}
+                    endIcon={<Info />}
+                    onClick={() => setOpen(true)}
+                >
+                    Chia sẻ tài liệu
+                </Button>
+
+                <Button
+                    sx={{
+                        width: 150,
+                        backgroundColor: gray[900],
+                        color: white[50],
+                        borderRadius: 1,
+                        paddingX: 2,
+                        fontSize: 12,
+                        textTransform: 'none',
+                        marginLeft: 'auto',
+                        '&:hover': {
+                            backgroundColor: gray[800],
+                        },
+                        marginX: 2
+                    }}
+                    endIcon={<Add />}
+                    onClick={() => setOpenPurchase(true)}
+                >
+                    Mua thêm
+                </Button>
+            </Box>
 
             <TransferModal open={open} onClose={() => setOpen(false)} document={document} />
+            <PurchaseModal open={openPurchase} onClose={() => setOpenPurchase(false)} document={document} />
         </Box>
     );
 };

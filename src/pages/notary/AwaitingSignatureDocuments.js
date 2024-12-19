@@ -34,7 +34,6 @@ const AwaitingSignatureDocuments = () => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        height: '90vh',
         padding: 4,
         justifyContent: 'space-between',
         gap: 2,
@@ -42,7 +41,6 @@ const AwaitingSignatureDocuments = () => {
     >
       <Paper
         sx={{
-          flex: 1,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-start',
