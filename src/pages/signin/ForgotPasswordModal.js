@@ -29,14 +29,13 @@ function ForgotPasswordModal({ open, handleClose }) {
     try {
       const response = await AuthService.ForgotPasswordModal(email);
       if (response.status === 204) {
-        toast.success('Email đã được gửi. Vui lòng kiểm tra hộp thư của bạn.');
+        toast.success('Vui lòng kiểm tra email của bạn để cài đặt lại mật khẩu');
         handleClose();
       }
     } catch (error) {
       console.error('Failed to send reset password', error);
       const errorMessage =
         error.status === 404 ? 'Email không tồn tại. Vui lòng nhập lại.' : 'Đã xảy ra lỗi. Vui lòng thử lại.';
-      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
