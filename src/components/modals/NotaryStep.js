@@ -66,6 +66,7 @@ const NotaryStep = ({ currentStep }) => {
                   fontWeight: index === currentStep ? 'bold' : 'normal',
                   fontSize: 12,
                   cursor: 'pointer',
+                  textWrap: 'nowrap',
                 }}
               >
                 {step.label}

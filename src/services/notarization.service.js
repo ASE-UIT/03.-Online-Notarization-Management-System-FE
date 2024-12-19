@@ -93,7 +93,9 @@ const getAllNotarizations = async (sortBy = null, limit, page) => {
 
 const getNotarizationByRole = async ({ status, page, limit }) => {
   try {
-    const response = await axiosConfig.get(`${NOTARIZATION_ENDPOINT}/getDocumentByRole`, { params: { status, page, limit } });
+    const response = await axiosConfig.get(`${NOTARIZATION_ENDPOINT}/getDocumentByRole`, {
+      params: { status, page, limit },
+    });
     return response.data;
   } catch (error) {
     const status = error.response?.status;
@@ -111,7 +113,7 @@ const getApproveHistory = async () => {
     const message = error.response?.data?.message;
     return { status, message };
   }
-}
+};
 
 const getDocumentById = async (documentId) => {
   try {
@@ -122,25 +124,33 @@ const getDocumentById = async (documentId) => {
     const message = error.response?.data?.message;
     return { status, message };
   }
-}
+};
 
 const forwardDocumentStatus = async (documentId, formData) => {
   try {
-    const response = await axiosConfig.patch(`${NOTARIZATION_ENDPOINT}/forwardDocumentStatus/${documentId}`,
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
-    );
+    const response = await axiosConfig.patch(`${NOTARIZATION_ENDPOINT}/forwardDocumentStatus/${documentId}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   } catch (error) {
     const status = error.response?.status;
     const message = error.response?.data?.message;
     return { status, message };
   }
-}
+};
+
+const approveSignatureByUser = async (formData) => {
+  try {
+    const response = await axiosConfig.post(`${NOTARIZATION_ENDPOINT}/approve-signature-by-user`, formData);
+    return response;
+  } catch (error) {
+    const status = error.response?.status;
+    const message = error.response?.data?.message;
+    return { status, message };
+  }
+};
 
 const approveSignatureByNotary = async (documentId) => {
   try {
@@ -149,9 +159,9 @@ const approveSignatureByNotary = async (documentId) => {
   } catch (error) {
     const status = error.response?.status;
     const message = error.response?.data?.message;
-    return { status, message }
+    return { status, message };
   }
-}
+};
 
 const NotarizationService = {
   getStatusById,
@@ -165,6 +175,7 @@ const NotarizationService = {
   getApproveHistory,
   getDocumentById,
   forwardDocumentStatus,
+  approveSignatureByUser,
   approveSignatureByNotary,
 };
 
