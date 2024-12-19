@@ -117,3 +117,36 @@ export const notaryPieChartOptions = {
   },
   cutout: '30%',
 };
+
+export const adminPieChartOptions = {
+  responsive: true,
+maintainAspectRatio: false,
+layout: {
+  padding: {
+      right: 50,
+  }
+},
+plugins: {
+  legend: {
+    position: 'right',
+    labels: {
+      font: {
+          size: 16,
+          family: 'Roboto',
+          weight: 400,
+          lineheight: 24
+      },
+      color: '#000',
+      boxWidth: 20,
+      padding: 24,
+    }
+  },
+  tooltip: {
+    callbacks: {
+      label: (context) => {
+        return `${context.label}: ${context.raw}`;
+      },
+    },
+  },
+},
+}

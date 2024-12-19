@@ -12,6 +12,8 @@ const PublicRoute = ({ children }) => {
       return <Navigate to="/user/create-notarization-profile" replace />;
     } else if (role === 'admin') {
       return <Navigate to="/admin/dashboard" replace />;
+    } else if (role === 'notary') {
+      return <Navigate to="/notary/dashboard" replace />;
     }
   }
 

@@ -140,6 +140,7 @@ const NotaryDataGrid = ({ data, paginationModel, setPaginationModel, loading }) 
         disableSelectionOnClick
         disableColumnMenu
         disableColumnResize
+        getRowId={(row) => row.id}
       />
     </Box>
   );

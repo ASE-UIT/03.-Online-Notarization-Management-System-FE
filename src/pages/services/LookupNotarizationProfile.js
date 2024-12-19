@@ -7,14 +7,14 @@ import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import NotarizationService from '../../services/notarization.service';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import NotaryDocumentDetailsModal from '../../components/modals/NotaryDocumentDetailsModal';
+import SearchingDocumentModal from '../../components/modals/SearchingDocumentModal';
 
 const LookupNotarizationProfile = () => {
   const [inputValue, setInputValue] = useState('');
   const [displayText, setDisplayText] = useState('');
   const [searchLoading, setSearchLoading] = useState(false);
   const [status, setStatus] = useState({ notFound: false, searching: false, found: false });
-  const [notarizationData, setNotarizationData] = useState(null);
+  const [document, setDocument] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
   const handleInputChange = (event) => {
@@ -40,23 +40,24 @@ const LookupNotarizationProfile = () => {
       setTimeout(async () => {
         try {
           const response = await NotarizationService.getStatusById(inputValue);
-          console.log('response', response);
-          setSearchLoading(false);
-          if (response) {
-            setDisplayText(response.documentId);
+
+          if (response.status === 200) {
+            setDisplayText(response.data.documentId);
             setStatus({ notFound: false, searching: false, found: true });
-            setNotarizationData(response);
+            setDocument(response.data);
           }
+
+          if (response.status === 404) {
+            setStatus({ notFound: true, searching: false, found: false });
+          }
+
+          if (response.status === 500) {
+            toast.error('Đã xảy ra lỗi, vui lòng thử lại sau');
+          }
+          setSearchLoading(false);
         } catch (error) {
           setSearchLoading(false);
-          console.log(error);
-          if (error === 404) {
-            setDisplayText(inputValue);
-            setStatus({ notFound: true, searching: false, found: false });
-          } else {
-            setDisplayText(inputValue);
-            setStatus({ notFound: true, searching: false, found: false });
-          }
+          toast.error('Đã xảy ra lỗi, vui lòng thử lại sau');
         }
       }, 1000);
     }
@@ -74,7 +75,7 @@ const LookupNotarizationProfile = () => {
         <StatusBox
           status={status}
           displayText={displayText}
-          notarizationData={notarizationData}
+          document={document}
           onOpenModal={handleOpenModal}
         />
       );
@@ -124,7 +125,7 @@ const LookupNotarizationProfile = () => {
           <TextField
             variant="outlined"
             size="medium"
-            placeholder="Nhập mã số hồ sơ công chứng..."
+            placeholder="Nhập mã số hồ sơ công chứng"
             autoFocus
             value={inputValue}
             onChange={handleInputChange}
@@ -180,7 +181,11 @@ const LookupNotarizationProfile = () => {
       >
         {renderStatusBox()}
       </Box>
-      {/* <NotaryDocumentDetailsModal open={openModal} handleClose={handleCloseModal} notarizationData={notarizationData} /> */}
+      <SearchingDocumentModal
+        open={openModal}
+        handleClose={handleCloseModal}
+        document={document}
+      />
     </Box>
   );
 };
