@@ -43,6 +43,7 @@ const NotarizationHistory = lazy(() => import('./pages/notary/NotarizedHistory')
 const AwaitingSignatureDocuments = lazy(() => import('./pages/notary/AwaitingSignatureDocuments'));
 const ForgotPassword = lazy(() => import('./pages/signin/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/signin/ResetPassword'));
+const SessionManagement = lazy(() => import('./pages/notary/SessionManagement'));
 
 function App() {
   const dispatch = useDispatch();
@@ -211,6 +212,7 @@ function App() {
                 <Route path="/notary/pending-notarization-documents" element={<ProcessingNotarizationDocuments />} />
                 <Route path="/notary/notarization-history" element={<NotarizationHistory />} />
                 <Route path="/notary/awaiting-signature-documents" element={<AwaitingSignatureDocuments />} />
+                <Route path="/notary/notary-session-management" element={<SessionManagement />} />
               </Route>
 
               <Route path="*" element={<NotFound />} />
