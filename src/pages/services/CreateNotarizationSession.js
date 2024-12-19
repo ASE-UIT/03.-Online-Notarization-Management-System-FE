@@ -7,8 +7,6 @@ import SessionCard from '../../components/services/SessionCard';
 import NotarySessionForm from './NotarySessionForm';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
-
-import UserService from '../../services/user.service';
 import SessionService from '../../services/session.service';
 
 const CreateNotarizationSession = () => {
@@ -23,6 +21,7 @@ const CreateNotarizationSession = () => {
   const fetchSessions = async () => {
     setLoading(true);
     try {
+<<<<<<< HEAD
       const data = await SessionService.getAllSessions();
       const processedSessions = Array.isArray(data)
         ? await Promise.all(
@@ -36,6 +35,13 @@ const CreateNotarizationSession = () => {
     } catch (error) {
       console.error('Error fetching sessions:', error);
       // Update UI to handle error (e.g., display error message)
+=======
+      const response = await SessionService.getSessionsByUserId();
+      setSessions(response?.results || []);
+    } catch (error) {
+      console.error('Error fetching sessions:', error);
+      setSessions([]);
+>>>>>>> bf89ffd47f5e840e8662dbfe263ad7f2edfa60e7
     } finally {
       setLoading(false);
     }
@@ -79,9 +85,17 @@ const CreateNotarizationSession = () => {
   const indexOfLastSession = currentPage * sessionsPerPage;
   const indexOfFirstSession = indexOfLastSession - sessionsPerPage;
   const currentSessions =
+<<<<<<< HEAD
     searchingSessions.length > 0
       ? searchingSessions.slice(indexOfFirstSession, indexOfLastSession)
       : sessions.slice(indexOfFirstSession, indexOfLastSession);
+=======
+    Array.isArray(searchingSessions) && searchingSessions.length > 0
+      ? searchingSessions.slice(indexOfFirstSession, indexOfLastSession)
+      : Array.isArray(sessions)
+        ? sessions.slice(indexOfFirstSession, indexOfLastSession)
+        : [];
+>>>>>>> bf89ffd47f5e840e8662dbfe263ad7f2edfa60e7
 
   const totalSessions = searchingSessions.length > 0 ? searchingSessions.length : sessions.length;
   const totalPages = Math.ceil(totalSessions / sessionsPerPage);

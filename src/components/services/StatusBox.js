@@ -2,11 +2,9 @@ import React from 'react';
 import { Box, Typography, Grow, Link } from '@mui/material';
 import { black, white } from '../../config/theme/themePrimitives';
 import { red, green } from '@mui/material/colors';
-
 import ErrorIcon from '@mui/icons-material/Error';
 import CircularProgress from '@mui/material/CircularProgress';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import NotaryDocumentDetailsModal from '../modals/NotaryDocumentDetailsModal';
 
 const StatusBox = ({ status, displayText, onOpenModal }) => {
   const renderIconByStatus = (status) => {

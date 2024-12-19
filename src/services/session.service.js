@@ -15,9 +15,15 @@ const createSession = async (session) => {
   }
 };
 
-const getAllSessions = async () => {
+const getAllSessions = async (sortBy = null, limit, page) => {
   try {
-    const response = await axiosConfig.get(`${SESSION_ENDPOINT}/getAllSessions`);
+    const response = await axiosConfig.get(`${SESSION_ENDPOINT}/getAllSessions`, {
+      params: {
+        sortBy,
+        limit,
+        page: page + 1,
+      },
+    });
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -39,10 +45,37 @@ const deleteUserOutOfSession = async (sessionId, email) => {
   }
 };
 
+const addUser = async (sessionId, emails) => {
+  try {
+    const response = await axiosConfig.patch(`${SESSION_ENDPOINT}/addUser/${sessionId}`, { emails });
+    return response;
+  } catch (error) {
+    if (error.response) {
+      return error.response.data;
+    }
+    return error.message;
+  }
+};
+
+const getSessionsByUserId = async () => {
+  try {
+    const response = await axiosConfig.get(`${SESSION_ENDPOINT}/getSessionsByUserId`);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      return error.response.data;
+    }
+    return error.message;
+  }
+};
+
 const SessionService = {
   createSession,
   getAllSessions,
+  getSessionsByUserId,
   deleteUserOutOfSession,
+  addUser,
+  getSessionsByUserId,
 };
 
 export default SessionService;

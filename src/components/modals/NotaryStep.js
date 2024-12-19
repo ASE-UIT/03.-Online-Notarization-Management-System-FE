@@ -6,8 +6,8 @@ import { primary, black, gray, white } from '../../config/theme/themePrimitives'
 
 const steps = [
   { label: 'Chờ xử lý' },
-  { label: 'Kiểm tra hồ sơ' },
-  { label: 'Tiếp nhận và xử lý' },
+  { label: 'Đang xử lý' },
+  { label: 'Đang xác minh' },
   { label: 'Sẵn sàng ký số' },
   { label: 'Hoàn tất' },
 ];
@@ -37,7 +37,7 @@ const NotaryStep = ({ currentStep }) => {
   };
 
   return (
-    <Box>
+    <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
       <Stepper activeStep={currentStep} orientation="vertical" connector={<CustomConnector />}>
         {steps.map((step, index) => (
           <Step key={step.label}>
@@ -66,6 +66,7 @@ const NotaryStep = ({ currentStep }) => {
                   fontWeight: index === currentStep ? 'bold' : 'normal',
                   fontSize: 12,
                   cursor: 'pointer',
+                  textWrap: 'nowrap',
                 }}
               >
                 {step.label}
