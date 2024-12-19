@@ -1,10 +1,44 @@
-import React from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import React, { useRef, useState } from 'react';
+import { Box, Typography, Button, Menu, MenuItem } from '@mui/material';
 import { black, green, primary, gray } from '../../../config/theme/themePrimitives';
-import { TaskAltRounded, CloseRounded, OpenInNewRounded } from '@mui/icons-material';
+import { TaskAltRounded, CloseRounded, OpenInNewRounded, DevicesRounded, Wallet } from '@mui/icons-material';
 import { VALID_FORMATS } from '../../../utils/constants';
+import UserWalletModal from '../../../components/services/UserWalletModal';
 
-const FileUploadSection = ({ uploadedFiles, handleFileChange, handleRemoveFile, title, confirmed = false }) => {
+const FileUploadSection = ({
+  uploadedFiles,
+  currentFiles,
+  handleFileChange,
+  handleRemoveFile,
+  title,
+  confirmed = false,
+  handleDocumentWalletChange,
+  documentWalletFiles,
+  handleRemoveDocumentWalletFile,
+}) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const inputRef = useRef(null);
+  const open = Boolean(anchorEl);
+  const [openWalletModal, setOpenWalletModal] = useState(false);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleChooseFromDevice = () => {
+    inputRef.current.click();
+    handleClose();
+  };
+
+  const handleCloseUserWalletModal = () => {
+    setOpenWalletModal(false);
+    handleClose();
+  };
+
   return (
     <Box sx={{ display: 'flex', gap: 1, flexDirection: 'column' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -31,23 +65,73 @@ const FileUploadSection = ({ uploadedFiles, handleFileChange, handleRemoveFile, 
                 transition: 'all 0.3s',
               }}
               component="label"
+              onClick={handleClick}
             >
               <Typography sx={{ fontSize: 12, fontWeight: 600, textTransform: 'capitalize', color: primary[500] }}>
                 Chọn tài liệu
               </Typography>
-              <input type="file" hidden multiple onChange={handleFileChange} accept={VALID_FORMATS} />
             </Button>
+            <Menu
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'center',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'center',
+              }}
+              PaperProps={{
+                elevation: 0,
+                sx: {
+                  overflow: 'visible',
+                  filter: `drop-shadow(0px 2px 8px ${black[100]})`,
+                  mt: 1.5,
+                  '& .MuiMenu-list': { padding: 1 },
+                  '& .MuiMenuItem-root': {
+                    fontSize: 12,
+                    fontWeight: 400,
+                    textTransform: 'none',
+                    width: 160,
+                    color: black[900],
+                    borderRadius: 1,
+                    '&:hover': {
+                      color: primary[500],
+                      backgroundColor: primary[50],
+                      fontWeight: 500,
+                    },
+                  },
+                },
+              }}
+            >
+              <MenuItem onClick={handleChooseFromDevice} sx={{ gap: 1 }}>
+                <DevicesRounded sx={{ fontSize: 14 }} />
+                Chọn từ máy
+              </MenuItem>
+              <MenuItem sx={{ gap: 1 }} onClick={() => setOpenWalletModal(true)}>
+                <Wallet sx={{ fontSize: 14 }} />
+                Chọn từ ví tài liệu
+              </MenuItem>
+              <UserWalletModal
+                open={openWalletModal}
+                onClose={handleCloseUserWalletModal}
+                handleDocumentWalletChange={handleDocumentWalletChange}
+              />
+            </Menu>
+            <input type="file" hidden multiple ref={inputRef} onChange={handleFileChange} accept={VALID_FORMATS} />
             <Typography sx={{ fontSize: 12, textTransform: 'capitalize', color: black[900] }}>
-              ({uploadedFiles.length} files đã đăng tải)
+              ({currentFiles?.length + documentWalletFiles?.length} files đã đăng tải)
             </Typography>
           </Box>
         ) : (
           <Typography sx={{ fontSize: 14, textTransform: 'capitalize', color: black[900] }}>
-            ({uploadedFiles.length} files đã đăng tải)
+            ({currentFiles?.length + documentWalletFiles?.length} files đã đăng tải)
           </Typography>
         )}
       </Box>
-      {uploadedFiles.map((file, index) => (
+      {currentFiles?.map((file, index) => (
         <Box
           key={index}
           sx={{
@@ -87,6 +171,54 @@ const FileUploadSection = ({ uploadedFiles, handleFileChange, handleRemoveFile, 
                   cursor: 'pointer',
                 }}
                 onClick={() => handleRemoveFile(file)}
+              >
+                <CloseRounded sx={{ fontSize: 18 }} />
+              </Box>
+            </Box>
+          )}
+        </Box>
+      ))}
+
+      {documentWalletFiles?.map((file, index) => (
+        <Box
+          key={index}
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1,
+              alignItems: 'center',
+              cursor: 'pointer',
+              ':hover': {
+                textDecoration: 'underline',
+              },
+            }}
+            onClick={() => window.open(file.document.tokenURI, '_blank')}
+          >
+            <Typography sx={{ display: 'list-item', ml: '1rem', fontSize: 14, color: black[500] }}>
+              {file.document.filename}
+            </Typography>
+            <OpenInNewRounded sx={{ fontSize: 14, color: black[500] }} />
+          </Box>
+          {!confirmed && (
+            <Box sx={{ display: 'flex' }}>
+              <Box sx={{ p: 1 }}>
+                <TaskAltRounded sx={{ color: green[500], fontSize: 18 }} />
+              </Box>
+              <Box
+                sx={{
+                  p: 1,
+                  borderRadius: 1,
+                  transition: 'all 0.3s',
+                  ':hover': { backgroundColor: gray[100] },
+                  cursor: 'pointer',
+                }}
+                onClick={() => handleRemoveDocumentWalletFile(file)}
               >
                 <CloseRounded sx={{ fontSize: 18 }} />
               </Box>
