@@ -58,20 +58,7 @@ describe('SignInSide Component', () => {
     expect(screen.getByText('Mật khẩu phải chứa ít nhất 6 ký tự.')).toBeInTheDocument();
   });
 
-  // test('calls userLogin on valid form submission', async () => {
-  //   userLogin.mockResolvedValueOnce({ status: 400 });
 
-  //   renderWithProviders(<SignInSide />);
-
-  //   fireEvent.change(screen.getByPlaceholderText('your@email.com'), { target: { value: 'test@example.com' } });
-  //   fireEvent.change(screen.getByPlaceholderText('••••••'), { target: { value: 'password' } });
-
-  //   fireEvent.click(screen.getByTestId('Loginbtn'));
-  //   await waitFor(()=>{
-  //     expect(userLogin).toHaveBeenCalledWith({ email: 'test@example.com', password: 'password' });     
-  //   })
-  //   expect(toast.error);
-  // });
 
   test('navigates to signup page on link click', () => {
     renderWithProviders(<SignInSide />);
@@ -83,7 +70,7 @@ describe('SignInSide Component', () => {
 
     fireEvent.click(screen.getByTestId('ForgotPass'));
 
-    expect(screen.getByText('Quên mật khẩu')).toBeInTheDocument();
+    expect(screen.getByText('Quên mật khẩu?')).toBeInTheDocument();
   });
 
   test('calls signInWithGoogle on button click', () => {

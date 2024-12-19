@@ -12,6 +12,8 @@ const mockStore = configureStore([]);
 describe('Sidebar Component', () => {
   let store;
   let initialState;
+  let adminState;
+  let adminStore;
 
   beforeEach(() => {
     // Thiết lập trạng thái ban đầu của store
@@ -24,6 +26,16 @@ describe('Sidebar Component', () => {
       },
     };
     store = mockStore(initialState);
+    // Thiết lập trạng thái ban đầu của store cho admin
+    adminState = {
+      user: {
+        user: {
+          name: 'Admin User',
+          role: 'admin',
+        },
+      },
+    };
+    adminStore = mockStore(adminState);
   });
 
   test('renders Sidebar and toggles the sidebar open/close', () => {
@@ -33,7 +45,7 @@ describe('Sidebar Component', () => {
         <Router>
           <Sidebar />
         </Router>
-      </Provider>
+      </Provider>,
     );
 
     // Kiểm tra sidebar đang mở (icon đóng hiển thị)
@@ -52,14 +64,29 @@ describe('Sidebar Component', () => {
         <Router>
           <Sidebar />
         </Router>
-      </Provider>
+      </Provider>,
     );
 
     // Kiểm tra các mục menu dựa trên vai trò 'user'
     expect(screen.getByText('Tạo hồ sơ công chứng')).toBeInTheDocument();
     expect(screen.getByText('Lịch sử')).toBeInTheDocument();
-    expect(screen.getByText('Tạo phiên công chứng')).toBeInTheDocument();
-    expect(screen.getByText('Cài đặt')).toBeInTheDocument();
+    expect(screen.getByText('Phiên công chứng')).toBeInTheDocument();
+    expect(screen.getByText('Ví tài liệu')).toBeInTheDocument();
+  });
+
+  test('renders correct items based on admin role', () => {
+    render(
+      <Provider store={adminStore}>
+        <Router>
+          <Sidebar />
+        </Router>
+      </Provider>,
+    );
+
+    expect(screen.getByText('Dashboard')).toBeInTheDocument();
+    expect(screen.getByText('Quản lý nhân viên')).toBeInTheDocument();
+    expect(screen.getByText('Quản lý người dùng')).toBeInTheDocument();
+    expect(screen.getByText('Quản lý công chứng')).toBeInTheDocument();
   });
 
   test('calls handleLogout when Logout menu is clicked', () => {
@@ -68,7 +95,7 @@ describe('Sidebar Component', () => {
         <Router>
           <Sidebar />
         </Router>
-      </Provider>
+      </Provider>,
     );
 
     // Mở modal Đăng xuất khi nhấn vào nút "Đăng xuất"
@@ -84,7 +111,7 @@ describe('Sidebar Component', () => {
         <Router>
           <Sidebar />
         </Router>
-      </Provider>
+      </Provider>,
     );
 
     // Kiểm tra việc nhấn vào menu Profile

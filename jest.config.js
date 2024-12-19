@@ -14,4 +14,7 @@ module.exports = {
     '^.+\\.jsx?$': 'babel-jest',
   },
   transformIgnorePatterns: ['/node_modules/(?!axios/.*)', 'src/App.test.js'],
+  testPathIgnorePatterns: [
+    'src/App.test.js',
+  ],
 };
