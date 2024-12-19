@@ -98,6 +98,17 @@ const deleteSessionFile = async (sessionId, fileId) => {
   }
 };
 
+const approveSignatureSessionByUser = async (formData) => {
+  try {
+    const response = await axiosConfig.post(`${SESSION_ENDPOINT}/approve-signature-session-by-user`, formData);
+    return response.data;
+  } catch (error) {
+    const status = error.response?.status;
+    const message = error.response?.data?.message;
+    return { status, message };
+  }
+};
+
 const SessionService = {
   createSession,
   getAllSessions,
@@ -108,6 +119,7 @@ const SessionService = {
   uploadSessionDocument,
   joinSession,
   deleteSessionFile,
+  approveSignatureSessionByUser,
 };
 
 export default SessionService;

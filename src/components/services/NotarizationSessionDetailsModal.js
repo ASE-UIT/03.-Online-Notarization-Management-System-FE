@@ -11,6 +11,8 @@ import FileUploadSection from '../../pages/services/create-notarization-profile/
 import { getDocumentNameByCode, STATUS_TYPES, VALID_FORMATS } from '../../utils/constants';
 import useWindowSize from '../../hooks/useWindowSize';
 import { uploadFileSuccess } from '../../stores/slices/sessionSlice';
+import NotaryFeedback from './NotaryFeedback';
+import SessionFeedback from './SessionFeedback';
 const AddGuest = ({ value, options, handleInputChange, handleAddGuest, loading }) => (
   <Box sx={{ mb: 2 }}>
     <Typography variant="body2">Thêm khách mời</Typography>
@@ -81,6 +83,7 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [notarizationData, setNotarizationData] = useState({ files: [], fileIds: [], customFileNames: [] });
   const [isUploading, setIsUploading] = useState(false);
+  const [loadingSignature, setLoadingSignature] = useState(false);
   const { user } = useSelector((state) => state.user);
   const { width, height } = useWindowSize();
 
@@ -288,7 +291,7 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
   const isCreator = user.email === session.creator.email;
 
   const renderSessionStatus = () => {
-    switch (session.status) {
+    switch (session.status.status) {
       case 'completed':
         return (
           <Box
@@ -400,6 +403,31 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
     }
   };
 
+  const handleSignatureSave = async (signatureImageUrl) => {
+    const signatureImageFile = new File([signatureImageUrl], user._id + '.png', { type: 'image/png' });
+    const formData = new FormData();
+    formData.append('signatureImage', signatureImageFile);
+    formData.append('sessionId', session._id);
+    setLoadingSignature(true);
+    try {
+      const response = await SessionService.approveSignatureSessionByUser(formData);
+      if (response.status === 400) {
+        toast.error('Tài liệu này đã được ký số');
+        return;
+      }
+      toast.success('Lưu chữ ký thành công');
+    } catch (error) {
+      setLoadingSignature(false);
+      if (error.status === 409) {
+        toast.error('Tài liệu này đã được ký số');
+      } else {
+        toast.error('Đã xảy ra lỗi khi lưu chữ ký');
+      }
+    } finally {
+      setLoadingSignature(false);
+    }
+  };
+
   useEffect(() => {
     let uploadedFiles = [];
     session.files.forEach((file) => {
@@ -427,7 +455,7 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
     >
       <Box
         sx={{
-          width: `calc(${width}px - 50%)`,
+          width: `calc(${width}px - 20%)`,
           maxHeight: `calc(${height}px - 20%)`,
           p: 4,
           backgroundColor: white[50],
@@ -577,8 +605,7 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
             </Box>
           </Box>
         </Box>
-
-        {session.creator._id === user.id && (
+        {session.creator._id === user.id && session.status.status === 'unknown' && (
           <AddGuest
             value={email}
             options={options}
@@ -590,54 +617,71 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
           />
         )}
 
-        {/* Guests */}
-        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 2 }}>
-          <AvatarWithCloseButton
-            key={session.creator.email}
-            email={session.creator.email}
-            onHideRemoveIcon={true}
-            name={session.creator.name}
-            isCreator={true}
-          />
-          {users.map((guest, index) => (
+        {session.status.status === 'unknown' && (
+          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 2 }}>
             <AvatarWithCloseButton
-              key={index}
-              email={guest.email}
-              onRemove={() => handleDeleteGuest(guest.email)}
-              onHideRemoveIcon={!isCreator}
+              key={session.creator.email}
+              email={session.creator.email}
+              onHideRemoveIcon={true}
+              name={session.creator.name}
+              isCreator={true}
             />
-          ))}
-        </Box>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <Typography sx={{ fontSize: 14, fontWeight: 500, textTransform: 'capitalize', color: black[900], mb: 1 }}>
-            Danh sách tài liệu đã đăng tải
-          </Typography>
-
-          {session?.notaryService?.required_documents.map((document, index) => (
-            <FileUploadSection
-              key={index}
-              title={getDocumentNameByCode(document)}
-              currentFiles={currentFiles.filter((file) => file.type === document)}
-              handleCurrentFileChange={(e) => handleFileChange(e, document)}
-              handleRemoveCurrentFile={handleRemoveFile}
-              uploadedFiles={uploadedFiles.filter((file) => file.type === document)}
-              handleRemoveUploadedFile={handleRemoveUploadedFile}
-              documentWalletFiles={documentWalletFiles.filter((file) => file.type === document)}
-              handleDocumentWalletFileChange={(file) => handleDocumentWalletChange(file, document)}
-              handleRemoveDocumentWalletFile={handleRemoveDocumentWalletFile}
-            />
-          ))}
-          <Button
-            variant="contained"
-            size="small"
-            sx={{ p: 1.5, backgroundColor: primary[500], alignSelf: 'flex-end' }}
-            onClick={handleUploadDocument}
-            disabled={isUploading || session.status !== 'unknown'}
-          >
-            <Typography sx={{ fontSize: 14, fontWeight: 600, textTransform: 'none', color: white[50] }}>
-              {isUploading ? 'Đang tải lên...' : 'Gửi tài liệu'}
+            {users.map((guest, index) => (
+              <AvatarWithCloseButton
+                key={index}
+                email={guest.email}
+                onRemove={() => handleDeleteGuest(guest.email)}
+                onHideRemoveIcon={!isCreator}
+              />
+            ))}
+          </Box>
+        )}
+        <Box sx={{ display: 'flex', gap: 2, flexDirection: 'column' }}>
+          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Typography sx={{ fontSize: 14, fontWeight: 500, textTransform: 'capitalize', color: black[900], mb: 1 }}>
+              Danh sách tài liệu đã đăng tải
             </Typography>
-          </Button>
+
+            {session?.notaryService?.required_documents.map((document, index) => (
+              <FileUploadSection
+                key={index}
+                title={getDocumentNameByCode(document)}
+                currentFiles={currentFiles.filter((file) => file.type === document)}
+                handleCurrentFileChange={(e) => handleFileChange(e, document)}
+                handleRemoveCurrentFile={handleRemoveFile}
+                uploadedFiles={uploadedFiles.filter((file) => file.type === document)}
+                handleRemoveUploadedFile={handleRemoveUploadedFile}
+                documentWalletFiles={documentWalletFiles.filter((file) => file.type === document)}
+                handleDocumentWalletFileChange={(file) => handleDocumentWalletChange(file, document)}
+                handleRemoveDocumentWalletFile={handleRemoveDocumentWalletFile}
+                confirmed={session.status.status !== 'unknown'}
+              />
+            ))}
+            <Button
+              variant="contained"
+              size="small"
+              sx={{
+                p: 1.5,
+                backgroundColor: primary[500],
+                alignSelf: 'flex-end',
+                display: session.status.status === 'unknown' ? 'block' : 'none',
+              }}
+              onClick={handleUploadDocument}
+              disabled={isUploading || session.status.status !== 'unknown'}
+            >
+              <Typography sx={{ fontSize: 14, fontWeight: 600, textTransform: 'none', color: white[50] }}>
+                {isUploading ? 'Đang tải lên...' : 'Gửi tài liệu'}
+              </Typography>
+            </Button>
+          </Box>
+          <SessionFeedback
+            signature={session.signature}
+            output={session.output}
+            feedback={session.status.feedback}
+            onSignatureSave={handleSignatureSave}
+            loading={loadingSignature}
+            createdBy={session.createdBy}
+          />
         </Box>
       </Box>
     </Modal>
