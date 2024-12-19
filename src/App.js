@@ -17,7 +17,7 @@ import PublicRoute from './routes/PublicRoute';
 import { setUser } from './stores/slices/userSlice';
 import Settings from './pages/admin/Settings';
 import ThirdParty from './pages/static/Loader';
-import Loader from './pages/static/Loader';
+import Loader from './components/Loader';
 
 const Home = lazy(() => import('./pages/home/Home'));
 const Services = lazy(() => import('./pages/services/Services'));
@@ -78,7 +78,7 @@ function App() {
   }, []);
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <ThemeProvider theme={theme}>
         <Box display={'flex'}>
           {isAuthenticated && <Sidebar />}

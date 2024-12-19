@@ -39,13 +39,21 @@ const getEmployeesMetrics = async (sortBy = null, limit, page) => {
       sortBy,
       limit,
       page: page + 1,
-    }});
+    }
+  });
   return response.data;
 }
 
 const getEmployeesCount = async () => {
   const response = await axiosConfig.get(`${ADMIN_METRICS_ENDPOINT}/employees/count`);
   return response.data;
+};
+
+const exportToExcel = async (period) => {
+  const response = await axiosConfig.get(`${ADMIN_METRICS_ENDPOINT}/export/${period}`, {
+    responseType: 'blob',
+  });
+  return response;
 };
 
 const AdminService = {
@@ -56,7 +64,8 @@ const AdminService = {
   getPaymentFieldByPeriod,
   getDocumentFieldByPeriod,
   getEmployeesMetrics,
-  getEmployeesCount
+  getEmployeesCount,
+  exportToExcel,
 };
 
 export default AdminService;
