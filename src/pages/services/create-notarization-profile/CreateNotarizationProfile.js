@@ -79,18 +79,35 @@ const CreateNotarizationProfile = () => {
   };
 
   const handleDocumentWalletChange = (document, documentType) => {
+    if (!document || !document.filename || !document._id) {
+      toast.error('Tài liệu không hợp lệ. Vui lòng kiểm tra lại.');
+      return;
+    }
+
     if (notarizationData.fileIds.includes(document._id)) {
       toast.error('Tài liệu đã được chọn trước đó.');
       return;
     }
 
-    setNotarizationData((prev) => ({
-      ...prev,
-      fileIds: [...prev.fileIds, document._id],
-      customFileNames: [...prev.customFileNames, document.filename],
-    }));
+    try {
+      const timestamp = Date.now();
+      const fileExtension = document.filename.includes('.') ? document.filename.split('.').pop() : '';
+      const customFileName = `${documentType}_${timestamp}${fileExtension ? `.${fileExtension}` : ''}`;
 
-    setDocumentWalletFiles((prev) => [...prev, { document, type: documentType }]);
+      setNotarizationData((prevData) => ({
+        ...prevData,
+        fileIds: [...prevData.fileIds, document._id],
+        customFileNames: [...prevData.customFileNames, customFileName],
+      }));
+
+      setDocumentWalletFiles((prevFiles) => [
+        ...prevFiles,
+        { document: { ...document, filename: customFileName }, type: documentType },
+      ]);
+    } catch (error) {
+      console.error('Error handling document wallet change:', error);
+      toast.error('Đã xảy ra lỗi khi đổi tên tài liệu.');
+    }
   };
 
   const handleFileChange = (e, documentType) => {
@@ -181,10 +198,7 @@ const CreateNotarizationProfile = () => {
       const requiredDocumentTypes = notarizationData?.notaryService?.required_documents || [];
 
       // Kết hợp tài liệu từ uploadedFiles và documentWalletFiles
-      const allDocumentTypes = [
-        ...uploadedFiles.map((file) => file.type),
-        ...documentWalletFiles.map((file) => file.type),
-      ];
+      const allDocumentTypes = [...uploadedFiles.map((file) => file.type), ...documentWalletFiles.map((file) => file.type)];
 
       const missingDocumentTypes = requiredDocumentTypes.filter((type) => !allDocumentTypes.includes(type));
 
