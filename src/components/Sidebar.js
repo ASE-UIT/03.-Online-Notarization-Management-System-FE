@@ -125,6 +125,12 @@ const Sidebar = () => {
           href: '/notary/awaiting-signature-documents',
         },
         {
+          type: 'notary-session-management',
+          icon: <Groups2Rounded />,
+          title: 'Quản lý phiên',
+          href: '/notary/notary-session-management',
+        },
+        {
           type: 'notarization-history',
           icon: <DocumentScanner />,
           title: 'Lịch sử công chứng',
