@@ -4,8 +4,8 @@ import { Avatar, Typography } from '@mui/material';
 const AvatarIcon = ({ email }) => {
   return (
     <div style={{ position: 'relative', display: 'inline-block', marginRight: '8px' }}>
-      <Avatar sx={{ width: 24, height: 24 }}>
-        <Typography sx={{ fontSize: 10 }}>{email.charAt(0).toUpperCase()}</Typography>
+      <Avatar sx={{ width: 32, height: 32 }}>
+        <Typography sx={{ fontSize: 12 }}>{email.charAt(0).toUpperCase()}</Typography>
       </Avatar>
     </div>
   );

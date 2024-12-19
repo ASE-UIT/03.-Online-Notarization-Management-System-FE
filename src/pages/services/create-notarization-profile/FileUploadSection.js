@@ -6,15 +6,16 @@ import { VALID_FORMATS } from '../../../utils/constants';
 import UserWalletModal from '../../../components/services/UserWalletModal';
 
 const FileUploadSection = ({
-  uploadedFiles,
-  currentFiles,
-  handleFileChange,
-  handleRemoveFile,
   title,
-  confirmed = false,
-  handleDocumentWalletChange,
+  currentFiles,
+  handleCurrentFileChange,
+  handleRemoveCurrentFile,
+  uploadedFiles,
+  handleRemoveUploadedFile,
   documentWalletFiles,
-  handleRemoveDocumentWalletFile
+  handleDocumentWalletFileChange,
+  handleRemoveDocumentWalletFile,
+  confirmed = false,
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const inputRef = useRef(null);
@@ -37,7 +38,9 @@ const FileUploadSection = ({
   const handleCloseUserWalletModal = () => {
     setOpenWalletModal(false);
     handleClose();
-  }
+  };
+
+  const totalFiles = (currentFiles?.length || 0) + (uploadedFiles?.length || 0) + (documentWalletFiles?.length || 0);
 
   return (
     <Box sx={{ display: 'flex', gap: 1, flexDirection: 'column' }}>
@@ -76,28 +79,28 @@ const FileUploadSection = ({
               open={open}
               onClose={handleClose}
               anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "center",
+                vertical: 'bottom',
+                horizontal: 'center',
               }}
               transformOrigin={{
-                vertical: "top",
-                horizontal: "center",
+                vertical: 'top',
+                horizontal: 'center',
               }}
               PaperProps={{
                 elevation: 0,
                 sx: {
-                  overflow: "visible",
+                  overflow: 'visible',
                   filter: `drop-shadow(0px 2px 8px ${black[100]})`,
                   mt: 1.5,
-                  "& .MuiMenu-list": { padding: 1 },
-                  "& .MuiMenuItem-root": {
+                  '& .MuiMenu-list': { padding: 1 },
+                  '& .MuiMenuItem-root': {
                     fontSize: 12,
                     fontWeight: 400,
-                    textTransform: "none",
+                    textTransform: 'none',
                     width: 160,
                     color: black[900],
                     borderRadius: 1,
-                    "&:hover": {
+                    '&:hover': {
                       color: primary[500],
                       backgroundColor: primary[50],
                       fontWeight: 500,
@@ -114,31 +117,19 @@ const FileUploadSection = ({
                 <Wallet sx={{ fontSize: 14 }} />
                 Chọn từ ví tài liệu
               </MenuItem>
-              <UserWalletModal
-                open={openWalletModal}
-                onClose={handleCloseUserWalletModal}
-                handleDocumentWalletChange={handleDocumentWalletChange}
-              />
             </Menu>
-            <input
-              type="file"
-              hidden
-              multiple
-              ref={inputRef}
-              onChange={handleFileChange}
-              accept={VALID_FORMATS}
-            />
+            <input type="file" hidden multiple ref={inputRef} onChange={handleCurrentFileChange} accept={VALID_FORMATS} />
             <Typography sx={{ fontSize: 12, textTransform: 'capitalize', color: black[900] }}>
-              ({currentFiles?.length + documentWalletFiles?.length} files đã đăng tải)
+              ({totalFiles} files đã đăng tải)
             </Typography>
           </Box>
         ) : (
           <Typography sx={{ fontSize: 14, textTransform: 'capitalize', color: black[900] }}>
-            ({currentFiles?.length + documentWalletFiles?.length} files đã đăng tải)
+            ({totalFiles} files đã đăng tải)
           </Typography>
         )}
       </Box>
-      {currentFiles?.map((file, index) => (
+      {uploadedFiles?.map((file, index) => (
         <Box
           key={index}
           sx={{
@@ -157,7 +148,7 @@ const FileUploadSection = ({
                 textDecoration: 'underline',
               },
             }}
-            onClick={() => window.open(file.file.url || file.file.filebaseUrl || URL.createObjectURL(file.file), '_blank')}
+            onClick={() => window.open(file.file.url || file.file.firebaseUrl || URL.createObjectURL(file.file), '_blank')}
           >
             <Typography sx={{ display: 'list-item', ml: '1rem', fontSize: 14, color: black[500] }}>
               {file.file.name || file.file.filename}
@@ -177,7 +168,55 @@ const FileUploadSection = ({
                   ':hover': { backgroundColor: gray[100] },
                   cursor: 'pointer',
                 }}
-                onClick={() => handleRemoveFile(file)}
+                onClick={() => handleRemoveUploadedFile(file)}
+              >
+                <CloseRounded sx={{ fontSize: 18 }} />
+              </Box>
+            </Box>
+          )}
+        </Box>
+      ))}
+
+      {currentFiles?.map((file, index) => (
+        <Box
+          key={index}
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1,
+              alignItems: 'center',
+              cursor: 'pointer',
+              ':hover': {
+                textDecoration: 'underline',
+              },
+            }}
+            onClick={() => window.open(file.file.url || file.file.firebaseUrl || URL.createObjectURL(file.file), '_blank')}
+          >
+            <Typography sx={{ display: 'list-item', ml: '1rem', fontSize: 14, color: black[500] }}>
+              {file.file.name || file.file.filename}
+            </Typography>
+            <OpenInNewRounded sx={{ fontSize: 14, color: black[500] }} />
+          </Box>
+          {!confirmed && (
+            <Box sx={{ display: 'flex' }}>
+              <Box sx={{ p: 1 }}>
+                <TaskAltRounded sx={{ color: green[500], fontSize: 18 }} />
+              </Box>
+              <Box
+                sx={{
+                  p: 1,
+                  borderRadius: 1,
+                  transition: 'all 0.3s',
+                  ':hover': { backgroundColor: gray[100] },
+                  cursor: 'pointer',
+                }}
+                onClick={() => handleRemoveCurrentFile(file)}
               >
                 <CloseRounded sx={{ fontSize: 18 }} />
               </Box>
@@ -233,6 +272,13 @@ const FileUploadSection = ({
           )}
         </Box>
       ))}
+      {openWalletModal && (
+        <UserWalletModal
+          open={openWalletModal}
+          onClose={handleCloseUserWalletModal}
+          handleDocumentWalletFileChange={handleDocumentWalletFileChange}
+        />
+      )}
     </Box>
   );
 };

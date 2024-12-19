@@ -69,6 +69,24 @@ const getSessionsByUserId = async () => {
   }
 };
 
+const uploadSessionDocument = async (sessionId, document) => {
+  try {
+    const response = await axiosConfig.post(`${SESSION_ENDPOINT}/upload-session-document/${sessionId}`, document);
+    return response.data;
+  } catch (error) {
+    return { status: error.response.status, message: error.response.data.message };
+  }
+};
+
+const joinSession = async (sessionId, action) => {
+  try {
+    const response = await axiosConfig.post(`${SESSION_ENDPOINT}/joinSession/${sessionId}`, { action });
+    return response.data;
+  } catch (error) {
+    return { status: error.response.status, message: error.response.data.message };
+  }
+};
+
 const getSessionsByStatus = async ({ status, page, limit }) => {
   try {
     const response = await axiosConfig.get(`${SESSION_ENDPOINT}/get-sessions-by-status`, {
@@ -81,7 +99,7 @@ const getSessionsByStatus = async ({ status, page, limit }) => {
     }
     return error.message;
   }
-}
+};
 
 const forwardSessionStatus = async (sessionId, formData) => {
   try {
@@ -98,6 +116,25 @@ const forwardSessionStatus = async (sessionId, formData) => {
   }
 };
 
+const deleteSessionFile = async (sessionId, fileId) => {
+  try {
+    const response = await axiosConfig.delete(`${SESSION_ENDPOINT}/${sessionId}/files/${fileId}`);
+    return response.data;
+  } catch (error) {
+    return { status: error.response.status, message: error.response.data.message };
+  }
+};
+
+const approveSignatureSessionByUser = async (formData) => {
+  try {
+    const response = await axiosConfig.post(`${SESSION_ENDPOINT}/approve-signature-session-by-user`, formData);
+    return response.data;
+  } catch (error) {
+    const status = error.response?.status;
+    const message = error.response?.data?.message;
+    return { status, message };
+  }
+};
 const approveSignatureSessionByNotary = async (sessionId) => {
   try {
     const response = await axiosConfig.post(`${SESSION_ENDPOINT}/approve-signature-session-by-notary`, { sessionId });
@@ -107,7 +144,7 @@ const approveSignatureSessionByNotary = async (sessionId) => {
     const message = error.response?.data?.message;
     return { status, message };
   }
-}
+};
 
 const SessionService = {
   createSession,
@@ -116,6 +153,10 @@ const SessionService = {
   deleteUserOutOfSession,
   addUser,
   getSessionsByUserId,
+  uploadSessionDocument,
+  joinSession,
+  deleteSessionFile,
+  approveSignatureSessionByUser,
   getSessionsByStatus,
   forwardSessionStatus,
   approveSignatureSessionByNotary,

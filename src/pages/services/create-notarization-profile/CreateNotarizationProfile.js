@@ -158,7 +158,10 @@ const CreateNotarizationProfile = () => {
       formData.append('customFileNames', JSON.stringify(notarizationData.customFileNames));
 
       const response = await NotarizationService.uploadNotarizationDocument(formData);
-      toast.success('Tạo yêu cầu công chứng thành công!');
+
+      if (response.status === 200) {
+        toast.success('Tạo hồ sơ công chứng thành công');
+      }
 
       setNotarizationData(initialNotarizationData);
       setUploadedFiles([]);

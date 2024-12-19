@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Card, CardContent, Divider, Typography, Avatar, CardActionArea } from '@mui/material';
+import { Box, Card, CardContent, Divider, Typography, Avatar, CardActionArea, Badge } from '@mui/material';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import { black, dark, green, red, white, yellow } from '../../config/theme/themePrimitives';
 import AvatarIcon from '../static/AvatarIcon';
@@ -56,7 +56,7 @@ const SessionCard = React.memo(({ session }) => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
-  }
+  };
 
   return (
     <Card
@@ -101,7 +101,7 @@ const SessionCard = React.memo(({ session }) => {
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
             <Typography sx={{ flex: 1, fontSize: 12, fontWeight: 500 }}>Lĩnh vực:</Typography>
-            <Box sx={{ px: 1, py: 0.5, backgroundColor: dark[50], borderRadius: 1, alignItems: 'center', display: 'flex' }} >
+            <Box sx={{ px: 1, py: 0.5, backgroundColor: dark[50], borderRadius: 1, alignItems: 'center', display: 'flex' }}>
               <Typography sx={{ fontSize: 12, fontWeight: 500, color: dark[500] }}>{session.notaryField.name}</Typography>
             </Box>
           </Box>
@@ -109,16 +109,19 @@ const SessionCard = React.memo(({ session }) => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
             <Typography sx={{ flex: 1, fontSize: 12, fontWeight: 500 }}>Dịch vụ:</Typography>
             <Box sx={{ px: 1, py: 0.5, backgroundColor: dark[50], borderRadius: 1, display: 'flex', alignItems: 'center' }}>
-              <Typography sx={{ fontSize: 12, fontWeight: 500, color: dark[500] }}>
-                {session.notaryService.name}
-              </Typography>
+              <Typography sx={{ fontSize: 12, fontWeight: 500, color: dark[500] }}>{session.notaryService.name}</Typography>
             </Box>
           </Box>
 
           <Box display="flex" alignItems="center" mt={2}>
             <AvatarIcon email={session.creator.email || 'Undefined'} />
             {session.users.map((user, index) => (
-              <AvatarIcon key={index} email={user.email} />
+              <Badge
+                variant="dot"
+                color={user.status === 'pending' ? 'warning' : user.status === 'accepted' ? 'success' : 'error'}
+              >
+                <AvatarIcon key={index} email={user.email} />
+              </Badge>
             ))}
           </Box>
 
@@ -138,9 +141,7 @@ const SessionCard = React.memo(({ session }) => {
             }}
           >
             <ScheduleIcon sx={{ width: 12, height: 12 }} />
-            <Typography sx={{ fontSize: 12, fontWeight: 500 }}>
-              {timeRemaining}
-            </Typography>
+            <Typography sx={{ fontSize: 12, fontWeight: 500 }}>{timeRemaining}</Typography>
           </Box>
         </Box>
       </CardActionArea>
