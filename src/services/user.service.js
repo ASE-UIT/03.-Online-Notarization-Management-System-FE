@@ -59,11 +59,24 @@ const getAllUsers = async (role = 'user', sortBy = null, limit, page) => {
   }
 }
 
+const createUserAccount = async (user) => {
+  try {
+    const response = await axiosConfig.post(`${USER_ENDPOINT}`, user);
+    return response;
+  } catch (error) {
+    if (error.response) {
+      return error.response.data;
+    }
+    return error.message;
+  }
+}
+
 const UserService = {
   getUserById,
   searchUserByEmail,
   updateUserById,
-  getAllUsers
+  getAllUsers,
+  createUserAccount,
 };
 
 export default UserService;
