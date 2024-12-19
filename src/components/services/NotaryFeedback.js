@@ -61,7 +61,7 @@ const NotaryFeedback = ({ signature, output, feedback, onSignatureSave, loading 
   }, [type]);
 
   const renderOutputSection = () => {
-    if (output) {
+    if (output.length > 0) {
       return output.map((item, index) => (
         <Box
           sx={{
@@ -114,7 +114,7 @@ const NotaryFeedback = ({ signature, output, feedback, onSignatureSave, loading 
   };
 
   const renderSignaturePad = () => {
-    if (output) {
+    if (output.length > 0) {
       if (!signature?.approvalStatus.user.approved) {
         return (
           <Box sx={{ backgroundColor: gray[50], mt: 2, px: 2, py: 1, borderRadius: 1 }}>
