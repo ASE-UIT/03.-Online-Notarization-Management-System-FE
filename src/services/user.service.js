@@ -40,11 +40,30 @@ const updateUserById = async (id, updateBody) => {
     }
   }
 };
+const getAllUsers = async (role = 'user', sortBy = null, limit, page) => {
+  try {
+    const response = await axiosConfig.get(`${USER_ENDPOINT}`, {
+      params: {
+        role,
+        sortBy,
+        limit,
+        page,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      return error.response.data;
+    }
+    return error.message;
+  }
+}
 
 const UserService = {
   getUserById,
   searchUserByEmail,
   updateUserById,
+  getAllUsers
 };
 
 export default UserService;

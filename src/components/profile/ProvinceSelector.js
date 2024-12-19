@@ -8,9 +8,9 @@ const ProvinceSelector = ({ city, district, ward, onCityChange, onDistrictChange
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
 
-  const [inputCity, setInputCity] = useState(city || '');
-  const [inputDistrict, setInputDistrict] = useState(district || '');
-  const [inputWard, setInputWard] = useState(ward || '');
+  const [inputCity, setInputCity] = useState('');
+  const [inputDistrict, setInputDistrict] = useState('');
+  const [inputWard, setInputWard] = useState('');
 
   useEffect(() => {
     const fetchCities = () => {
@@ -22,6 +22,18 @@ const ProvinceSelector = ({ city, district, ward, onCityChange, onDistrictChange
     };
     fetchCities();
   }, []);
+  
+  useEffect(() => {
+    setInputCity(city);
+  }, [city]);
+  
+  useEffect(() => {
+    setInputDistrict(district);
+  }, [district]);
+  
+  useEffect(() => {
+    setInputWard(ward);
+  }, [ward]);
 
   useEffect(() => {
     if (city) {
@@ -57,6 +69,7 @@ const ProvinceSelector = ({ city, district, ward, onCityChange, onDistrictChange
       }
     } else {
       setWards([]);
+      setInputWard('');
     }
   }, [inputDistrict, districts, district]);
 
@@ -71,6 +84,8 @@ const ProvinceSelector = ({ city, district, ward, onCityChange, onDistrictChange
   const handleDistrictChange = (value) => {
     setInputDistrict(value);
     onDistrictChange(value);
+    setWards([]);
+    setInputWard('');
   };
   const handleWardChange = (value) => {
     setInputWard(value);
@@ -89,6 +104,7 @@ const ProvinceSelector = ({ city, district, ward, onCityChange, onDistrictChange
       <LabeledTextField
         label="Tỉnh/Thành phố"
         value={inputCity || ''}
+        defaultValue={city}
         onChange={handleCityChange}
         isAutoComplete={true}
         options={cities}
@@ -96,6 +112,7 @@ const ProvinceSelector = ({ city, district, ward, onCityChange, onDistrictChange
       <LabeledTextField
         label="Quận/Huyện"
         value={city ? inputDistrict : ''}
+        defaultValue={district}
         onChange={handleDistrictChange}
         isAutoComplete={true}
         options={districts}
@@ -103,7 +120,8 @@ const ProvinceSelector = ({ city, district, ward, onCityChange, onDistrictChange
       />
       <LabeledTextField
         label="Xã/Phường/Thị trấn"
-        value={district && city ? inputWard : ''}
+        value={(district && city) ? inputWard : ''}
+        defaultValue={ward}
         onChange={handleWardChange}
         isAutoComplete={true}
         options={wards}

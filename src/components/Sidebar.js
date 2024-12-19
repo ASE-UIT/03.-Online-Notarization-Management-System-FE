@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Box, Divider, Drawer, IconButton, List, Typography } from '@mui/material';
-import { KeyboardDoubleArrowLeft, KeyboardDoubleArrowRight, Logout } from '@mui/icons-material';
+import { Article, HistoryEdu, KeyboardDoubleArrowLeft, KeyboardDoubleArrowRight, Logout, Wallet } from '@mui/icons-material';
 import { dark, primary, white, red } from '../config/theme/themePrimitives';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -10,7 +10,6 @@ import {
   AddCircleOutline,
   DocumentScanner,
   Groups2Rounded,
-  Settings,
   GridViewRounded,
   SupervisorAccountRounded,
   AccountCircleRounded,
@@ -67,10 +66,15 @@ const Sidebar = () => {
         {
           type: 'create-notarization-session',
           icon: <Groups2Rounded />,
-          title: 'Tạo phiên công chứng',
-          href: '/user/create-notarization-session',
+          title: 'Phiên công chứng',
+          href: '/user/notarization-session',
         },
-        { type: 'settings', icon: <Settings />, title: 'Cài đặt', href: '/user/settings' },
+        {
+          type: 'document-wallet',
+          icon: <Wallet />,
+          title: 'Ví tài liệu',
+          href: '/user/document-wallet',
+        },
       );
     } else if (role === 'admin') {
       items.push(
@@ -98,17 +102,36 @@ const Sidebar = () => {
           title: 'Quản lý công chứng',
           href: '/admin/notary-management',
         },
-        {
-          type: 'notary-session-management',
-          icon: <Groups2Rounded />,
-          title: 'Quản lý phiên công chứng',
-          href: '/admin/notary-session-management',
-        },
       );
     } else if (role === 'secretary') {
     } else if (role === 'notary') {
+      items.push(
+        {
+          type: 'dashboard',
+          icon: <GridViewRounded />,
+          title: 'Dashboard',
+          href: '/notary/dashboard',
+        },
+        {
+          type: 'pending-notarization-documents',
+          icon: <Article />,
+          title: 'Tài liệu chờ xác nhận',
+          href: '/notary/pending-notarization-documents',
+        },
+        {
+          type: 'awaiting-signature-documents',
+          icon: <HistoryEdu />,
+          title: 'Tài liệu chờ ký số',
+          href: '/notary/awaiting-signature-documents',
+        },
+        {
+          type: 'notarization-history',
+          icon: <DocumentScanner />,
+          title: 'Lịch sử công chứng',
+          href: '/notary/notarization-history',
+        },
+      );
     }
-
     return items;
   }, [role]);
 

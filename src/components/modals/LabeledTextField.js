@@ -1,23 +1,16 @@
-import { Box, IconButton, Typography, TextField, InputAdornment, Menu, MenuItem, Autocomplete } from '@mui/material';
-import React, { useState, useEffect } from 'react';
+import { Box, Typography, TextField, Autocomplete } from '@mui/material';
+import React from 'react';
 import { black } from '../../config/theme/themePrimitives';
 
-const LabeledTextField = ({ label, isAutoComplete = false, value = '', onChange, options = [], disabled = false }) => {
-  const [anchorEl, setAnchorEl] = useState(null);
-
-  const handleOpenMenu = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleCloseMenu = () => {
-    setAnchorEl(null);
-  };
-
-  const handleSelectOption = (option) => {
-    onChange(option);
-    handleCloseMenu();
-  };
-
+const LabeledTextField = ({
+  label,
+  isAutoComplete = false,
+  value = '',
+  defaultValue = '',
+  onChange,
+  options = [],
+  disabled = false,
+}) => {
   return (
     <Box
       sx={{
@@ -45,6 +38,7 @@ const LabeledTextField = ({ label, isAutoComplete = false, value = '', onChange,
                 {...params}
                 variant="outlined"
                 size="small"
+                placeholder={defaultValue}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': {
@@ -67,6 +61,7 @@ const LabeledTextField = ({ label, isAutoComplete = false, value = '', onChange,
         <TextField
           variant="outlined"
           size="small"
+          disabled={disabled}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           sx={{

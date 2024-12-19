@@ -31,12 +31,12 @@ const PersonalInformation = () => {
         isEmailVerified: user?.isEmailVerified || false,
         name: user?.name || '',
         email: user?.email || '',
-        phone: user?.phone || '',
-        identification: user?.identification || '',
-        city: user?.city || '',
-        district: user?.district || '',
-        ward: user?.ward || '',
-        street: user?.street || '',
+        phone: user?.phoneNumber || '',
+        identification: user?.citizenId || '',
+        city: user.address?.province || '',
+        district: user.address?.district || '',
+        ward: user.address?.town || '',
+        street: user.address?.street || '',
       });
     }
   }, [user]);
