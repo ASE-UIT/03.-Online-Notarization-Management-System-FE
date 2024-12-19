@@ -1,15 +1,16 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { white, gray, black, primary } from '../../config/theme/themePrimitives';
+import { white, gray, black, primary, green, blue, yellow, red } from '../../config/theme/themePrimitives';
 import { Close } from '@mui/icons-material';
 import AvatarWithCloseButton from '../static/AvatarWithCloseButton';
 import { Box, Button, IconButton, Modal, Typography, Autocomplete, TextField } from '@mui/material';
 import SessionService from '../../services/session.service';
 import UserService from '../../services/user.service';
 import { toast } from 'react-toastify';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import FileUploadSection from '../../pages/services/create-notarization-profile/FileUploadSection';
-import { getDocumentNameByCode, VALID_FORMATS } from '../../utils/constants';
+import { getDocumentNameByCode, STATUS_TYPES, VALID_FORMATS } from '../../utils/constants';
 import useWindowSize from '../../hooks/useWindowSize';
+import { uploadFileSuccess } from '../../stores/slices/sessionSlice';
 const AddGuest = ({ value, options, handleInputChange, handleAddGuest, loading }) => (
   <Box sx={{ mb: 2 }}>
     <Typography variant="body2">Thêm khách mời</Typography>
@@ -75,10 +76,15 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
   const [options, setOptions] = useState([]);
   const [users, setUsers] = useState(session.users);
   const [loading, setLoading] = useState(false);
+  const [currentFiles, setCurrentFiles] = useState([]);
+  const [documentWalletFiles, setDocumentWalletFiles] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [notarizationData, setNotarizationData] = useState({ files: [], fileIds: [], customFileNames: [] });
+  const [isUploading, setIsUploading] = useState(false);
   const { user } = useSelector((state) => state.user);
   const { width, height } = useWindowSize();
-  const [isUploading, setIsUploading] = useState(false);
+
+  const dispatch = useDispatch();
 
   const debounce = (func, wait) => {
     let timeout;
@@ -86,15 +92,6 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
       clearTimeout(timeout);
       timeout = setTimeout(() => func.apply(this, args), wait);
     };
-  };
-
-  const handleRemoveGuest = (emailToRemove) => {
-    setUsers((prev) => prev.filter((user) => user.email !== emailToRemove));
-  };
-
-  const handleInputChange = (event, newValue) => {
-    setEmail(newValue);
-    fetchEmails(newValue);
   };
 
   const fetchEmails = useCallback(
@@ -124,6 +121,15 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
     }, 1500),
     [],
   );
+
+  const handleRemoveGuest = (emailToRemove) => {
+    setUsers((prev) => prev.filter((user) => user.email !== emailToRemove));
+  };
+
+  const handleInputChange = (event, newValue) => {
+    setEmail(newValue);
+    fetchEmails(newValue);
+  };
 
   const handleAddGuest = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -171,10 +177,42 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
     });
   };
 
-  const handleDeleteUser = async (email) => {
+  const handleDeleteGuest = async (email) => {
     setUsers((prev) => prev.filter((user) => user.email !== email));
     const response = await SessionService.deleteUserOutOfSession(session._id, email);
     return response;
+  };
+
+  const handleDocumentWalletChange = (document, documentType) => {
+    if (!document || !document.filename || !document._id) {
+      toast.error('Tài liệu không hợp lệ. Vui lòng kiểm tra lại.');
+      return;
+    }
+
+    if (documentWalletFiles.find((file) => file.document._id === document._id)) {
+      toast.error('Tài liệu đã được chọn trước đó.');
+      return;
+    }
+
+    try {
+      const timestamp = Date.now();
+      const fileExtension = document.filename.includes('.') ? document.filename.split('.').pop() : '';
+      const customFileName = `${documentType}_${timestamp}${fileExtension ? `.${fileExtension}` : ''}`;
+
+      setNotarizationData((prevData) => ({
+        ...prevData,
+        fileIds: [...prevData.fileIds, document._id],
+        customFileNames: [...prevData.customFileNames, customFileName],
+      }));
+
+      setDocumentWalletFiles((prevFiles) => [
+        ...prevFiles,
+        { document: { ...document, filename: customFileName }, type: documentType },
+      ]);
+    } catch (error) {
+      console.error('Error handling document wallet change:', error);
+      toast.error('Đã xảy ra lỗi khi đổi tên tài liệu.');
+    }
   };
 
   const handleFileChange = (e, documentType) => {
@@ -191,26 +229,34 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
       const newFileName = `${documentType}_${timestamp}.${fileExtension}`;
       const renamedFile = new File([file], newFileName, { type: file.type });
 
-      setUploadedFiles((prev) => [...prev, { file: renamedFile, type: documentType }]);
+      setCurrentFiles((prev) => [...prev, { file: renamedFile, type: documentType }]);
     });
   };
 
-  const handleRemoveFile = (fileToRemove) => {
-    setUploadedFiles((prev) => prev.filter((file) => file !== fileToRemove));
-  };
-
   const handleUploadDocument = async () => {
-    if (uploadedFiles.length === 0) {
+    if (currentFiles.length === 0 && documentWalletFiles.length === 0) {
       toast.error('Vui lòng chọn tài liệu để tải lên');
       return;
     }
 
     setIsUploading(true);
     try {
-      await SessionService.uploadSessionDocument(
-        session._id,
-        uploadedFiles.map((file) => file.file),
-      );
+      const sessionId = session._id;
+
+      const formData = new FormData();
+
+      currentFiles.forEach((file) => {
+        formData.append('files', file.file);
+      });
+
+      formData.append('fileIds', JSON.stringify(notarizationData.fileIds));
+      formData.append('customFileNames', JSON.stringify(notarizationData.customFileNames));
+
+      const response = await SessionService.uploadSessionDocument(sessionId, formData);
+      if (response.status === undefined) {
+        toast.success('Tải lên tài liệu thành công');
+        dispatch(uploadFileSuccess(true));
+      }
     } catch (error) {
       toast.error(error);
     } finally {
@@ -218,7 +264,141 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
     }
   };
 
+  const handleRemoveFile = (fileToRemove) => {
+    setCurrentFiles((prev) => prev.filter((file) => file !== fileToRemove));
+  };
+
+  const handleRemoveDocumentWalletFile = (document) => {
+    setDocumentWalletFiles((prev) => prev.filter((file) => file.document._id !== document.document._id));
+  };
+
+  const handleRemoveUploadedFile = async (document) => {
+    const response = await SessionService.deleteSessionFile(session._id, document.file._id);
+    console.log(response);
+
+    if (response.status === 404) {
+      toast.error('Tài liệu không tồn tại');
+      return;
+    }
+
+    toast.success('Xóa tài liệu thành công');
+    setUploadedFiles((prev) => prev.filter((file) => file.file._id !== document.file._id));
+  };
+
   const isCreator = user.email === session.creator.email;
+
+  const renderSessionStatus = () => {
+    switch (session.status) {
+      case 'completed':
+        return (
+          <Box
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              mb: 2,
+              backgroundColor: green[50],
+              py: 1,
+              px: 2,
+              borderRadius: 100,
+            }}
+          >
+            <Typography variant="body3" sx={{ flexGrow: 1, fontWeight: 600, color: green[500] }}>
+              Đã hoàn thành
+            </Typography>
+          </Box>
+        );
+      case 'digitalSignature':
+        return (
+          <Box
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              mb: 2,
+              backgroundColor: blue[50],
+              py: 1,
+              px: 2,
+              borderRadius: 100,
+            }}
+          >
+            <Typography variant="body3" sx={{ flexGrow: 1, fontWeight: 600, color: blue[500] }}>
+              Sẵn sàng ký số
+            </Typography>
+          </Box>
+        );
+      case 'pending':
+        return (
+          <Box
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              mb: 2,
+              backgroundColor: gray[50],
+              py: 1,
+              px: 2,
+              borderRadius: 100,
+            }}
+          >
+            <Typography variant="body3" sx={{ flexGrow: 1, fontWeight: 600, color: gray[500] }}>
+              Chờ xác nhận
+            </Typography>
+          </Box>
+        );
+      case 'processing':
+        return (
+          <Box
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              mb: 2,
+              backgroundColor: yellow[50],
+              py: 1,
+              px: 2,
+              borderRadius: 100,
+            }}
+          >
+            <Typography variant="body3" sx={{ flexGrow: 1, fontWeight: 600, color: yellow[500] }}>
+              Đang xử lý
+            </Typography>
+          </Box>
+        );
+      case 'rejected':
+        return (
+          <Box
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              mb: 2,
+              backgroundColor: red[50],
+              py: 1,
+              px: 2,
+              borderRadius: 100,
+            }}
+          >
+            <Typography variant="body3" sx={{ flexGrow: 1, fontWeight: 600, color: red[500] }}>
+              Đã từ chối
+            </Typography>
+          </Box>
+        );
+      default:
+        return (
+          <Box
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              mb: 2,
+              backgroundColor: gray[50],
+              py: 1,
+              px: 2,
+              borderRadius: 100,
+            }}
+          >
+            <Typography variant="body3" sx={{ flexGrow: 1, fontWeight: 600, color: gray[500] }}>
+              Chưa xác định
+            </Typography>
+          </Box>
+        );
+    }
+  };
 
   useEffect(() => {
     let uploadedFiles = [];
@@ -229,6 +409,7 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
 
       uploadedFiles.push({ file: file, type: fileType });
     });
+
     setUploadedFiles(uploadedFiles);
     console.log(uploadedFiles);
   }, [session.files]);
@@ -265,7 +446,7 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
         }}
       >
         {/* Header */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
           <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 600 }}>
             Chi tiết phiên công chứng
           </Typography>
@@ -273,6 +454,8 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
             <Close />
           </IconButton>
         </Box>
+
+        {renderSessionStatus()}
 
         {/* Notary Session Name */}
         <Box sx={{ display: 'flex', flexWrap: 'wrap', mb: 2 }}>
@@ -420,7 +603,7 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
             <AvatarWithCloseButton
               key={index}
               email={guest.email}
-              onRemove={() => handleDeleteUser(guest.email)}
+              onRemove={() => handleDeleteGuest(guest.email)}
               onHideRemoveIcon={!isCreator}
             />
           ))}
@@ -433,10 +616,15 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
           {session?.notaryService?.required_documents.map((document, index) => (
             <FileUploadSection
               key={index}
-              uploadedFiles={uploadedFiles.filter((file) => file.type === document)}
-              handleFileChange={(e) => handleFileChange(e, document)}
-              handleRemoveFile={handleRemoveFile}
               title={getDocumentNameByCode(document)}
+              currentFiles={currentFiles.filter((file) => file.type === document)}
+              handleCurrentFileChange={(e) => handleFileChange(e, document)}
+              handleRemoveCurrentFile={handleRemoveFile}
+              uploadedFiles={uploadedFiles.filter((file) => file.type === document)}
+              handleRemoveUploadedFile={handleRemoveUploadedFile}
+              documentWalletFiles={documentWalletFiles.filter((file) => file.type === document)}
+              handleDocumentWalletFileChange={(file) => handleDocumentWalletChange(file, document)}
+              handleRemoveDocumentWalletFile={handleRemoveDocumentWalletFile}
             />
           ))}
           <Button
@@ -444,7 +632,7 @@ const NotarizationSessionDetailsModal = ({ open, onClose, session }) => {
             size="small"
             sx={{ p: 1.5, backgroundColor: primary[500], alignSelf: 'flex-end' }}
             onClick={handleUploadDocument}
-            disabled={isUploading || uploadedFiles.length === 0}
+            disabled={isUploading || session.status !== 'unknown'}
           >
             <Typography sx={{ fontSize: 14, fontWeight: 600, textTransform: 'none', color: white[50] }}>
               {isUploading ? 'Đang tải lên...' : 'Gửi tài liệu'}

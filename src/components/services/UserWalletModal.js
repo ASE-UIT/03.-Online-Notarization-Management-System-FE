@@ -5,7 +5,7 @@ import UserWalletService from '../../services/userwallet.service';
 import { Divider } from '@mui/material';
 import { PictureAsPdf, Image } from '@mui/icons-material';
 
-const UserWalletModal = ({ open, onClose, handleDocumentWalletChange }) => {
+const UserWalletModal = ({ open, onClose, handleDocumentWalletFileChange }) => {
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -31,7 +31,7 @@ const UserWalletModal = ({ open, onClose, handleDocumentWalletChange }) => {
   }, []);
 
   const handleSelectDocument = (document) => {
-    handleDocumentWalletChange(document);
+    handleDocumentWalletFileChange(document);
     onClose();
   };
 

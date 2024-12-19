@@ -69,17 +69,12 @@ const getSessionsByUserId = async () => {
   }
 };
 
-const uploadSessionDocument = async (sessionId, files) => {
+const uploadSessionDocument = async (sessionId, document) => {
   try {
-    const formData = new FormData();
-    files.forEach((file) => formData.append('files', file));
-    const response = await axiosConfig.post(`${SESSION_ENDPOINT}/upload-session-document/${sessionId}`, formData);
+    const response = await axiosConfig.post(`${SESSION_ENDPOINT}/upload-session-document/${sessionId}`, document);
     return response.data;
   } catch (error) {
-    if (error.response) {
-      return error.response.data;
-    }
-    return error.message;
+    return { status: error.response.status, message: error.response.data.message };
   }
 };
 
@@ -96,13 +91,10 @@ const joinSession = async (sessionId, action) => {
 
 const deleteSessionFile = async (sessionId, fileId) => {
   try {
-    const response = await axiosConfig.delete(`${SESSION_ENDPOINT}/delete-session-document/${sessionId}/${fileId}`);
+    const response = await axiosConfig.delete(`${SESSION_ENDPOINT}/${sessionId}/files/${fileId}`);
     return response.data;
   } catch (error) {
-    if (error.response) {
-      return error.response.data;
-    }
-    return error.message;
+    return { status: error.response.status, message: error.response.data.message };
   }
 };
 

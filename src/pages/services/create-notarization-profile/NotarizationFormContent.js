@@ -146,12 +146,12 @@ const NotarizationFormContent = ({
               {notarizationData?.notaryService?.required_documents.map((document, index) => (
                 <FileUploadSection
                   key={index}
-                  currentFiles={uploadedFiles.filter((file) => file.type === document)}
-                  handleFileChange={(e) => handleFileChange(e, document)}
-                  handleRemoveFile={handleRemoveFile}
                   title={getDocumentNameByCode(document)}
-                  handleDocumentWalletChange={(file) => handleDocumentWalletChange(file, document)}
+                  currentFiles={uploadedFiles.filter((file) => file.type === document)}
+                  handleCurrentFileChange={(e) => handleFileChange(e, document)}
+                  handleRemoveCurrentFile={handleRemoveFile}
                   documentWalletFiles={documentWalletFiles.filter((file) => file.type === document)}
+                  handleDocumentWalletFileChange={(file) => handleDocumentWalletChange(file, document)}
                   handleRemoveDocumentWalletFile={handleRemoveDocumentWalletFile}
                 />
               ))}

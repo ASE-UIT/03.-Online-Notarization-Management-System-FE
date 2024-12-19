@@ -10,6 +10,8 @@ import Stack from '@mui/material/Stack';
 import SessionService from '../../services/session.service';
 import JoinSessionModal from './JoinSessionModal';
 import { useSearchParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { uploadFileSuccess } from '../../stores/slices/sessionSlice';
 
 const CreateNotarizationSession = () => {
   const [openNotarySessionForm, setOpenNotarySessionForm] = useState(false);
@@ -22,6 +24,8 @@ const CreateNotarizationSession = () => {
   const sessionsPerPage = 6;
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('sessionId');
+  const { uploadFileSuccessState } = useSelector((state) => state.session);
+  const dispatch = useDispatch();
 
   const fetchSessions = async () => {
     setLoading(true);
@@ -117,6 +121,13 @@ const CreateNotarizationSession = () => {
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
+
+  useEffect(() => {
+    if (uploadFileSuccessState) {
+      fetchSessions();
+      dispatch(uploadFileSuccess(false));
+    }
+  }, [uploadFileSuccessState]);
 
   return (
     <Box sx={{ display: 'flex', width: '100%', height: '100vh', flexDirection: 'column' }}>
