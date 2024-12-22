@@ -1,11 +1,13 @@
 import React from 'react';
-import { Box, Typography, IconButton } from '@mui/material';
-import { white, black, yellow } from '../../../config/theme/themePrimitives';
-import { NotificationsRounded } from '@mui/icons-material';
-
+import { Box, Button, Typography } from '@mui/material';
+import { white, primary } from '../../../config/theme/themePrimitives';
+import CreateNotaryAccountModal from './CreateNotaryAccountModal';
 
 const Header = () => {
-    return (
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <>
       <Box
         sx={{
           display: 'flex',
@@ -19,27 +21,26 @@ const Header = () => {
             Quản lý nhân viên
           </Typography>
         </Box>
-
-        <IconButton
+        <Button
           sx={{
-            p: 1,
-            backgroundColor: black[50],
-            borderRadius: 1,
-            transition: 'background-color 0.2s ease',
+            backgroundColor: primary[500],
+            color: white[50],
             '&:hover': {
-              backgroundColor: yellow[50],
-              boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
-              transform: 'scale(1.05)',
+              backgroundColor: primary[700],
             },
-            '&:hover .MuiSvgIcon-root': {
-              color: yellow[500],
-              transform: 'scale(1.05)',
-            },
+            textTransform: 'none',
+            fontSize: '16px',
+            fontWeight: 500,
+            padding: '4px 16px',
+            borderRadius: 1,
           }}
+          onClick={() => setOpen(true)}
         >
-          <NotificationsRounded sx={{ fontSize: '1.5rem', color: black[500] }} />
-        </IconButton>
+          Thêm nhân viên
+        </Button>
       </Box>
-    );
+      <CreateNotaryAccountModal open={open} onClose={() => setOpen(false)} />
+    </>
+  );
 };
 export default Header;

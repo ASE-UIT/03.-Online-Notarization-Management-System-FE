@@ -9,7 +9,7 @@ const NOTARIZATION_SERVICE_ENDPOINT = `${API_BASE_URL}/notarization-services`;
 const getStatusById = async (documentId) => {
   try {
     const response = await axios.get(`${NOTARIZATION_ENDPOINT}/getStatusById/${documentId}`);
-    return response.data;
+    return response;
   } catch (error) {
     const status = error.response?.status;
     const message = error.response?.data?.message;
@@ -91,10 +91,71 @@ const getAllNotarizations = async (sortBy = null, limit, page) => {
   }
 };
 
-const getNotarizationByRole = async () => {
+const getNotarizationByRole = async ({ status, page, limit }) => {
   try {
-    const response = await axiosConfig.get(`${NOTARIZATION_ENDPOINT}/getDocumentByRole`);
+    const response = await axiosConfig.get(`${NOTARIZATION_ENDPOINT}/getDocumentByRole`, {
+      params: { status, page, limit },
+    });
     return response.data;
+  } catch (error) {
+    const status = error.response?.status;
+    const message = error.response?.data?.message;
+    return { status, message };
+  }
+};
+
+const getApproveHistory = async () => {
+  try {
+    const response = await axiosConfig.get(`${NOTARIZATION_ENDPOINT}/getApproveHistory`);
+    return response.data;
+  } catch (error) {
+    const status = error.response?.status;
+    const message = error.response?.data?.message;
+    return { status, message };
+  }
+};
+
+const getDocumentById = async (documentId) => {
+  try {
+    const response = await axiosConfig.get(`${NOTARIZATION_ENDPOINT}/document/${documentId}`);
+    return response.data;
+  } catch (error) {
+    const status = error.response?.status;
+    const message = error.response?.data?.message;
+    return { status, message };
+  }
+};
+
+const forwardDocumentStatus = async (documentId, formData) => {
+  try {
+    const response = await axiosConfig.patch(`${NOTARIZATION_ENDPOINT}/forwardDocumentStatus/${documentId}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    const status = error.response?.status;
+    const message = error.response?.data?.message;
+    return { status, message };
+  }
+};
+
+const approveSignatureByUser = async (formData) => {
+  try {
+    const response = await axiosConfig.post(`${NOTARIZATION_ENDPOINT}/approve-signature-by-user`, formData);
+    return response;
+  } catch (error) {
+    const status = error.response?.status;
+    const message = error.response?.data?.message;
+    return { status, message };
+  }
+};
+
+const approveSignatureByNotary = async (documentId) => {
+  try {
+    const response = await axiosConfig.post(`${NOTARIZATION_ENDPOINT}/approve-signature-by-notary`, { documentId });
+    return response;
   } catch (error) {
     const status = error.response?.status;
     const message = error.response?.data?.message;
@@ -111,6 +172,11 @@ const NotarizationService = {
   uploadNotarizationDocument,
   getAllNotarizations,
   getNotarizationByRole,
+  getApproveHistory,
+  getDocumentById,
+  forwardDocumentStatus,
+  approveSignatureByUser,
+  approveSignatureByNotary,
 };
 
 export default NotarizationService;

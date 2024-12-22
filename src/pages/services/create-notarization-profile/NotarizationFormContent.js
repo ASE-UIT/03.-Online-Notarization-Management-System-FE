@@ -35,26 +35,31 @@ const requiredFields = [
     label: 'Số bản sao',
     name: 'amount',
     placeholder: 'Nhập số lượng bản sao',
+    type: 'number',
   },
   {
     label: 'Họ và tên',
     name: 'fullName',
     placeholder: 'Nhập họ và tên',
+    type: 'text',
   },
   {
     label: 'Số điện thoại',
     name: 'phoneNumber',
     placeholder: 'Nhập số điện thoại',
+    type: 'tel',
   },
   {
     label: 'Số CMND/CCCD/Hộ chiếu',
     name: 'citizenId',
     placeholder: 'Nhập số CMND/CCCD/Hộ chiếu',
+    type: 'text',
   },
   {
     label: 'Email',
     name: 'email',
     placeholder: 'Nhập địa chỉ email',
+    type: 'email',
   },
 ];
 
@@ -75,6 +80,9 @@ const NotarizationFormContent = ({
   handleRemoveFile,
   loadingNotarization,
   notarizationData,
+  handleDocumentWalletChange,
+  documentWalletFiles,
+  handleRemoveDocumentWalletFile,
 }) => {
   const stepTitles = [
     'Chọn lĩnh vực và dịch vụ công chứng bạn cần',
@@ -125,6 +133,7 @@ const NotarizationFormContent = ({
                 value={notarizationData[field.name]}
                 placeholder={field.placeholder}
                 onChange={handleInputChange}
+                type={field.type}
                 required
               />
             ))}
@@ -137,10 +146,13 @@ const NotarizationFormContent = ({
               {notarizationData?.notaryService?.required_documents.map((document, index) => (
                 <FileUploadSection
                   key={index}
-                  uploadedFiles={uploadedFiles.filter((file) => file.type === document)}
-                  handleFileChange={(e) => handleFileChange(e, document)}
-                  handleRemoveFile={handleRemoveFile}
                   title={getDocumentNameByCode(document)}
+                  currentFiles={uploadedFiles.filter((file) => file.type === document)}
+                  handleCurrentFileChange={(e) => handleFileChange(e, document)}
+                  handleRemoveCurrentFile={handleRemoveFile}
+                  documentWalletFiles={documentWalletFiles.filter((file) => file.type === document)}
+                  handleDocumentWalletFileChange={(file) => handleDocumentWalletChange(file, document)}
+                  handleRemoveDocumentWalletFile={handleRemoveDocumentWalletFile}
                 />
               ))}
             </Box>
@@ -182,10 +194,13 @@ const NotarizationFormContent = ({
               {notarizationData?.notaryService?.required_documents.map((document, index) => (
                 <FileUploadSection
                   key={index}
-                  uploadedFiles={uploadedFiles.filter((file) => file.type === document)}
+                  currentFiles={uploadedFiles.filter((file) => file.type === document)}
                   handleFileChange={(e) => handleFileChange(e, document)}
                   handleRemoveFile={handleRemoveFile}
                   title={getDocumentNameByCode(document)}
+                  handleDocumentWalletChange={(file) => handleDocumentWalletChange(file, document)}
+                  documentWalletFiles={documentWalletFiles.filter((file) => file.type === document)}
+                  handleRemoveDocumentWalletFile={handleRemoveDocumentWalletFile}
                   confirmed
                 />
               ))}

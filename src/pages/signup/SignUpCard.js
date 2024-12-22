@@ -53,7 +53,7 @@ export default function SignUpCard() {
       const response = await AuthService.register(data.get('name'), data.get('email'), data.get('password'));
       console.log(response);
       if (response.status === 201) {
-        toast.success('Đăng ký thành công');
+        toast.success('Đăng ký thành công! Vui lòng kiểm tra email để kích hoạt tài khoản.');
         navigate('/signin/');
       }
     } catch (error) {

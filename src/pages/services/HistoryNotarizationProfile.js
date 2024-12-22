@@ -1,153 +1,114 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Typography, Button, TextField, InputAdornment } from '@mui/material';
-import 'react-toastify/dist/ReactToastify.css';
-import FindInPageIcon from '@mui/icons-material/FindInPage';
-import SearchIcon from '@mui/icons-material/Search';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Box, Typography, TextField, InputAdornment } from '@mui/material';
 import { white, black } from '../../config/theme/themePrimitives';
 import StatusFilterButton from '../../components/services/StatusFilterButton';
 import HistoryDataTable from '../../components/services/HistoryDataTable';
 import NotarizationService from '../../services/notarization.service';
 import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import SkeletonHistoryDataTable from '../../components/services/SkeletonHistoryDataTable';
-import { useNavigate } from 'react-router-dom';
-import AppsIcon from '@mui/icons-material/Apps';
-import HourglassTopIcon from '@mui/icons-material/HourglassTop';
-import LoopIcon from '@mui/icons-material/Loop';
-import EditNoteIcon from '@mui/icons-material/EditNote';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import ErrorIcon from '@mui/icons-material/Error';
-import VerifiedIcon from '@mui/icons-material/Verified';
+import {
+  AppsRounded,
+  CheckCircleRounded,
+  EditNoteRounded,
+  ErrorRounded,
+  HourglassTopRounded,
+  LoopRounded,
+  SearchRounded,
+} from '@mui/icons-material';
+import { STATUS_TYPES } from '../../utils/constants';
+
+const ICON_MAP = {
+  [STATUS_TYPES.All]: <AppsRounded sx={{ height: '18px', width: '18px' }} />,
+  [STATUS_TYPES.Pending]: <HourglassTopRounded sx={{ height: '18px', width: '18px' }} />,
+  [STATUS_TYPES.Processing]: <LoopRounded sx={{ height: '18px', width: '18px' }} />,
+  [STATUS_TYPES.DigitalSignature]: <EditNoteRounded sx={{ height: '18px', width: '18px' }} />,
+  [STATUS_TYPES.Completed]: <CheckCircleRounded sx={{ height: '18px', width: '18px' }} />,
+  [STATUS_TYPES.Rejected]: <ErrorRounded sx={{ height: '18px', width: '18px' }} />,
+};
+
+const HEAD_CELLS = [
+  { id: 'profile', disablePadding: true, label: 'Số hồ sơ' },
+  { id: 'date', disablePadding: false, label: 'Ngày công chứng' },
+  { id: 'name', disablePadding: false, label: 'Người yêu cầu' },
+  { id: 'status', disablePadding: false, label: 'Tình trạng' },
+  { id: 'service', disablePadding: false, label: 'Loại dịch vụ' },
+];
+
+const createData = (id, profile, date, name, status, service) => ({
+  id,
+  profile,
+  date,
+  name,
+  status,
+  service,
+});
 
 const HistoryNotarizationProfile = () => {
-  const statusTypes = {
-    All: 'Tất cả',
-    Pending: 'Chờ xử lý',
-    Processing: 'Đang xử lý',
-    Verification: 'Đang xác minh',
-    DigitalSignature: 'Sẵn sàng ký số',
-    Completed: 'Hoàn tất',
-    Rejected: 'Không hợp lệ',
-  };
-
-  const iconMap = {
-    [statusTypes.All]: <AppsIcon sx={{ height: '18px', width: '18px' }} />,
-    [statusTypes.Pending]: <HourglassTopIcon sx={{ height: '18px', width: '18px' }} />,
-    [statusTypes.Processing]: <LoopIcon sx={{ height: '18px', width: '18px' }} />,
-    [statusTypes.DigitalSignature]: <EditNoteIcon sx={{ height: '18px', width: '18px' }} />,
-    [statusTypes.Verification]: <VerifiedIcon sx={{ height: '18px', width: '18px'}}/>,
-    [statusTypes.Completed]: <CheckCircleIcon sx={{ height: '18px', width: '18px' }} />,
-    [statusTypes.Rejected]: <ErrorIcon sx={{ height: '18px', width: '18px' }} />,
-  };
-  
-  const headCells = [
-    {
-      id: 'profile',
-      disablePadding: true,
-      label: 'Số hồ sơ',
-    },
-    {
-      id: 'date',
-      disablePadding: false,
-      label: 'Ngày công chứng',
-    },
-    {
-      id: 'name',
-      disablePadding: false,
-      label: 'Người yêu cầu',
-    },
-    {
-      id: 'status',
-      disablePadding: false,
-      label: 'Tình trạng',
-    },
-    {
-      id: 'service',
-      disablePadding: false,
-      label: 'Loại dịch vụ',
-    },
-  ];
-  
-  function createData(id, profile, date, name, status, service) {
-    return {
-      id,
-      profile,
-      date,
-      name,
-      status,
-      service,
-    };
-  }
-
-  const [statusFilter, setStatusFilter] = useState(statusTypes.All);
-  const [statusClicked, setStatusClicked] = useState(statusTypes.All);
+  const [statusFilter, setStatusFilter] = useState(STATUS_TYPES.All);
+  const [statusClicked, setStatusClicked] = useState(STATUS_TYPES.All);
   const [searchText, setSearchText] = useState('');
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [rows, setRows] = useState([]);
   const [fullData, setFullData] = useState([]);
-  const navigate = useNavigate();
 
-  async function getHistoryFromDB() {
+  const fetchHistory = useCallback(async () => {
     try {
       setLoadingStatus(true);
       const response = await NotarizationService.getHistory();
       setFullData(response);
 
-      const data = await Promise.all(
-        response.map(async (item, index) => {          
-          const date = new Date(item.createdAt);
-          const notaryDate = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
-          let status;          
+      const formattedData = response.map((item, index) => {
+        const date = new Date(item.createdAt);
+        const notaryDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+        const statusMap = {
+          pending: 'Chờ xử lý',
+          processing: 'Đang xử lý',
+          verification: 'Đang xác minh',
+          digitalSignature: 'Sẵn sàng ký số',
+          completed: 'Hoàn tất',
+          rejected: 'Không hợp lệ',
+        };
+        return createData(
+          index + 1,
+          item._id,
+          notaryDate,
+          item.requesterInfo.fullName,
+          statusMap[item.status.status],
+          item.notarizationService.name,
+        );
+      });
 
-          if (item.status.status === 'pending') status = 'Chờ xử lý';
-          if (item.status.status === 'processing') status = 'Đang xử lý';
-          if (item.status.status === 'verification') status = 'Đang xác minh';
-          if (item.status.status === 'digitalSignature') status = 'Sẵn sàng ký số';
-          if (item.status.status === 'completed') status = 'Hoàn tất';
-          if (item.status.status === 'rejected') status = 'Không hợp lệ';
-          return createData(index + 1, item._id, notaryDate, item.requesterInfo.fullName, status, item.notarizationService.name);
-        }),
-      );
-      setRows(data);
-      setLoadingStatus(false);
+      setRows(formattedData);
     } catch (error) {
-      if (error.response && error.response.status === 401) {
+      if (error.response?.status === 401) {
         toast.error('Vui lòng đăng nhập');
       }
+    } finally {
+      setLoadingStatus(false);
     }
-  }
-
-  function setStatusColor(params) {
-    let color = '';
-    let backgroundColor = '';
-    if (params === 'Chờ xử lý') {
-      color = '#324155';
-      backgroundColor = '#EBEDEF';
-    } else if (params === 'Đang xử lý') {
-      color = '#FFAA00';
-      backgroundColor = '#FFF7E6';
-    } else if (params === 'Đang xác minh') {
-      color = '#7007C1';
-      backgroundColor = '#F9F0FF';
-    } else if (params === 'Sẵn sàng ký số') {
-      color = '#0095FF';
-      backgroundColor = '#E6F4FF';
-    } else if (params === 'Hoàn tất') {
-      color = '#43B75D';
-      backgroundColor = '#ECF8EF';
-    } else if (params === 'Không hợp lệ') {
-      color = '#EE443F';
-      backgroundColor = '#FDECEC';
-    }
-    return { color, backgroundColor };
-  }
-
-  useEffect(() => {
-    getHistoryFromDB();
   }, []);
 
-  const handleClick = () => {
-    navigate('/lookup');
+  const handleFilterChange = (status) => {
+    setStatusFilter(status);
+    setStatusClicked(status);
   };
+
+  const getStatusStyles = (status) => {
+    const styles = {
+      'Chờ xử lý': { color: '#324155', backgroundColor: '#EBEDEF' },
+      'Đang xử lý': { color: '#FFAA00', backgroundColor: '#FFF7E6' },
+      'Đang xác minh': { color: '#7007C1', backgroundColor: '#F9F0FF' },
+      'Sẵn sàng ký số': { color: '#0095FF', backgroundColor: '#E6F4FF' },
+      'Hoàn tất': { color: '#43B75D', backgroundColor: '#ECF8EF' },
+      'Không hợp lệ': { color: '#EE443F', backgroundColor: '#FDECEC' },
+    };
+    return styles[status] || {};
+  };
+
+  useEffect(() => {
+    fetchHistory();
+  }, [fetchHistory]);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100vh' }}>
@@ -158,6 +119,7 @@ const HistoryNotarizationProfile = () => {
           p: 3,
           gap: '8px',
           backgroundColor: white[50],
+          flexDirection: { xs: 'column', sm: 'row' },
         }}
       >
         <Box sx={{ flex: 1, gap: 2 }}>
@@ -167,34 +129,6 @@ const HistoryNotarizationProfile = () => {
 
           <Typography variant="caption">Toàn bộ lịch sử công chứng của bạn sẽ hiển thị ở đây</Typography>
         </Box>
-
-        {/* Tra cứu hồ sơ */}
-        <Button
-          startIcon={<FindInPageIcon />}
-          disableElevation
-          onClick={handleClick}
-          sx={{
-            display: 'flex',
-            p: '6px 12px',
-            borderRadius: '8px',
-            border: '1px solid #A91D3A',
-            background: '#FFF',
-            fontSize: '14px',
-            height: 'fit-content',
-            mt: {
-              xs: 2,
-              sm: 2,
-              md: 0,
-              lg: 0,
-              xl: 0,
-            },
-          }}
-          size="small"
-        >
-          <Typography variant="button" sx={{ textTransform: 'none', padding: 0 }}>
-            Tra cứu hồ sơ
-          </Typography>
-        </Button>
       </Box>
 
       {/* Main */}
@@ -217,79 +151,24 @@ const HistoryNotarizationProfile = () => {
         >
           <Box
             sx={{
-              display: 'flex',
+              display: { xs: 'none', sm: 'none', md: 'flex', lg: 'flex', xl: 'flex' },
               gap: '8px',
               alignSelf: 'stretch',
               borderBottom: '1px solid #C0C0C0',
             }}
           >
-            <StatusFilterButton
-              statusFilter={statusTypes.All}
-              handleFilterByStatus={() => {
-                setStatusFilter(statusTypes.All);
-                setStatusClicked(statusTypes.All);
-              }}
-              clickedButton={statusClicked}
-              iconMap={iconMap}
-            ></StatusFilterButton>
-
-            <StatusFilterButton
-              statusFilter={statusTypes.Pending}
-              handleFilterByStatus={() => {
-                setStatusFilter(statusTypes.Pending);
-                setStatusClicked(statusTypes.Pending);
-              }}
-              clickedButton={statusClicked}
-              iconMap={iconMap}
-            />
-            <StatusFilterButton
-              statusFilter={statusTypes.Processing}
-              handleFilterByStatus={() => {
-                setStatusFilter(statusTypes.Processing);
-                setStatusClicked(statusTypes.Processing);
-              }}
-              clickedButton={statusClicked}
-              iconMap={iconMap}
-            />
-            <StatusFilterButton
-              statusFilter={statusTypes.Verification}
-              handleFilterByStatus={() => {
-                setStatusFilter(statusTypes.Verification);
-                setStatusClicked(statusTypes.Verification);
-              }}
-              clickedButton={statusClicked}
-              iconMap={iconMap}
-            />
-            <StatusFilterButton
-              statusFilter={statusTypes.DigitalSignature}
-              handleFilterByStatus={() => {
-                setStatusFilter(statusTypes.DigitalSignature);
-                setStatusClicked(statusTypes.DigitalSignature);
-              }}
-              clickedButton={statusClicked}
-              iconMap={iconMap}
-            />
-            <StatusFilterButton
-              statusFilter={statusTypes.Completed}
-              handleFilterByStatus={() => {
-                setStatusFilter(statusTypes.Completed);
-                setStatusClicked(statusTypes.Completed);
-              }}
-              clickedButton={statusClicked}
-              iconMap={iconMap}
-            />
-            <StatusFilterButton
-              statusFilter={statusTypes.Rejected}
-              handleFilterByStatus={() => {
-                setStatusFilter(statusTypes.Rejected);
-                setStatusClicked(statusTypes.Rejected);
-              }}
-              clickedButton={statusClicked}
-              iconMap={iconMap}
-            />
+            {Object.keys(STATUS_TYPES).map((key) => (
+              <StatusFilterButton
+                key={key}
+                statusFilter={STATUS_TYPES[key]}
+                handleFilterByStatus={() => handleFilterChange(STATUS_TYPES[key])}
+                clickedButton={statusClicked}
+                iconMap={ICON_MAP}
+              />
+            ))}
           </Box>
 
-          <Box flex={1}></Box>
+          <Box sx={{ flex: 1, display: { xs: 'none', sm: 'none', md: 'flex' } }}></Box>
 
           <TextField
             variant="outlined"
@@ -299,7 +178,7 @@ const HistoryNotarizationProfile = () => {
             onChange={(e) => setSearchText(e.target.value)}
             sx={{
               borderRadius: 1,
-              width: '20%',
+              width: { xs: '100%', sm: '100%', md: '20%' },
               minWidth: '150px',
               '& .MuiInputBase-input': {
                 fontSize: 14,
@@ -308,31 +187,25 @@ const HistoryNotarizationProfile = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon sx={{ color: black[300] }} />
+                  <SearchRounded sx={{ color: black[300] }} />
                 </InputAdornment>
               ),
             }}
           ></TextField>
         </Box>
-        <Box
-          sx={{
-            border: !loadingStatus ? '1px solid var(--black-50, #E0E0E0)' : 'none',
-            borderRadius: '8px',
-            background: white[50],
-          }}
-        >
+        <Box sx={{ border: !loadingStatus ? '1px solid #E0E0E0' : 'none', borderRadius: '8px', background: white[50] }}>
           {loadingStatus ? (
-            <SkeletonHistoryDataTable headCells={headCells}></SkeletonHistoryDataTable>
+            <SkeletonHistoryDataTable headCells={HEAD_CELLS} />
           ) : (
             <HistoryDataTable
               filterStatus={statusFilter}
               searchText={searchText}
               rows={rows}
-              headCells={headCells}
-              statusTypes={statusTypes}
-              setStatusColor={setStatusColor}
+              headCells={HEAD_CELLS}
+              statusTypes={STATUS_TYPES}
+              setStatusColor={getStatusStyles}
               data={fullData}
-            ></HistoryDataTable>
+            />
           )}
         </Box>
       </Box>

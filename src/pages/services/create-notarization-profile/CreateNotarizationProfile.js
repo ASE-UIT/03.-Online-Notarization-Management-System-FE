@@ -13,6 +13,9 @@ const initialNotarizationData = {
   notaryField: null,
   notaryService: null,
   amount: null,
+  fileIds: [],
+  customFileNames: [],
+  files: [],
 };
 
 const initialFieldsAndServices = {
@@ -24,6 +27,7 @@ const CreateNotarizationProfile = () => {
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [documentWalletFiles, setDocumentWalletFiles] = useState([]);
   const [notarizationData, setNotarizationData] = useState(initialNotarizationData);
   const [fieldsAndServices, setFieldsAndServices] = useState(initialFieldsAndServices);
   const [loadingNotarization, setLoadingNotarization] = useState(false);
@@ -58,14 +62,52 @@ const CreateNotarizationProfile = () => {
   }, [fieldsAndServices, selectedField]);
 
   const handleInputChange = (event) => {
-    if (event.target.name === 'amount') {
-      setNotarizationData((prev) => ({ ...prev, [event.target.name]: parseInt(event.target.value) }));
+    const { name, value } = event.target;
+
+    if (name === 'amount') {
+      setNotarizationData((prev) => ({
+        ...prev,
+        [name]: value === '' ? undefined : parseInt(value, 10),
+      }));
       return;
     }
+
     setNotarizationData((prev) => ({
       ...prev,
-      requesterInfo: { ...prev.requesterInfo, [event.target.name]: event.target.value },
+      requesterInfo: { ...prev.requesterInfo, [name]: value },
     }));
+  };
+
+  const handleDocumentWalletChange = (document, documentType) => {
+    if (!document || !document.filename || !document._id) {
+      toast.error('Tài liệu không hợp lệ. Vui lòng kiểm tra lại.');
+      return;
+    }
+
+    if (notarizationData.fileIds.includes(document._id)) {
+      toast.error('Tài liệu đã được chọn trước đó.');
+      return;
+    }
+
+    try {
+      const timestamp = Date.now();
+      const fileExtension = document.filename.includes('.') ? document.filename.split('.').pop() : '';
+      const customFileName = `${documentType}_${timestamp}${fileExtension ? `.${fileExtension}` : ''}`;
+
+      setNotarizationData((prevData) => ({
+        ...prevData,
+        fileIds: [...prevData.fileIds, document._id],
+        customFileNames: [...prevData.customFileNames, customFileName],
+      }));
+
+      setDocumentWalletFiles((prevFiles) => [
+        ...prevFiles,
+        { document: { ...document, filename: customFileName }, type: documentType },
+      ]);
+    } catch (error) {
+      console.error('Error handling document wallet change:', error);
+      toast.error('Đã xảy ra lỗi khi đổi tên tài liệu.');
+    }
   };
 
   const handleFileChange = (e, documentType) => {
@@ -90,6 +132,16 @@ const CreateNotarizationProfile = () => {
     setUploadedFiles((prev) => prev.filter((file) => file !== fileToRemove));
   };
 
+  const handleRemoveDocumentWalletFile = (document) => {
+    setDocumentWalletFiles((prev) => prev.filter((file) => file.document._id !== document.document._id));
+
+    setNotarizationData((prev) => ({
+      ...prev,
+      fileIds: prev.fileIds.filter((id) => id !== document.document._id),
+      customFileNames: prev.customFileNames.filter((name) => name !== document.document.filename),
+    }));
+  };
+
   const handleConfirm = async () => {
     setLoading(true);
     try {
@@ -101,8 +153,15 @@ const CreateNotarizationProfile = () => {
 
       notarizationData.files.forEach((file) => file && formData.append('files', file));
 
+      formData.append('fileIds', JSON.stringify(notarizationData.fileIds));
+
+      formData.append('customFileNames', JSON.stringify(notarizationData.customFileNames));
+
       const response = await NotarizationService.uploadNotarizationDocument(formData);
-      toast.success('Tạo yêu cầu công chứng thành công!');
+
+      if (response.status === 200) {
+        toast.success('Tạo hồ sơ công chứng thành công');
+      }
 
       setNotarizationData(initialNotarizationData);
       setUploadedFiles([]);
@@ -138,11 +197,13 @@ const CreateNotarizationProfile = () => {
         toast.error('Vui lòng nhập thông tin người yêu cầu.');
         return;
       }
+
       const requiredDocumentTypes = notarizationData?.notaryService?.required_documents || [];
 
-      const uploadedDocumentTypes = uploadedFiles.map((file) => file.type);
+      // Kết hợp tài liệu từ uploadedFiles và documentWalletFiles
+      const allDocumentTypes = [...uploadedFiles.map((file) => file.type), ...documentWalletFiles.map((file) => file.type)];
 
-      const missingDocumentTypes = requiredDocumentTypes.filter((type) => !uploadedDocumentTypes.includes(type));
+      const missingDocumentTypes = requiredDocumentTypes.filter((type) => !allDocumentTypes.includes(type));
 
       if (missingDocumentTypes.length > 0) {
         toast.error(`Vui lòng tải lên đầy đủ các tài liệu: ${missingDocumentTypes.map(getDocumentNameByCode).join(', ')}`);
@@ -168,6 +229,8 @@ const CreateNotarizationProfile = () => {
     setFieldsAndServices({ notarizationField: [], notarizationService: [] });
     setSelectedService(null);
   }, [selectedField]);
+
+  console.log(notarizationData);
 
   return (
     <Box
@@ -233,6 +296,9 @@ const CreateNotarizationProfile = () => {
             handleRemoveFile={handleRemoveFile}
             loadingNotarization={loadingNotarization}
             notarizationData={notarizationData}
+            handleDocumentWalletChange={handleDocumentWalletChange}
+            documentWalletFiles={documentWalletFiles}
+            handleRemoveDocumentWalletFile={handleRemoveDocumentWalletFile}
           />
         </Box>
       </Box>

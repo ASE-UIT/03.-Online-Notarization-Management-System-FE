@@ -16,6 +16,8 @@ import PrivateRoute from './routes/PrivateRoute';
 import PublicRoute from './routes/PublicRoute';
 import { setUser } from './stores/slices/userSlice';
 import Settings from './pages/admin/Settings';
+import ThirdParty from './pages/static/Loader';
+import Loader from './components/Loader';
 
 const Home = lazy(() => import('./pages/home/Home'));
 const Services = lazy(() => import('./pages/services/Services'));
@@ -35,14 +37,20 @@ const AdminDashboard = lazy(() => import('./pages/admin/dashboard/AdminDashboard
 const UserManagement = lazy(() => import('./pages/admin/user-management/UserManagement'));
 const NotaryManagement = lazy(() => import('./pages/admin/notary-management/NotaryManagement'));
 const NotaryDashboard = lazy(() => import('./pages/notary/NotaryDashboard'));
-const NotarizationDocuments = lazy(() => import('./pages/notary/NotarizationDocuments'));
-const NotarizationHistory = lazy(() => import('./pages/notary/NotarizationHistory'));
+const DocumentWallet = lazy(() => import('./pages/services/DocumentWallet'));
+const ProcessingNotarizationDocuments = lazy(() => import('./pages/notary/ProcessingNotarizationDocuments'));
+const NotarizationHistory = lazy(() => import('./pages/notary/NotarizedHistory'));
+const AwaitingSignatureDocuments = lazy(() => import('./pages/notary/AwaitingSignatureDocuments'));
+const ForgotPassword = lazy(() => import('./pages/signin/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/signin/ResetPassword'));
+const SessionManagement = lazy(() => import('./pages/notary/SessionManagement'));
 
 function App() {
   const dispatch = useDispatch();
   const theme = createTheme(getDesignTokens());
   const { isAuthenticated } = useSelector((state) => state.auth);
   const { token, refreshToken } = TokenService.getAccessTokenFromURL(window.location.search);
+  const resetPasswordToken = TokenService.getResetPasswordTokenFromURL(window.location.search);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -53,6 +61,7 @@ function App() {
           const user = await UserService.getUserById(TokenService.decodeToken(token).sub);
           dispatch(setUser(user));
           window.history.replaceState({}, document.title, window.location.pathname);
+          window.location.reload();
         } catch (error) {
           console.error('Failed to fetch user:', error);
         }
@@ -62,8 +71,15 @@ function App() {
     fetchUser();
   }, [token, refreshToken, dispatch]);
 
+  useEffect(() => {
+    if (resetPasswordToken) {
+      Cookies.set('resetPasswordToken', resetPasswordToken);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <ThemeProvider theme={theme}>
         <Box display={'flex'}>
           {isAuthenticated && <Sidebar />}
@@ -119,16 +135,43 @@ function App() {
                   </PublicRoute>
                 }
               />
+              <Route
+                path="/forgot-password"
+                element={
+                  <PublicRoute>
+                    <ForgotPassword />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/reset-password"
+                element={
+                  <PublicRoute>
+                    <ResetPassword />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/third-party"
+                element={
+                  <PublicRoute>
+                    <Loader />
+                  </PublicRoute>
+                }
+              />
 
               {/* Auth Routes */}
               <Route path="/signin" element={<PublicRoute element={<SignIn />} />} />
               <Route path="/signup" element={<PublicRoute element={<SignUp />} />} />
+              <Route path="/forgot-password" element={<PublicRoute element={<ForgotPassword />} />} />
+              <Route path="/reset-password" element={<PublicRoute element={<ResetPassword />} />} />
 
               {/* User Routes */}
               <Route element={<PrivateRoute allowedRoles={['user']} />}>
                 <Route path="/user/create-notarization-profile" element={<CreateNotarizationProfile />} />
                 <Route path="/user/history" element={<HistoryNotarizationProfile />} />
-                <Route path="/user/create-notarization-session" element={<CreateNotarizationSession />} />
+                <Route path="/user/document-wallet" element={<DocumentWallet />} />
+                <Route path="/user/notarization-session" element={<CreateNotarizationSession />} />
               </Route>
 
               {/* Admin Routes */}
@@ -166,8 +209,10 @@ function App() {
               {/* Notary Routes */}
               <Route element={<PrivateRoute allowedRoles={['notary']} />}>
                 <Route path="/notary/dashboard" element={<NotaryDashboard />} />
-                <Route path="/notary/notarization-documents" element={<NotarizationDocuments />} />
+                <Route path="/notary/pending-notarization-documents" element={<ProcessingNotarizationDocuments />} />
                 <Route path="/notary/notarization-history" element={<NotarizationHistory />} />
+                <Route path="/notary/awaiting-signature-documents" element={<AwaitingSignatureDocuments />} />
+                <Route path="/notary/notary-session-management" element={<SessionManagement />} />
               </Route>
 
               <Route path="*" element={<NotFound />} />

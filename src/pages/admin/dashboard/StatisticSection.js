@@ -3,6 +3,8 @@ import { Autocomplete, Box, Button, TextField, Typography } from '@mui/material'
 import React from 'react';
 import { black, dark, green, primary, red, white, yellow } from '../../../config/theme/themePrimitives';
 import StatCard from './StatCard';
+import AdminService from '../../../services/admin.service';
+import { toast } from 'react-toastify';
 
 const StatisticSection = ({ period, setPeriod, documentMetrics, sessionMetrics, paymentMetrics }) => {
   const renderPercentageChange = (data) => {
@@ -20,6 +22,40 @@ const StatisticSection = ({ period, setPeriod, documentMetrics, sessionMetrics, 
       : `${percentageChange}% so với ${previousPeriod}`;
   };
 
+  const handleExportExcel = async () => {
+    try {
+      const response = await AdminService.exportToExcel(period.id);
+
+      if (response && response.data) {
+        const blob = new Blob([response.data], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+
+        if (blob.size === 0) {
+          toast.error('Tệp tin trống');
+          return;
+        }
+
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `${period.name}.xlsx`);
+        document.body.appendChild(link);
+        link.click();
+
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+
+        toast.success('Xuất file thành công');
+      } else {
+        toast.error('Không thể tải file');
+      }
+    } catch (error) {
+      console.error('Excel export error:', error);
+      toast.error('Lỗi xuất file');
+    }
+  }
+
   return (
     <Box
       sx={{
@@ -36,7 +72,7 @@ const StatisticSection = ({ period, setPeriod, documentMetrics, sessionMetrics, 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
         <Box sx={{ flex: 1 }}>
           <Typography sx={{ color: black[900], fontSize: 16, fontWeight: 600 }}>Thống kê</Typography>
-          <Typography sx={{ color: black[400], fontSize: 14 }}>Thống kê hôm nay</Typography>
+          <Typography sx={{ color: black[400], fontSize: 14 }}>Thống kê {period.name.toLowerCase()}</Typography>
         </Box>
         <Button
           variant="outlined"
@@ -56,6 +92,7 @@ const StatisticSection = ({ period, setPeriod, documentMetrics, sessionMetrics, 
             },
           }}
           startIcon={<FileUploadRounded sx={{ color: dark[400], fontSize: 16 }} />}
+          onClick={handleExportExcel}
         >
           <Typography sx={{ fontSize: 14, textTransform: 'capitalize', fontWeight: 500 }}>Xuất</Typography>
         </Button>

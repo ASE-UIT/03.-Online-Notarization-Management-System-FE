@@ -8,24 +8,38 @@ import NotarySessionForm from './NotarySessionForm';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 import SessionService from '../../services/session.service';
+import JoinSessionModal from './JoinSessionModal';
+import { useSearchParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { uploadFileSuccess } from '../../stores/slices/sessionSlice';
 
 const CreateNotarizationSession = () => {
   const [openNotarySessionForm, setOpenNotarySessionForm] = useState(false);
+  const [openJoinSessionModal, setOpenJoinSessionModal] = useState(false);
   const [sessions, setSessions] = useState([]);
   const [searchingSessions, setSearchingSessions] = useState([]);
   const [searchValue, setSearchValue] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const sessionsPerPage = 6;
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get('sessionId');
+  const { uploadFileSuccessState } = useSelector((state) => state.session);
+  const dispatch = useDispatch();
 
   const fetchSessions = async () => {
     setLoading(true);
     try {
-      const sessions = await SessionService.getSessionsByUserId();
-      console.log(sessions);
-      setSessions(sessions.results);
+      const response = await SessionService.getSessionsByUserId();
+
+      const sessions = response.results.filter((session) => {
+        return session.users.every((user) => user.status !== 'rejected');
+      });
+
+      setSessions(sessions);
     } catch (error) {
       console.error('Error fetching sessions:', error);
+      setSessions([]);
     } finally {
       setLoading(false);
     }
@@ -69,9 +83,11 @@ const CreateNotarizationSession = () => {
   const indexOfLastSession = currentPage * sessionsPerPage;
   const indexOfFirstSession = indexOfLastSession - sessionsPerPage;
   const currentSessions =
-    searchingSessions.length > 0
+    Array.isArray(searchingSessions) && searchingSessions.length > 0
       ? searchingSessions.slice(indexOfFirstSession, indexOfLastSession)
-      : sessions.slice(indexOfFirstSession, indexOfLastSession);
+      : Array.isArray(sessions)
+        ? sessions.slice(indexOfFirstSession, indexOfLastSession)
+        : [];
 
   const totalSessions = searchingSessions.length > 0 ? searchingSessions.length : sessions.length;
   const totalPages = Math.ceil(totalSessions / sessionsPerPage);
@@ -98,6 +114,20 @@ const CreateNotarizationSession = () => {
       <Skeleton width="40%" height={20} />
     </Box>
   ));
+
+  useEffect(() => {
+    if (sessionId) {
+      setOpenJoinSessionModal(true);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (uploadFileSuccessState) {
+      fetchSessions();
+      dispatch(uploadFileSuccess(false));
+    }
+  }, [uploadFileSuccessState]);
 
   return (
     <Box sx={{ display: 'flex', width: '100%', height: '100vh', flexDirection: 'column' }}>
@@ -257,7 +287,7 @@ const CreateNotarizationSession = () => {
               }}
             >
               {currentSessions.map((session, index) => (
-                <SessionCard key={index} session={session} />
+                <SessionCard key={session._id} session={session} />
               ))}
             </Box>
           ) : (
@@ -312,6 +342,7 @@ const CreateNotarizationSession = () => {
           setOpen={setOpenNotarySessionForm}
           handleSuccess={handleAddSessionSuccess}
         />
+        <JoinSessionModal sessionId={sessionId} open={openJoinSessionModal} setOpen={setOpenJoinSessionModal} />
       </Box>
     </Box>
   );

@@ -1,6 +1,6 @@
-## CongChungOnline Frontend
+# Online Notarization Management System - Frontend
 
-This repository contains the frontend code for **CongChungOnline**, a platform for online notarization services that leverages blockchain and NFT for document storage. This frontend interacts with the provided backend to facilitate the user experience.
+This repository contains the frontend code for **Online Notarization Management System**, a platform for online notarization services that leverages blockchain and NFT for document storage. This frontend interacts with the provided backend to facilitate the user experience.
 
 ## Features
 
@@ -26,8 +26,8 @@ This repository contains the frontend code for **CongChungOnline**, a platform f
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/ASE-UIT/congchungonline-fe.git
-   cd congchungonline-fe
+   git clone https://github.com/ASE-UIT/03.-Online-Notarization-Management-System-FE.git
+   cd 03.-Online-Notarization-Management-System-FE
    ```
 
 2. Install dependencies:
@@ -56,6 +56,7 @@ This repository contains the frontend code for **CongChungOnline**, a platform f
 # Backend API base URL
 REACT_APP_API_BASE_URL=http://localhost:3000
 ```
+Backend repository: [Online Notarization Management System - Backend](https://github.com/ASE-UIT/03.-Online-Notarization-Management-System-BE)
 
 ## Running the Application
 
@@ -78,4 +79,3 @@ Contributions are welcome! Please feel free to submit issues or pull requests.
 ## License
 
 This project is licensed under the MIT License.
-```

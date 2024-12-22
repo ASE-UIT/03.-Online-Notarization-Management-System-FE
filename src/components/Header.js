@@ -43,10 +43,9 @@ const Header = () => {
     };
 
     const services = [
+        { name: "Trang chủ", path: "/" },
         { name: "Dịch vụ công chứng", path: "/services" },
         { name: "Tra cứu hồ sơ công chứng", path: "/lookup" },
-        { name: "Văn phòng công chứng", path: "/" },
-        { name: "Đăng ký VPCC", path: "*" },
     ];
 
     return (

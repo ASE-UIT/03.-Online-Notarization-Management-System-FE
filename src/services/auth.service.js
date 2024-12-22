@@ -73,12 +73,35 @@ const forgotPassword = async (email) => {
   }
 };
 
+const resetPassword = async (token, password) => {
+  try {
+    const response = await axios.post(
+      `${AUTH_ENDPOINT}/reset-password`,
+      { password },
+      {
+        params: {
+          token,
+        },
+      },
+    );
+    if (response.status === 204) {
+      return response.data;
+    }
+  } catch (error) {
+    if (error.response) {
+      throw error.response || 'Error resetting password';
+    }
+    throw new Error('An error occurred while resetting password.');
+  }
+};
+
 const AuthService = {
   login,
   logout,
   refreshAccessToken,
   register,
   forgotPassword,
+  resetPassword,
 };
 
 export default AuthService;
