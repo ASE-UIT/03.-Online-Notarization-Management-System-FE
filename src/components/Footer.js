@@ -30,7 +30,7 @@ const Footer = () => {
     ];
 
     return (
-        <Box sx={{ backgroundColor: "primary.main", py: 5, width: "100%" }}>
+        <Box sx={{ backgroundColor: "primary.main", py: 5, width: "100%" }} data-testid="footer-content">
             <Container>
                 <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} spacing={5}>
                     <Box flex={1} mb={{ xs: 4, md: 0 }}>
