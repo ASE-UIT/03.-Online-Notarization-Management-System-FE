@@ -72,6 +72,7 @@ const VideoCard = () => {
                     controls
                     preload='metadata'
                     controlsList='nodownload'
+                    data-testid = 'tutorial-video'
                     width={400}
                     height={225}
                     style={{ borderRadius: 8 }}
